@@ -3,113 +3,241 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Toolzz - All in One AI Hub</title>
+    <title>A2Z Toolzz - Future AI Hub</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet"/>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: white; margin: 0; overflow-x: hidden; }
-        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
-        .gradient-text { background: linear-gradient(to right, #00d2ff, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .tool-card:hover { transform: translateY(-8px); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 20px 40px -15px rgba(0, 210, 255, 0.3); }
+        :root {
+            --neon-red: #ff0055;
+            --neon-blue: #00f7ff;
+            --dark-bg: #05000a;
+        }
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background-color: var(--dark-bg); 
+            color: white; margin: 0; overflow-x: hidden; 
+            background-image: radial-gradient(circle at 20% 0%, #2a0015, var(--dark-bg) 60%), radial-gradient(circle at 80% 80%, #1a0030, var(--dark-bg) 60%);
+            background-attachment: fixed;
+        }
+        /* Ultra Glossy Effect */
+        .glass-morph { 
+            background: rgba(20, 0, 10, 0.6); 
+            backdrop-filter: blur(25px) saturate(150%); 
+            border: 1px solid rgba(255, 0, 85, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+        /* Neon Text Glow */
+        .neon-text-red {
+            color: white;
+            text-shadow: 0 0 5px var(--neon-red), 0 0 15px var(--neon-red), 0 0 30px var(--neon-red);
+        }
+        .neon-text-blue {
+            text-shadow: 0 0 5px var(--neon-blue), 0 0 15px var(--neon-blue);
+        }
+        /* Neon Box Glow */
+        .neon-box:hover {
+            box-shadow: 0 0 20px var(--neon-red), inset 0 0 20px rgba(255, 0, 85, 0.2);
+            border-color: var(--neon-red);
+            transform: translateY(-5px) scale(1.02);
+        }
+        /* Neon Buttons */
+        .btn-neon {
+            background: linear-gradient(45deg, #990033, #ff0055);
+            box-shadow: 0 0 10px var(--neon-red);
+            border: none; transition: all 0.3s ease;
+        }
+        .btn-neon:hover { box-shadow: 0 0 30px var(--neon-red); transform: scale(1.05); }
+        .btn-neon:active { transform: scale(0.95); }
+
+        /* Neon Inputs */
+        .input-neon {
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,0,85,0.3); color: white;
+            transition: all 0.3s ease;
+        }
+        .input-neon:focus { outline: none; border-color: var(--neon-red); box-shadow: 0 0 15px var(--neon-red); }
+
+        /* Animations */
+        .animate-fade-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; transform: translateY(30px); }
+        .delay-1 { animation-delay: 0.2s; } .delay-2 { animation-delay: 0.4s; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        .modal-content { transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-active .modal-content { transform: translateY(0); }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Future Loader */
+        .loader-future {
+            width: 48px; height: 48px; border-radius: 50%; display: inline-block;
+            border-top: 4px solid var(--neon-red); border-right: 4px solid transparent;
+            box-sizing: border-box; animation: rotation 1s linear infinite;
+            filter: drop-shadow(0 0 10px var(--neon-red));
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="min-h-screen" style="background: radial-gradient(circle at top right, #1e3a8a, #020617);">
+<body class="min-h-screen">
 
-    <nav class="sticky top-0 z-[100] glass px-6 py-5 flex justify-between items-center border-b border-white/5">
-        <h1 class="text-xl font-black italic tracking-tighter uppercase">A2Z <span class="text-cyan-400">TOOLZZ</span></h1>
-        <i class="fa-solid fa-clock-rotate-left opacity-50 cursor-pointer" onclick="renderHistory()"></i>
+    <nav class="sticky top-0 z-[100] glass-morph px-6 py-4 flex justify-between items-center border-b border-white/5 animate-fade-up">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-bolt neon-text-red text-2xl animate-pulse"></i>
+            <h1 class="text-xl font-black tracking-tighter uppercase italic"><span class="neon-text-red">A2Z</span> TOOLZZ</h1>
+        </div>
+        <div class="glass-morph p-2 rounded-full cursor-pointer hover:bg-white/10 transition" onclick="renderHistory()">
+            <i class="fa-solid fa-clock-rotate-left text-white/70"></i>
+        </div>
     </nav>
 
-    <div class="max-w-6xl mx-auto px-6 py-10 w-full">
-        <div class="mb-12 md:text-center">
-            <h2 class="text-4xl md:text-7xl font-extrabold mb-4 leading-tight">Master <span class="text-cyan-400">AI Hub</span></h2>
-            <p class="text-slate-400 text-sm md:text-lg">One app for every content creator. No ads, no limits.</p>
+    <div class="max-w-6xl mx-auto px-6 py-12 w-full">
+        <div class="mb-16 md:text-center animate-fade-up delay-1">
+            <h2 class="text-4xl md:text-7xl font-extrabold mb-6 leading-tight tracking-tight">WELCOME TO THE <br/><span class="neon-text-red">FUTURE AI HUB</span></h2>
+            <p class="text-red-200/70 text-sm md:text-lg tracking-widest uppercase font-semibold">Advanced Tools. Vine Red Aesthetics. No Limits.</p>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-16">
-            <div class="glass p-6 md:p-10 rounded-[2.5rem] text-center tool-card cursor-pointer group" onclick="openM('downloader')">
-                <i class="fa-solid fa-cloud-arrow-down text-3xl text-cyan-500 mb-4 group-hover:scale-110 transition"></i>
-                <h3 class="font-bold text-[10px] md:text-sm uppercase tracking-widest">Video Save</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 mb-20 animate-fade-up delay-2">
+            <div class="glass-morph neon-box p-8 md:p-12 rounded-[2.5rem] text-center cursor-pointer group transition-all duration-300" onclick="openM('downloader')">
+                <div class="mb-6 relative">
+                    <div class="absolute inset-0 bg-red-500/20 blur-xl rounded-full group-hover:bg-red-500/40 transition-all"></div>
+                    <i class="fa-solid fa-cloud-bolt text-4xl md:text-5xl neon-text-blue relative z-10 group-hover:scale-110 transition-transform"></i>
+                </div>
+                <h3 class="font-bold text-xs md:text-sm uppercase tracking-[0.2em] text-red-100">Video Save</h3>
             </div>
-            <div class="glass p-6 md:p-10 rounded-[2.5rem] text-center tool-card cursor-pointer group" onclick="openM('enhancer')">
-                <i class="fa-solid fa-wand-magic-sparkles text-3xl text-yellow-500 mb-4 group-hover:scale-110 transition"></i>
-                <h3 class="font-bold text-[10px] md:text-sm uppercase tracking-widest">Photo Fix</h3>
+            <div class="glass-morph neon-box p-8 md:p-12 rounded-[2.5rem] text-center cursor-pointer group transition-all duration-300" onclick="openM('enhancer')">
+                 <div class="mb-6 relative">
+                    <div class="absolute inset-0 bg-yellow-500/20 blur-xl rounded-full group-hover:bg-yellow-500/40 transition-all"></div>
+                    <i class="fa-solid fa-wand-magic-sparkles text-4xl md:text-5xl text-yellow-400 relative z-10 group-hover:scale-110 transition-transform" style="text-shadow: 0 0 15px #eab308;"></i>
+                </div>
+                <h3 class="font-bold text-xs md:text-sm uppercase tracking-[0.2em] text-red-100">Photo Fix</h3>
             </div>
-            <div class="glass p-6 md:p-10 rounded-[2.5rem] text-center tool-card cursor-pointer group">
-                <i class="fa-solid fa-palette text-3xl text-blue-500 mb-4 group-hover:scale-110 transition"></i>
-                <h3 class="font-bold text-[10px] md:text-sm uppercase tracking-widest">AI Toning</h3>
+             <div class="glass-morph neon-box p-8 md:p-12 rounded-[2.5rem] text-center cursor-pointer group transition-all duration-300 opacity-60">
+                 <div class="mb-6 relative">
+                    <div class="absolute inset-0 bg-blue-500/20 blur-xl rounded-full"></div>
+                    <i class="fa-solid fa-palette text-4xl md:text-5xl text-blue-400 relative z-10" style="text-shadow: 0 0 15px #3b82f6;"></i>
+                </div>
+                <h3 class="font-bold text-xs md:text-sm uppercase tracking-[0.2em] text-red-100">AI Toning</h3>
+                <p class="text-[8px] text-red-300/50 mt-2">COMING SOON</p>
             </div>
-            <div class="glass p-6 md:p-10 rounded-[2.5rem] text-center tool-card cursor-pointer group" onclick="openM('social')">
-                <i class="fa-brands fa-instagram text-3xl text-pink-500 mb-4 group-hover:scale-110 transition"></i>
-                <h3 class="font-bold text-[10px] md:text-sm uppercase tracking-widest">Insta Pro</h3>
+             <div class="glass-morph neon-box p-8 md:p-12 rounded-[2.5rem] text-center cursor-pointer group transition-all duration-300" onclick="openM('social')">
+                 <div class="mb-6 relative">
+                    <div class="absolute inset-0 bg-pink-500/20 blur-xl rounded-full group-hover:bg-pink-500/40 transition-all"></div>
+                    <i class="fa-brands fa-instagram text-4xl md:text-5xl text-pink-400 relative z-10 group-hover:scale-110 transition-transform" style="text-shadow: 0 0 15px #ec4899;"></i>
+                </div>
+                <h3 class="font-bold text-xs md:text-sm uppercase tracking-[0.2em] text-red-100">Insta Pro</h3>
             </div>
         </div>
 
-        <div id="history-container">
-            <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Device activity</h4>
-            <div id="hist-list" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar"></div>
-        </div>
-    </div>
-
-    <div id="downloader-modal" class="fixed inset-0 z-[200] hidden items-end md:items-center justify-center p-0 md:p-6">
-        <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" onclick="closeM('downloader')"></div>
-        <div class="glass w-full md:max-w-2xl h-[85vh] md:h-auto rounded-t-[3rem] md:rounded-[3rem] p-8 relative z-10 overflow-y-auto">
-            <h2 class="text-xl font-bold mb-6 italic uppercase text-cyan-400">Video Downloader</h2>
-            <div class="flex bg-slate-900 rounded-2xl p-1 mb-8 border border-white/5">
-                <input type="text" id="v-url" placeholder="Paste link (YT, Insta, TikTok)..." class="flex-grow bg-transparent border-none outline-none p-4 text-sm text-white"/>
-                <button onclick="fetchVideo()" class="bg-cyan-600 px-8 rounded-2xl font-bold text-xs">Fetch</button>
-            </div>
-            <div id="v-loader" class="hidden text-center py-10"><i class="fa-solid fa-spinner fa-spin text-2xl text-cyan-400"></i></div>
-            <div id="v-results" class="hidden space-y-4">
-                <img id="v-thumb" class="w-full aspect-video object-cover rounded-[2rem] shadow-2xl mb-4"/>
-                <div id="v-links" class="space-y-3"></div>
-            </div>
+        <div id="history-container" class="animate-fade-up delay-2">
+            <h4 class="text-[10px] font-bold text-red-300/70 uppercase tracking-[0.3em] mb-6 pl-4">Neural Activity Log</h4>
+            <div id="hist-list" class="flex gap-4 overflow-x-auto pb-6 pl-4 no-scrollbar mask-image-linear-gradient(to right, black 80%, transparent)"></div>
         </div>
     </div>
 
-    <div id="enhancer-modal" class="fixed inset-0 z-[200] hidden items-end md:items-center justify-center p-0 md:p-6">
-        <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" onclick="closeM('enhancer')"></div>
-        <div class="glass w-full md:max-w-2xl h-[85vh] md:h-auto rounded-t-[3rem] md:rounded-[3rem] p-8 relative z-10 overflow-y-auto">
-            <h2 class="text-xl font-bold mb-6 italic uppercase text-yellow-500">AI Photo Fixer</h2>
-            <div class="border-2 border-dashed border-white/10 rounded-[2rem] p-10 text-center mb-6" id="p-zone">
+    <div id="downloader-modal" class="fixed inset-0 z-[200] hidden items-end md:items-center justify-center p-0 md:p-6 transition-all duration-300">
+        <div class="absolute inset-0 bg-[#05000a]/90 backdrop-blur-2xl" onclick="closeM('downloader')"></div>
+        <div class="modal-content glass-morph w-full md:max-w-2xl h-[85vh] md:h-auto rounded-t-[3rem] md:rounded-[3rem] p-8 md:p-10 relative z-10 overflow-y-auto border-t-2 border-[var(--neon-red)]">
+            <div class="w-16 h-1.5 bg-red-500/30 rounded-full mx-auto mb-8 md:hidden"></div>
+            <h2 class="text-2xl font-black mb-8 italic uppercase neon-text-red tracking-wider">
+                <i class="fa-solid fa-cloud-arrow-down mr-2"></i> Video Downloader
+            </h2>
+            
+            <div class="flex flex-col md:flex-row gap-4 mb-8">
+                <input type="text" id="v-url" placeholder="Paste futuristic link here..." class="input-neon flex-grow rounded-2xl p-5 text-sm placeholder-red-200/30"/>
+                <button onclick="fetchVideo()" class="btn-neon px-10 py-4 rounded-2xl font-bold text-sm tracking-wider uppercase">
+                    <i class="fa-solid fa-bolt mr-2"></i> Fetch
+                </button>
+            </div>
+
+            <div id="v-loader" class="hidden text-center py-12">
+                <span class="loader-future"></span>
+                <p class="text-red-200/70 text-xs mt-4 animate-pulse tracking-widest">INITIALIZING NEURAL LINK...</p>
+            </div>
+            
+            <div id="v-results" class="hidden space-y-6 animate-fade-up">
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-red-600 to-blue-600 rounded-[2.2rem] blur opacity-30 group-hover:opacity-70 transition duration-1000 group-hover:duration-200"></div>
+                    <img id="v-thumb" class="relative w-full aspect-video object-cover rounded-[2rem] shadow-2xl z-10"/>
+                </div>
+                <div id="v-links" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="enhancer-modal" class="fixed inset-0 z-[200] hidden items-end md:items-center justify-center p-0 md:p-6 transition-all duration-300">
+        <div class="absolute inset-0 bg-[#05000a]/90 backdrop-blur-2xl" onclick="closeM('enhancer')"></div>
+        <div class="modal-content glass-morph w-full md:max-w-2xl h-[85vh] md:h-auto rounded-t-[3rem] md:rounded-[3rem] p-8 md:p-10 relative z-10 overflow-y-auto border-t-2 border-yellow-500/50">
+            <div class="w-16 h-1.5 bg-yellow-500/30 rounded-full mx-auto mb-8 md:hidden"></div>
+            <h2 class="text-2xl font-black mb-8 italic uppercase text-yellow-400 tracking-wider" style="text-shadow: 0 0 15px #eab308;">
+                <i class="fa-solid fa-wand-sparkles mr-2"></i> AI Photo Fixer
+            </h2>
+
+            <div class="border-2 border-dashed border-yellow-500/30 hover:border-yellow-500/80 hover:bg-yellow-500/5 transition-all rounded-[2.5rem] p-12 text-center mb-8 cursor-pointer" id="p-zone" onclick="document.getElementById('p-input').click()">
                 <input type="file" id="p-input" class="hidden" accept="image/*" onchange="previewImg(event)"/>
-                <div onclick="document.getElementById('p-input').click()" class="cursor-pointer">
-                    <i class="fa-solid fa-image text-4xl text-yellow-500 mb-4"></i>
-                    <p class="text-[10px] text-slate-400">Upload Photo</p>
+                 <div class="mb-4 relative inline-block">
+                    <div class="absolute inset-0 bg-yellow-500/40 blur-md rounded-full animate-pulse"></div>
+                    <i class="fa-solid fa-cloud-upload-alt text-6xl text-yellow-400 relative z-10"></i>
                 </div>
+                <p class="text-xs text-yellow-200/70 tracking-widest uppercase font-bold">Tap to upload image to matrix</p>
             </div>
-            <div id="p-loader" class="hidden text-center py-10"><i class="fa-solid fa-wand-sparkles fa-spin text-2xl text-yellow-500"></i></div>
-            <div id="p-results" class="hidden space-y-6">
-                <div class="grid grid-cols-2 gap-4">
-                    <img id="before-img" class="rounded-2xl w-full aspect-square object-cover"/>
-                    <img id="after-img" class="rounded-2xl w-full aspect-square object-cover border border-yellow-500/20"/>
+            
+            <div id="p-loader" class="hidden text-center py-12">
+                 <span class="loader-future" style="border-top-color: #eab308; filter: drop-shadow(0 0 10px #eab308);"></span>
+                <p class="text-yellow-200/70 text-xs mt-4 animate-pulse tracking-widest">AI UPSCALING IN PROGRESS...</p>
+            </div>
+
+            <div id="p-results" class="hidden space-y-8 animate-fade-up">
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-[10px] uppercase mb-3 text-white/50 tracking-widest text-center">Original Input</p>
+                        <img id="before-img" class="rounded-2xl w-full aspect-square object-cover glass-morph p-1"/>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase mb-3 text-yellow-400 tracking-widest text-center glow-yellow">AI Output</p>
+                         <div class="relative">
+                             <div class="absolute -inset-1 bg-yellow-500/50 blur rounded-3xl"></div>
+                             <img id="after-img" class="relative rounded-2xl w-full aspect-square object-cover border-2 border-yellow-400 z-10"/>
+                         </div>
+                    </div>
                 </div>
-                <button onclick="enhanceImg()" id="enh-btn" class="w-full bg-yellow-600 py-4 rounded-2xl font-bold text-xs uppercase">Enhance Now</button>
+                <button onclick="enhanceImg()" id="enh-btn" class="btn-neon w-full py-5 rounded-2xl font-bold text-sm tracking-[0.2em] uppercase" style="background: linear-gradient(45deg, #854d0e, #eab308); box-shadow: 0 0 15px #eab308;">
+                    <i class="fa-solid fa-microchip mr-2"></i> Initiate Enhancement
+                </button>
             </div>
         </div>
     </div>
 
-    <div id="social-modal" class="fixed inset-0 z-[200] hidden items-end md:items-center justify-center p-0 md:p-6">
-        <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" onclick="closeM('social')"></div>
-        <div class="glass w-full md:max-w-2xl h-[85vh] md:h-auto rounded-t-[3rem] md:rounded-[3rem] p-8 relative z-10 overflow-y-auto">
-            <h2 class="text-xl font-bold mb-6 italic uppercase text-pink-500">AI Caption Pro</h2>
-            <textarea id="ai-prompt" placeholder="What is your photo about? (e.g., Sunset at beach)" class="w-full h-32 bg-slate-900 border border-white/5 rounded-2xl p-4 text-sm text-white outline-none mb-6"></textarea>
-            <button onclick="generateAI()" id="ai-btn" class="w-full bg-pink-600 py-4 rounded-2xl font-bold text-xs uppercase">Generate Viral Captions</button>
-            <div id="ai-loader" class="hidden text-center py-10"><i class="fa-solid fa-robot fa-fade text-2xl text-pink-500"></i></div>
-            <div id="ai-result" class="hidden mt-6 bg-white/5 p-6 rounded-2xl text-sm leading-relaxed whitespace-pre-line border border-pink-500/10"></div>
+    <div id="social-modal" class="fixed inset-0 z-[200] hidden items-end md:items-center justify-center p-0 md:p-6 transition-all duration-300">
+        <div class="absolute inset-0 bg-[#05000a]/90 backdrop-blur-2xl" onclick="closeM('social')"></div>
+        <div class="modal-content glass-morph w-full md:max-w-2xl h-[85vh] md:h-auto rounded-t-[3rem] md:rounded-[3rem] p-8 md:p-10 relative z-10 overflow-y-auto border-t-2 border-pink-500/50">
+            <div class="w-16 h-1.5 bg-pink-500/30 rounded-full mx-auto mb-8 md:hidden"></div>
+             <h2 class="text-2xl font-black mb-8 italic uppercase text-pink-400 tracking-wider" style="text-shadow: 0 0 15px #ec4899;">
+                <i class="fa-brands fa-instagram mr-2"></i> AI Caption Pro
+            </h2>
+
+            <textarea id="ai-prompt" placeholder="Describe your photo concept to the AI..." class="input-neon w-full h-40 rounded-3xl p-6 text-sm text-white placeholder-pink-200/30 resize-none mb-8" style="border-color: rgba(236, 72, 153, 0.3);"></textarea>
+            
+            <button onclick="generateAI()" id="ai-btn" class="btn-neon w-full py-5 rounded-2xl font-bold text-sm tracking-[0.2em] uppercase" style="background: linear-gradient(45deg, #831843, #ec4899); box-shadow: 0 0 15px #ec4899;">
+                 <i class="fa-solid fa-robot mr-2"></i> Generate Viral Content
+            </button>
+
+             <div id="ai-loader" class="hidden text-center py-12">
+                 <span class="loader-future" style="border-top-color: #ec4899; filter: drop-shadow(0 0 10px #ec4899);"></span>
+                <p class="text-pink-200/70 text-xs mt-4 animate-pulse tracking-widest">PROCESSING LANGUAGE MODEL...</p>
+            </div>
+
+            <div id="ai-result" class="hidden mt-8 glass-morph p-8 rounded-[2rem] text-sm leading-relaxed whitespace-pre-line border-pink-500/30 shadow-[0_0_20px_rgba(236,72,153,0.1)] animate-fade-up"></div>
         </div>
     </div>
+
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
     //<![CDATA[
-        // Firebase Configuration
+        // Firebase Init
         const firebaseConfig = {
             apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw",
             databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -120,18 +248,27 @@
         let keys = {};
         let selectedImg = null;
 
-        // Real-time Sync from Offline Admin
-        db.ref('settings').on('value', (s) => { keys = s.val() || {}; console.log("Keys Synced!"); });
+        // Sync Keys
+        db.ref('settings').on('value', (s) => { keys = s.val() || {}; console.log("Neural Link Established."); });
 
-        // UI Handlers
-        function openM(id) { document.getElementById(id + '-modal').classList.replace('hidden', 'flex'); }
-        function closeM(id) { document.getElementById(id + '-modal').classList.replace('flex', 'hidden'); }
+        // UI Handlers (Updated for animation)
+        function openM(id) { 
+            const modal = document.getElementById(id + '-modal');
+            modal.classList.replace('hidden', 'flex');
+            setTimeout(() => modal.classList.add('modal-active'), 10); // Trigger animation
+        }
+        function closeM(id) { 
+            const modal = document.getElementById(id + '-modal');
+            modal.classList.remove('modal-active'); // Trigger fade out
+            setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
+        }
 
-        // 1. VIDEO LOGIC
+        // 1. VIDEO LOGIC (With Force Download Fix)
         async function fetchVideo() {
             const url = document.getElementById('v-url').value;
-            if(!url || !keys.videoKey) return alert("System Syncing... Ensure Key is set in Admin.");
+            if(!url || !keys.videoKey) return alert("🚫 API Key Missing! Update Admin Panel.");
             document.getElementById('v-loader').classList.remove('hidden');
+            document.getElementById('v-results').classList.add('hidden');
             try {
                 const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
                     method: 'POST',
@@ -139,83 +276,116 @@
                     body: JSON.stringify({ url })
                 });
                 const d = await res.json();
-                document.getElementById('v-thumb').src = d.picture || d.thumbnail;
-                document.getElementById('v-links').innerHTML = d.medias.map(m => `
-                    <div class="glass p-4 rounded-2xl flex justify-between items-center border-white/5">
-                        <span class="text-[10px] font-bold text-cyan-400 uppercase">${m.quality}</span>
-                        <a href="${m.url}" target="_blank" class="bg-cyan-600 px-5 py-2 rounded-xl text-[10px] font-bold">SAVE</a>
-                    </div>`).join('');
-                document.getElementById('v-results').classList.remove('hidden');
-                saveLog('Video Downloader', d.title);
-            } catch (e) { alert("API Error!"); }
+                renderData(d);
+                saveLog('Video Save', d.title || 'URL Processed');
+            } catch (e) { alert("Connection Error! Try again."); }
             document.getElementById('v-loader').classList.add('hidden');
+        }
+
+        function renderData(data) {
+            const title = data.title || "video";
+            document.getElementById('v-thumb').src = data.picture || data.thumbnail;
+            document.getElementById('v-links').innerHTML = data.medias.map(m => `
+                <div class="glass-morph p-4 rounded-2xl flex justify-between items-center border-red-500/20 group hover:bg-red-500/10 transition">
+                    <span class="text-xs font-bold text-red-200/80 uppercase tracking-wider">${m.quality} <span class="opacity-50">(${m.extension})</span></span>
+                    <button onclick="forceDownload('${m.url}', '${title.replace(/[^a-z0-9]/gi, '_').substring(0, 20)}.${m.extension}')" 
+                            class="btn-neon px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest">
+                        <i class="fa-solid fa-download mr-2"></i> Download
+                    </button>
+                </div>
+            `).join('');
+            document.getElementById('v-results').classList.remove('hidden');
+        }
+
+        async function forceDownload(url, filename) {
+            alert("⬇️ Downloading initiated in background...");
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none'; a.href = blobUrl; a.download = filename;
+                document.body.appendChild(a); a.click();
+                window.URL.revokeObjectURL(blobUrl); document.body.removeChild(a);
+            } catch (e) {
+                const link = document.createElement('a'); link.href = url; link.target = '_blank'; link.download = filename; link.click();
+                alert("Manual save required: Long press video and tap 'Save'.");
+            }
         }
 
         // 2. PHOTO ENHANCER LOGIC
         function previewImg(e) {
             selectedImg = e.target.files[0];
-            document.getElementById('before-img').src = URL.createObjectURL(selectedImg);
-            document.getElementById('p-results').classList.remove('hidden');
-            document.getElementById('p-zone').classList.add('hidden');
+            if(selectedImg){
+                 document.getElementById('before-img').src = URL.createObjectURL(selectedImg);
+                 document.getElementById('p-results').classList.remove('hidden');
+                 document.getElementById('p-zone').classList.add('hidden');
+            }
         }
 
         async function enhanceImg() {
-            if(!keys.photoKey) return alert("Hugging Face Key missing in Admin!");
+            if(!keys.photoKey) return alert("🚫 Hugging Face Key missing!");
             const btn = document.getElementById('enh-btn');
             document.getElementById('p-loader').classList.remove('hidden');
-            btn.disabled = true;
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...';
             try {
                 const res = await fetch("https://api-inference.huggingface.co/models/akhaliq/Real-ESRGAN", {
                     headers: { Authorization: `Bearer ${keys.photoKey}` },
                     method: "POST", body: selectedImg,
                 });
                 const blob = await res.blob();
-                document.getElementById('after-img').src = URL.createObjectURL(blob);
-                saveLog('Photo Fix', 'AI Enhancement Done');
-                btn.innerText = "Enhancement Success!";
-            } catch (e) { alert("Server Busy. Try again."); }
+                const imgUrl = URL.createObjectURL(blob);
+                document.getElementById('after-img').src = imgUrl;
+                saveLog('Photo Fix', 'Enhanced Image Generated');
+                btn.innerHTML = `<i class="fa-solid fa-check mr-2"></i> Enhancement Complete!`;
+                // Auto download prompt after success
+                setTimeout(() => forceDownload(imgUrl, 'A2Z_Enhanced.png'), 1000);
+            } catch (e) { alert("AI Model Busy. Please retry."); btn.disabled = false; btn.innerText = "Initiate Enhancement"; }
             document.getElementById('p-loader').classList.add('hidden');
-            btn.disabled = false;
         }
 
-        // 3. INSTA PRO (GEMINI) LOGIC
+        // 3. INSTA PRO LOGIC
         async function generateAI() {
             const prompt = document.getElementById('ai-prompt').value;
-            if(!prompt || !keys.geminiKey) return alert("Gemini Key missing in Admin!");
+            if(!prompt || !keys.geminiKey) return alert("🚫 Gemini API Key missing!");
             const loader = document.getElementById('ai-loader');
             const resDiv = document.getElementById('ai-result');
-            loader.classList.remove('hidden'); resDiv.classList.add('hidden');
+            const btn = document.getElementById('ai-btn');
+            loader.classList.remove('hidden'); resDiv.classList.add('hidden'); btn.disabled = true;
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${keys.geminiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: "Generate 3 viral Instagram captions and 10 trending hashtags for: " + prompt }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: "Generate 3 engaging, viral Instagram captions with emojis and 15 trending hashtags for this concept: " + prompt }] }] })
                 });
                 const d = await res.json();
                 resDiv.innerText = d.candidates[0].content.parts[0].text;
                 resDiv.classList.remove('hidden');
-                saveLog('Insta Pro', prompt);
-            } catch (e) { alert("AI Limit reached!"); }
-            loader.classList.add('hidden');
+                saveLog('Insta Pro', 'Caption Generated: ' + prompt.substring(0, 15) + '...');
+            } catch (e) { alert("AI Traffic High. Try later."); }
+            loader.classList.add('hidden'); btn.disabled = false;
         }
 
         // HISTORY LOGS
         function saveLog(t, i) {
-            let logs = JSON.parse(localStorage.getItem('user_activity')) || [];
-            logs.unshift({ t, i, time: new Date().toLocaleTimeString() });
-            localStorage.setItem('user_activity', JSON.stringify(logs.slice(0, 5)));
+            let logs = JSON.parse(localStorage.getItem('a2z_activity')) || [];
+            logs.unshift({ t, i, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+            localStorage.setItem('a2z_activity', JSON.stringify(logs.slice(0, 6)));
             renderHistory();
         }
 
         function renderHistory() {
             const list = document.getElementById('hist-list');
-            const logs = JSON.parse(localStorage.getItem('user_activity')) || [];
+            const logs = JSON.parse(localStorage.getItem('a2z_activity')) || [];
             if(logs.length > 0) {
                 list.innerHTML = logs.map(l => `
-                    <div class="glass min-w-[150px] p-4 rounded-[2rem] text-[10px] border border-white/5">
-                        <p class="text-cyan-400 font-bold uppercase mb-1">${l.t}</p>
-                        <p class="text-slate-500 truncate w-28">${l.i}</p>
+                    <div class="glass-morph min-w-[160px] p-4 rounded-[2rem] border-red-500/10">
+                        <p class="neon-text-red font-black uppercase text-[10px] mb-2 tracking-wider"><i class="fa-solid fa-circle-dot text-[6px] mr-2 align-middle"></i>${l.t}</p>
+                        <p class="text-red-100/60 truncate text-xs font-semibold">${l.i}</p>
+                        <p class="text-red-100/30 text-[9px] text-right mt-2">${l.time}</p>
                     </div>`).join('');
+            } else {
+                 list.innerHTML = `<p class="text-red-200/40 text-xs italic pl-2">No recent neural activity...</p>`;
             }
         }
         window.onload = renderHistory;
