@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2Z IDM - Pro Download Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
+    <style>
+        :root { --neon: #ff0055; --bg: #05000a; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed; }
+        .idm-window { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px); border: 1px solid rgba(255, 0, 85, 0.2); border-radius: 2rem; }
+        .progress-bar-bg { width: 100%; height: 8px; background: #111; border-radius: 20px; overflow: hidden; }
+        .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff0055, #ff6b9d); transition: 0.1s; box-shadow: 0 0 15px var(--neon); }
+        .neon-glow { text-shadow: 0 0 10px var(--neon); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div class="max-w-2xl w-full idm-window p-10 space-y-8 animate-fade-in">
+        <header class="flex justify-between items-center border-b border-white/10 pb-6">
+            <div>
+                <h1 class="text-2xl font-black italic uppercase tracking-tighter neon-glow"><span class="text-pink-600">A2Z</span> IDM PRO</h1>
+                <p class="text-[8px] font-bold text-white/30 uppercase tracking-[0.3em]">Neural Binary Grabber v13.0</p>
+            </div>
+            <i class="fa-solid fa-cloud-arrow-down text-3xl text-pink-600 animate-bounce"></i>
+        </header>
+
+        <div id="loader-state" class="space-y-4">
+            <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl">
+                <div class="w-12 h-12 bg-pink-600/20 rounded-xl flex items-center justify-center text-pink-500">
+                    <i class="fa-solid fa-file-video text-xl"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-[10px] font-black text-white/40 uppercase">Target Stream Detected</p>
+                    <p id="video-url-display" class="text-xs font-bold truncate text-pink-500/80">Connecting...</p>
+                </div>
+            </div>
+
+            <div id="idm-console" class="hidden space-y-4 bg-black/40 p-6 rounded-2xl border border-white/5">
+                <div class="flex justify-between items-end">
+                    <div class="space-y-1">
+                        <p class="text-[9px] font-black text-pink-500 uppercase">Transfer Status</p>
+                        <p id="status-text" class="text-[10px] font-bold text-white/60 uppercase tracking-widest">Intercepting Data...</p>
+                    </div>
+                    <span id="percent-val" class="text-3xl font-black italic">0%</span>
+                </div>
+                <div class="progress-bar-bg"><div id="progress-fill" class="progress-bar-fill"></div></div>
+                <div class="flex justify-between text-[8px] font-bold text-white/20 uppercase tracking-widest">
+                    <span>Neural Tunneling: Active</span>
+                    <span id="size-info">Calculating...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <button id="start-btn" onclick="startIdmSuck()" class="flex-1 py-5 rounded-2xl bg-pink-600 font-black text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(255,0,85,0.3)] transition active:scale-95">
+                Start Download
+            </button>
+            <button onclick="window.close()" class="px-8 rounded-2xl bg-white/5 border border-white/10 font-black text-[10px] uppercase text-white/40">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Get URL from Query String (?url=...)
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoUrl = urlParams.get('url');
+        
+        if (videoUrl) {
+            document.getElementById('video-url-display').innerText = videoUrl;
+        } else {
+            alert("No Link Found! Redirecting to Hub...");
+            window.location.href = "index.html";
+        }
+
+        async function startIdmSuck() {
+            const btn = document.getElementById('start-btn');
+            const consoleBox = document.getElementById('idm-console');
+            const fill = document.getElementById('progress-fill');
+            const percent = document.getElementById('percent-val');
+            const status = document.getElementById('status-text');
+            const sizeDisplay = document.getElementById('size-info');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            consoleBox.classList.remove('hidden');
+
+            // IDM Proxies to force download
+            const proxies = ["https://api.allorigins.win/raw?url=", "https://corsproxy.io/?"];
+            let downloaded = false;
+
+            for (let proxy of proxies) {
+                if (downloaded) break;
+                try {
+                    status.innerText = "Tunneling via Node " + (proxies.indexOf(proxy) + 1);
+                    
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', proxy + encodeURIComponent(videoUrl), true);
+                    xhr.responseType = 'blob';
+
+                    // Progress Logic
+                    xhr.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            const p = Math.floor((e.loaded / e.total) * 100);
+                            const totalMB = (e.total / (1024 * 1024)).toFixed(2);
+                            const currentMB = (e.loaded / (1024 * 1024)).toFixed(2);
+                            
+                            fill.style.width = p + "%";
+                            percent.innerText = p + "%";
+                            sizeDisplay.innerText = `${currentMB}MB / ${totalMB}MB`;
+                        }
+                    };
+
+                    const task = new Promise((resolve, reject) => {
+                        xhr.onload = () => {
+                            if (xhr.status === 200) {
+                                const bUrl = URL.createObjectURL(xhr.response);
+                                const a = document.createElement('a');
+                                a.href = bUrl;
+                                a.download = `A2Z_IDM_SAVE_${Date.now()}.mp4`;
+                                document.body.appendChild(a);
+                                a.click();
+                                setTimeout(() => URL.revokeObjectURL(bUrl), 1000);
+                                resolve(true);
+                            } else { reject(); }
+                        };
+                        xhr.onerror = () => reject();
+                    });
+
+                    downloaded = await task;
+                    if(downloaded) {
+                        status.innerText = "Download Complete!";
+                        btn.innerText = "FILE SAVED";
+                    }
+                } catch (e) { status.innerText = "Node Blocked. Switching..."; }
+            }
+
+            if(!downloaded) {
+                status.innerText = "IDM Failed. Fallback Active.";
+                window.location.href = videoUrl;
+            }
+        }
+    </script>
+</body>
+</html>
