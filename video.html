@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Vortex Engine v18.0</title>
+    <title>A2Z Studio - Vortex Engine v21.0</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
@@ -16,7 +16,7 @@
             background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
         }
 
-        /* --- NEURAL VORTEX UI --- */
+        /* --- VORTEX UI --- */
         .vortex-node { position: relative; width: 260px; height: 260px; margin: 40px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .bh-core {
             position: relative; width: 160px; height: 160px; background: black; border-radius: 50%;
@@ -31,10 +31,9 @@
         .pulse-active { animation: pulse 0.6s infinite alternate !important; }
         @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1.05); opacity: 1; } }
 
-        /* --- CLEAN RESULT CARDS --- */
+        /* --- RESULT CARDS --- */
         .result-box { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 2rem; overflow: hidden; }
         .dl-row { border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 18px 25px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; }
-        .dl-row:hover { background: rgba(255, 0, 85, 0.05); }
         .save-btn { background: linear-gradient(45deg, #80002a, #ff0055); padding: 10px 25px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; letter-spacing: 1px; }
 
         /* MAINTENANCE SYSTEM */
@@ -52,10 +51,10 @@
     </div>
 
     <nav class="p-6 flex justify-between items-center">
-        <a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest transition hover:text-white"><i class="fa-solid fa-arrow-left mr-2"></i> Hub</a>
+        <a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> Hub</a>
         <div class="flex items-center gap-2 opacity-30">
             <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-            <span class="text-[7px] font-black uppercase tracking-widest text-white">Vortex v18.0</span>
+            <span class="text-[7px] font-black uppercase text-white">Vortex v21.0</span>
         </div>
     </nav>
 
@@ -78,7 +77,7 @@
                 <div id="dl-links"></div>
             </div>
             
-            <p class="text-[7px] text-center text-white/10 uppercase font-black tracking-widest italic mt-4">Downloads handled by A2Z Force Engine</p>
+            <p class="text-[7px] text-center text-white/10 uppercase font-black tracking-widest italic mt-4">Transmitting to Force Engine...</p>
         </div>
     </div>
 
@@ -86,16 +85,16 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
-        // FIREBASE CONNECT
-        const firebaseConfig = { 
+        // Master Config from Master Control
+        const fbConfig = { 
             apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
             databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
         };
-        firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(fbConfig);
         const db = firebase.database();
         let settings = {};
 
-        // SYNC SETTINGS
+        // Syncing with Admin Settings
         db.ref('settings').on('value', (snapshot) => {
             settings = snapshot.val() || {};
             if(settings.maintenanceMode) {
@@ -111,12 +110,12 @@
         // --- FETCHING LOGIC ---
         async function triggerNeuralSuck() {
             try {
+                // Clipboard Auto-Grab
                 const link = await navigator.clipboard.readText();
-                if (!link.startsWith('http')) return alert("Bhai, link copy karo pehle!");
+                if (!link.startsWith('http')) return alert("Bhai, pehle link copy karo!");
 
                 core.classList.add('pulse-active');
                 text.innerHTML = "Sucking...";
-                status.innerText = "Connecting to Rapid Node...";
                 document.getElementById('results').classList.add('hidden');
 
                 const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
@@ -140,17 +139,17 @@
 
             } catch (e) {
                 core.classList.remove('pulse-active');
-                text.innerHTML = "Error<br>Retry";
-                status.innerText = "Sync Failed. Tap again.";
+                text.innerHTML = "Retry";
+                status.innerText = "Neural Sync Failed.";
             }
         }
 
-        // --- THE REDIRECTION ENGINE ---
+        // --- THE FORCE ENGINE TRANSMITTER ---
         function sendToForceEngine(url, btn) {
-            btn.innerText = "SENDING...";
+            btn.innerText = "LAUNCHING...";
             btn.disabled = true;
 
-            // Link ko force.html par redirect karega
+            // Redirecting link to the dedicated force.html engine
             const target = "force.html?url=" + encodeURIComponent(url);
             window.open(target, '_blank'); 
 
@@ -167,19 +166,16 @@
             const linksBox = document.getElementById('dl-links');
             const m = data.medias;
             
-            // Quality Filter: Normal, High, 4K
-            const n = m.find(x => x.quality.includes('360') || x.quality.includes('480'));
-            const h = m.find(x => x.quality.includes('720') || x.quality.includes('1080'));
-            const u = m.find(x => x.quality.includes('4k'));
+            // Clean Quality Filter
+            const options = [
+                m.find(x => x.quality.includes('360') || x.quality.includes('480')),
+                m.find(x => x.quality.includes('720') || x.quality.includes('1080')),
+                m.find(x => x.quality.includes('4k'))
+            ].filter(Boolean);
 
-            const options = [];
-            if(n) options.push({q: 'Normal Quality', url: n.url});
-            if(h) options.push({q: 'High Quality (HD)', url: h.url});
-            if(u) options.push({q: '4K Ultra HD', url: u.url});
-
-            linksBox.innerHTML = options.map(opt => `
+            document.getElementById('dl-links').innerHTML = options.map(opt => `
                 <div class="dl-row">
-                    <p class="text-[9px] font-black uppercase tracking-widest text-white/40">${opt.q}</p>
+                    <p class="text-[9px] font-black uppercase tracking-widest text-white/40">${opt.quality}</p>
                     <button onclick="sendToForceEngine('${opt.url}', this)" class="save-btn">Save</button>
                 </div>
             `).join('');
