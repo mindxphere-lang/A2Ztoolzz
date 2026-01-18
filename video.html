@@ -3,86 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Vortex Engine</title>
+    <title>A2Z Studio - Vortex Engine v6.0</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
+
     <style>
         :root { --neon: #ff0055; --bg: #05000a; }
-        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden; background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed; }
-        .vortex-wrapper { position: relative; width: 280px; height: 280px; margin: 30px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .black-hole { position: relative; width: 170px; height: 170px; background: black; border-radius: 50%; box-shadow: 0 0 50px var(--neon), inset 0 0 30px var(--neon); z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center; }
-        .black-hole span { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--neon); }
+        body { 
+            font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden;
+            background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
+        }
+
+        /* --- THE VORTEX UI --- */
+        .vortex-container { position: relative; width: 280px; height: 280px; margin: 40px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .black-hole {
+            position: relative; width: 170px; height: 170px; background: black; border-radius: 50%;
+            box-shadow: 0 0 60px 10px var(--neon), inset 0 0 40px var(--neon);
+            z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .black-hole span { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--neon); text-transform: uppercase; line-height: 1.5; }
         .vortex-ring { position: absolute; inset: 0; border: 2px dashed rgba(255, 0, 85, 0.2); border-radius: 50%; animation: spin 10s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        /* Downloading State */
         .hyper-pulse { animation: hyper 0.5s infinite alternate !important; }
-        @keyframes hyper { 0% { transform: scale(0.95); } 100% { transform: scale(1.05); } }
-        .video-box { position: relative; width: 100%; border-radius: 2rem; overflow: hidden; background: #000; border: 1px solid rgba(255, 0, 85, 0.2); cursor: pointer; }
-        .video-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 15px; font-size: 10px; font-weight: bold; z-index: 10; pointer-events: none; }
-        .dl-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 1.2rem; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        .btn-save { background: linear-gradient(45deg, #80002a, #ff0055); padding: 10px 25px; border-radius: 10px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; transition: 0.3s; }
-        #m-screen { position: fixed; inset: 0; z-index: 3000; background: black; display: none; align-items: center; justify-content: center; text-align: center; }
+        @keyframes hyper { 0% { transform: scale(0.9); box-shadow: 0 0 40px var(--neon); } 100% { transform: scale(1.1); box-shadow: 0 0 100px 20px var(--neon); } }
+
+        /* --- VIDEO DISPLAY BOX --- */
+        .video-card { position: relative; width: 100%; border-radius: 2.5rem; overflow: hidden; background: #000; border: 1px solid rgba(255, 0, 85, 0.2); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); z-index: 20; transition: 0.3s; pointer-events: none; }
+        .video-name-tag { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.9)); padding: 20px; font-size: 11px; font-weight: 900; color: #fff; z-index: 30; pointer-events: none; }
+
+        /* --- CLEAN DOWNLOAD CARDS --- */
+        .dl-node { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 1.5rem; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; }
+        .dl-node:hover { border-color: var(--neon); background: rgba(255, 0, 85, 0.05); }
+        .save-btn { background: linear-gradient(45deg, #80002a, #ff0055); padding: 12px 28px; border-radius: 14px; font-size: 10px; font-weight: 900; text-transform: uppercase; color: white; box-shadow: 0 5px 15px rgba(255, 0, 85, 0.3); }
+        .save-btn:disabled { opacity: 0.5; filter: grayscale(1); }
+
+        /* MAINTENANCE MODE OVERLAY */
+        #m-screen { position: fixed; inset: 0; z-index: 5000; background: black; display: none; align-items: center; justify-content: center; text-align: center; }
     </style>
 </head>
 <body class="min-h-screen">
+
     <div id="m-screen">
-        <div class="p-10"><div class="w-16 h-16 border-4 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div><h1 class="text-2xl font-black uppercase text-pink-600 italic">Maintenance Mode</h1><p id="m-msg-display" class="text-white/40 text-[10px] font-bold uppercase mt-2"></p></div>
-    </div>
-    <nav class="p-4"><a href="index.html" class="text-pink-500 font-black uppercase text-[9px] tracking-widest"><i class="fa-solid fa-arrow-left mr-1"></i> HUB</a></nav>
-    <div class="max-w-xl mx-auto px-6">
-        <div class="vortex-wrapper" onclick="startNeuralFetch()"><div class="vortex-ring"></div><div class="black-hole" id="bh-core"><span id="bh-text">TAP TO<br>AUTO-PASTE</span></div></div>
-        <div id="status-msg" class="text-center text-[9px] font-black uppercase tracking-widest text-pink-500/30 mb-8">System Ready</div>
-        <div id="v-results" class="hidden space-y-6 mb-20">
-            <div class="video-box" onclick="this.querySelector('video').paused ? this.querySelector('video').play() : this.querySelector('video').pause()">
-                <video id="v-player" playsinline class="w-full aspect-video bg-black" disablePictureInPicture controlsList="nodownload noplaybackrate"></video>
-                <div id="v-name" class="video-label truncate text-white/70">Video Loading...</div>
-            </div>
-            <div id="v-links" class="space-y-2"></div>
+        <div class="p-10">
+            <div class="w-20 h-20 border-4 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-8"></div>
+            <h1 class="text-3xl font-black text-pink-600 uppercase italic mb-4">SYSTEM PAUSED</h1>
+            <p id="m-msg-display" class="text-white/40 text-[10px] tracking-widest uppercase font-black"></p>
         </div>
     </div>
+
+    <nav class="p-6 flex justify-between items-center">
+        <a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest transition hover:text-white"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Hub</a>
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Neural Node Active</span>
+        </div>
+    </nav>
+
+    <div class="max-w-xl mx-auto px-6 pb-20">
+        
+        <div class="vortex-container" onclick="startVortexFetch()">
+            <div class="vortex-ring"></div>
+            <div class="vortex-ring" style="animation-delay: -5s; opacity: 0.3;"></div>
+            <div class="black-hole" id="bh-core">
+                <span id="bh-text">Tap to<br>Auto-Paste</span>
+            </div>
+        </div>
+
+        <div id="status-label" class="text-center text-[9px] font-black uppercase tracking-[0.4em] text-pink-500/30 mb-12">Engine Ready</div>
+
+        <div id="v-results" class="hidden space-y-8 animate-fade-in">
+            <div class="video-card" onclick="togglePlayback()">
+                <div id="play-ui" class="play-overlay"><i class="fa-solid fa-play text-4xl text-white shadow-xl"></i></div>
+                <video id="v-player" playsinline class="w-full aspect-video bg-black" onplay="hidePlayUI()" onpause="showPlayUI()" disablePictureInPicture controlsList="nodownload noplaybackrate"></video>
+                <div id="v-name" class="video-name-tag truncate">Stream Detected</div>
+            </div>
+
+            <div id="v-links" class="space-y-3"></div>
+            <p class="text-[7px] text-center text-white/20 uppercase font-black tracking-widest mt-4 italic">iPhone: Check 'Files' app after saving</p>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
     <script>
-        firebase.initializeApp({ apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" });
-        const db = firebase.database(); let keys = {}; 
-        db.ref('settings').on('value', (s) => { 
-            keys = s.val() || {}; 
-            if(keys.maintenanceMode) { document.getElementById('m-screen').style.display = 'flex'; document.getElementById('m-msg-display').innerText = keys.maintenanceMsg; }
-            else { document.getElementById('m-screen').style.display = 'none'; }
+        // FIREBASE INITIALIZATION
+        const firebaseConfig = { 
+            apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
+            databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let keys = {};
+
+        // SYNC MASTER SETTINGS
+        db.ref('settings').on('value', (snapshot) => {
+            keys = snapshot.val() || {};
+            const mScreen = document.getElementById('m-screen');
+            if(keys.maintenanceMode) {
+                mScreen.style.display = 'flex';
+                document.getElementById('m-msg-display').innerText = keys.maintenanceMsg;
+            } else {
+                mScreen.style.display = 'none';
+            }
         });
-        async function startNeuralFetch() {
-            const url = await navigator.clipboard.readText(); if (!url.startsWith('http')) return alert("Link copy karo pehle!");
-            const core = document.getElementById('bh-core'); const text = document.getElementById('bh-text');
-            core.classList.add('hyper-pulse'); text.innerHTML = "SUCKING...";
-            document.getElementById('v-results').classList.add('hidden');
-            const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': keys.videoKey, 'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' },
-                body: JSON.stringify({ url })
-            });
-            const data = await res.json();
-            if (data.medias) { renderResults(data); core.classList.remove('hyper-pulse'); text.innerHTML = "SUCCESS"; setTimeout(() => { text.innerHTML = "TAP TO<br>AUTO-PASTE"; }, 3000); }
-        }
-        async function forceDownload(fileUrl, btn) {
-            btn.innerText = "WAIT..."; btn.disabled = true;
+
+        const bhCore = document.getElementById('bh-core'), bhText = document.getElementById('bh-text'), player = document.getElementById('v-player'), playUI = document.getElementById('play-ui'), statusLabel = document.getElementById('status-label');
+
+        function togglePlayback() { if(player.paused) player.play(); else player.pause(); }
+        function hidePlayUI() { playUI.style.opacity = '0'; }
+        function showPlayUI() { playUI.style.opacity = '1'; }
+
+        // --- THE NEURAL FETCH LOGIC ---
+        async function startVortexFetch() {
             try {
-                const response = await fetch(fileUrl); const blob = await response.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = blobUrl; a.download = `A2Z_VIDEO_${Date.now()}.mp4`;
-                document.body.appendChild(a); a.click();
-                setTimeout(() => { URL.revokeObjectURL(blobUrl); document.body.removeChild(a); }, 1000);
-                btn.innerText = "SAVED!";
-            } catch (e) { window.open(fileUrl, '_blank'); btn.innerText = "OPENED"; }
-            setTimeout(() => { btn.innerText = "SAVE"; btn.disabled = false; }, 3000);
+                const url = await navigator.clipboard.readText();
+                if (!url.startsWith('http')) return alert("Please copy a valid video link first!");
+
+                bhCore.classList.add('hyper-pulse');
+                bhText.innerHTML = "Sucking<br>Data...";
+                statusLabel.innerText = "Connecting to Rapid Node...";
+                document.getElementById('v-results').classList.add('hidden');
+
+                const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'X-RapidAPI-Key': keys.videoKey, 
+                        'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' 
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                const data = await res.json();
+                if (data.medias) {
+                    renderVortexResults(data);
+                    bhCore.classList.remove('hyper-pulse');
+                    bhText.innerHTML = "Success<br>Ready";
+                    statusLabel.innerText = "Neural Sync Complete";
+                    setTimeout(() => { bhText.innerHTML = "Tap to<br>Auto-Paste"; }, 3000);
+                } else { throw new Error("API Limit"); }
+
+            } catch (e) {
+                bhCore.classList.remove('hyper-pulse');
+                bhText.innerHTML = "Error<br>Retry";
+                statusLabel.innerText = "Sync Failed. Tap again to retry.";
+            }
         }
-        function renderResults(data) {
-            document.getElementById('v-player').src = data.medias[0].url;
-            document.getElementById('v-name').innerText = data.title || "Vortex Video Found";
+
+        // --- THE "FORCE DOWNLOAD" ENGINE (PC & MOBILE FIX) ---
+        async function forceSave(fileUrl, btn) {
+            const originalText = btn.innerText;
+            btn.innerText = "Fetching...";
+            btn.disabled = true;
+
+            const proxies = ["", "https://api.allorigins.win/raw?url=", "https://corsproxy.io/?"];
+            let isSaved = false;
+
+            for (let proxy of proxies) {
+                if (isSaved) break;
+                try {
+                    const finalUrl = proxy + encodeURIComponent(fileUrl);
+                    const response = await fetch(finalUrl);
+                    if (!response.ok) throw new Error();
+
+                    const blob = await response.blob();
+                    const blobUrl = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = blobUrl;
+                    a.download = `A2Z_STUDIO_VIDEO_${Math.floor(Date.now()/1000)}.mp4`;
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    setTimeout(() => { URL.revokeObjectURL(blobUrl); document.body.removeChild(a); }, 1000);
+                    btn.innerText = "Saved!";
+                    isSaved = true;
+                } catch (e) { console.warn("Path Blocked. Trying Proxy..."); }
+            }
+
+            if (!isSaved) {
+                window.location.href = fileUrl; // Last resort
+                btn.innerText = "Opened";
+            }
+            setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 3000);
+        }
+
+        function renderVortexResults(data) {
+            player.src = data.medias[0].url; 
+            document.getElementById('v-name').innerText = data.title || "Neural Stream Found";
+
+            const linksBox = document.getElementById('v-links');
             const m = data.medias;
-            const filtered = [m.find(x => x.quality.includes('360') || x.quality.includes('480')), m.find(x => x.quality.includes('720') || x.quality.includes('1080')), m.find(x => x.quality.includes('4k') || x.quality.includes('2160'))].filter(Boolean);
-            document.getElementById('v-links').innerHTML = filtered.map(l => `
-                <div class="dl-card"><p class="text-[9px] font-black uppercase tracking-widest">${l.quality}</p>
-                <button onclick="forceDownload('${l.url}', this)" class="btn-save">Save</button></div>
+            
+            // Filtering for Normal, High, 4K
+            const norm = m.find(x => x.quality.includes('360') || x.quality.includes('480'));
+            const high = m.find(x => x.quality.includes('720') || x.quality.includes('1080'));
+            const ultra = m.find(x => x.quality.includes('4k') || x.quality.includes('2160'));
+
+            const options = [];
+            if(norm) options.push({label: 'Normal (SD)', url: norm.url});
+            if(high) options.push({label: 'High Quality (HD)', url: high.url});
+            if(ultra) options.push({label: '4K Ultra HD', url: ultra.url});
+
+            linksBox.innerHTML = options.map(opt => `
+                <div class="dl-node animate-fade-in">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-white/80">${opt.label}</p>
+                    <button onclick="forceSave('${opt.url}', this)" class="save-btn">Save</button>
+                </div>
             `).join('');
             document.getElementById('v-results').classList.remove('hidden');
         }
