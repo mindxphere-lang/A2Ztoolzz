@@ -25,14 +25,21 @@
         .hyper-pulse { animation: hyper 0.5s infinite alternate !important; }
         @keyframes hyper { 0% { transform: scale(0.9); } 100% { transform: scale(1.1); } }
         
-        /* Video Result Box */
+        /* Minimalist Video Box */
         .video-box { 
             position: relative; width: 100%; border-radius: 2.5rem; overflow: hidden; 
-            background: #000; border: 2px solid rgba(255, 0, 85, 0.2); 
+            background: #000; border: 2px solid rgba(255, 0, 85, 0.2); cursor: pointer;
         }
+        /* Custom Play Overlay */
+        .play-overlay {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.3); transition: 0.3s; z-index: 30;
+        }
+        .play-overlay i { font-size: 50px; color: white; filter: drop-shadow(0 0 10px var(--neon-red)); }
+        
         .video-label { 
             position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.9)); 
-            padding: 20px; font-size: 11px; font-weight: bold; color: #fff; z-index: 20; pointer-events: none;
+            padding: 20px; font-size: 11px; font-weight: bold; color: #fff; z-index: 40; pointer-events: none;
         }
 
         .dl-card {
@@ -60,8 +67,9 @@
         <div id="status-msg" class="text-center text-[10px] font-black uppercase tracking-widest text-pink-500/50 mb-10">System Ready</div>
 
         <div id="v-results" class="hidden space-y-8 animate-fade-in">
-            <div class="video-box">
-                <video id="v-player" controls class="w-full aspect-video bg-black"></video>
+            <div class="video-box" onclick="togglePlay()">
+                <div id="play-ui" class="play-overlay"><i class="fa-solid fa-play"></i></div>
+                <video id="v-player" playsinline class="w-full aspect-video bg-black" onplay="hideUI()" onpause="showUI()" disablePictureInPicture controlsList="noplaybackrate"></video>
                 <div id="v-name" class="video-label truncate">Video Detected</div>
             </div>
             <div id="v-links" class="space-y-3"></div>
@@ -71,11 +79,23 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
-        firebase.initializeApp(firebaseConfig); const db = firebase.database();
-        let keys = {}; db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
+        const firebaseConfig = { 
+            apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
+            databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
+        };
+        firebase.initializeApp(firebaseConfig); 
+        const db = firebase.database();
+        let keys = {}; 
+        db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
 
-        const core = document.getElementById('bh-core'), text = document.getElementById('bh-text');
+        const core = document.getElementById('bh-core'), 
+              text = document.getElementById('bh-text'),
+              player = document.getElementById('v-player'),
+              playUI = document.getElementById('play-ui');
+
+        function togglePlay() { if(player.paused) player.play(); else player.pause(); }
+        function hideUI() { playUI.style.opacity = '0'; }
+        function showUI() { playUI.style.opacity = '1'; playUI.innerHTML = '<i class="fa-solid fa-play"></i>'; }
 
         async function startProcess() {
             try {
@@ -100,41 +120,44 @@
             } catch (e) { alert("Copy Link First!"); core.classList.remove('hyper-pulse'); text.innerHTML = "RETRY"; }
         }
 
-        // IMPROVED DOWNLOAD LOGIC
-        async function forceDownload(videoUrl, filename, btn) {
-            btn.innerText = "WAIT..."; btn.disabled = true;
+        // FORCE BLOB DOWNLOAD (Works on Mobile & PC)
+        async function forceDownload(videoUrl, btn) {
+            const originalText = btn.innerText;
+            btn.innerText = "STARTING..."; 
+            btn.disabled = true;
+
             try {
-                // Background fetch with CORS handling
-                const response = await fetch(videoUrl, { mode: 'no-cors' }); 
-                // Note: Direct fetch might fail on some CDNs due to CORS. 
-                // Fallback is used below to ensure user gets the video.
+                const response = await fetch(videoUrl);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = videoUrl;
-                a.setAttribute('download', filename);
-                a.setAttribute('target', '_blank');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `A2Z_Video_${Date.now()}.mp4`;
                 document.body.appendChild(a);
                 a.click();
-                document.body.removeChild(a);
-                btn.innerText = "DONE!";
+                window.URL.revokeObjectURL(url);
+                btn.innerText = "SAVED!";
             } catch (e) {
-                window.open(videoUrl, '_blank');
+                // Fallback for CORS issues
+                const a = document.createElement('a');
+                a.href = videoUrl;
+                a.setAttribute('download', '');
+                a.click();
+                btn.innerText = "OPENED";
             } finally {
                 setTimeout(() => { btn.innerText = "SAVE"; btn.disabled = false; }, 3000);
             }
         }
 
         function renderResults(data) {
-            // Set Video Source and Name in Box
-            const player = document.getElementById('v-player');
             player.src = data.medias[0].url; 
             document.getElementById('v-name').innerText = data.title || "Video Success";
 
-            // Filter for Normal, High, 4K
             const linksBox = document.getElementById('v-links');
             const filtered = [];
             const m = data.medias;
             
-            // Logic to pick Normal (360/480), High (720/1080), 4K (2160)
             const n = m.find(x => x.quality.includes('360') || x.quality.includes('480'));
             const h = m.find(x => x.quality.includes('720') || x.quality.includes('1080'));
             const f = m.find(x => x.quality.includes('4k') || x.quality.includes('2160'));
@@ -146,7 +169,7 @@
             linksBox.innerHTML = filtered.map(l => `
                 <div class="dl-card">
                     <p class="text-[10px] font-black tracking-widest uppercase">${l.q}</p>
-                    <button onclick="forceDownload('${l.url}', 'A2Z_Video.mp4', this)" class="btn-save">SAVE</button>
+                    <button onclick="forceDownload('${l.url}', this)" class="btn-save">SAVE</button>
                 </div>
             `).join('');
             document.getElementById('v-results').classList.remove('hidden');
