@@ -3,213 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Vortex Fresh v8.0</title>
-    
+    <title>A2Z Studio - Vortex Fresh</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
-
     <style>
         :root { --neon: #ff0055; --bg: #05000a; }
         body { 
             font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden;
             background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
         }
-
-        /* --- SIMPLE VORTEX UI --- */
-        .vortex-container { position: relative; width: 250px; height: 250px; margin: 40px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .vortex-core {
-            position: relative; width: 150px; height: 150px; background: black; border-radius: 50%;
-            box-shadow: 0 0 50px var(--neon), inset 0 0 20px var(--neon);
+        /* Vortex UI */
+        .vortex-node { position: relative; width: 260px; height: 260px; margin: 40px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .bh-core {
+            position: relative; width: 160px; height: 160px; background: black; border-radius: 50%;
+            box-shadow: 0 0 50px 10px var(--neon), inset 0 0 30px var(--neon);
             z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: 0.4s;
         }
-        .vortex-core span { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--neon); text-transform: uppercase; }
-        .vortex-ring { position: absolute; inset: 0; border: 1px solid rgba(255, 0, 85, 0.2); border-radius: 50%; animation: spin 15s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        /* PULSE EFFECT */
-        .vortex-active { animation: pulse 0.8s infinite alternate !important; }
-        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 30px var(--neon); } 100% { transform: scale(1.05); box-shadow: 0 0 70px var(--neon); } }
+        .bh-core span { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--neon); text-transform: uppercase; }
+        .ring { position: absolute; inset: 0; border: 1px dashed rgba(255, 0, 85, 0.15); border-radius: 50%; animation: rotate 12s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .pulse-active { animation: pulse 0.6s infinite alternate !important; }
+        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1.05); opacity: 1; } }
 
-        /* --- RESULT CARDS --- */
-        .card-result { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 2rem; overflow: hidden; margin-top: 20px; }
-        .quality-row { padding: 15px 25px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, 0.03); }
-        .save-btn { background: linear-gradient(45deg, #80002a, #ff0055); padding: 10px 25px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; letter-spacing: 1px; }
+        /* Clean Cards */
+        .result-box { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 2rem; overflow: hidden; }
+        .dl-row { border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 15px 25px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; }
+        .save-btn { background: linear-gradient(45deg, #80002a, #ff0055); padding: 10px 25px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; }
 
-        /* MAINTENANCE SCREEN */
-        #m-overlay { position: fixed; inset: 0; z-index: 9999; background: black; display: none; align-items: center; justify-content: center; text-align: center; }
+        /* Maintenance */
+        #m-mode { position: fixed; inset: 0; z-index: 9999; background: black; display: none; align-items: center; justify-content: center; text-align: center; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <div id="m-overlay">
-        <div class="p-10">
+    <div id="m-mode">
+        <div class="p-10 text-center">
             <div class="w-12 h-12 border-2 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <h1 class="text-xl font-black text-pink-600 uppercase italic mb-2">System Paused</h1>
-            <p id="m-text" class="text-white/30 text-[9px] tracking-widest uppercase font-bold"></p>
+            <h1 class="text-xl font-black text-pink-600 uppercase italic mb-2">Node Paused</h1>
+            <p id="m-msg" class="text-white/30 text-[9px] tracking-widest uppercase font-bold"></p>
         </div>
     </div>
 
-    <nav class="p-6 flex justify-between items-center sticky top-0 bg-[#05000a]/50 backdrop-blur-lg z-50">
-        <a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> HUB</a>
-        <div class="text-[7px] font-black uppercase tracking-widest text-white/20">Vortex Engine 8.0</div>
+    <nav class="p-6 flex justify-between items-center">
+        <a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> Hub</a>
     </nav>
 
     <div class="max-w-xl mx-auto px-6 pb-20">
-        
-        <div class="vortex-container" onclick="initiateSuck()">
-            <div class="vortex-ring"></div>
-            <div class="vortex-core" id="v-core">
-                <span id="v-text">Tap to<br>Suck Content</span>
-            </div>
+        <div class="vortex-node" onclick="triggerNeuralSuck()">
+            <div class="ring"></div>
+            <div class="bh-core" id="core"><span id="core-text">Tap to<br>Suck Content</span></div>
         </div>
 
-        <p id="status-label" class="text-center text-[8px] font-black uppercase tracking-[0.4em] text-pink-500/30 mb-10">Node Status: Ready</p>
+        <div id="status-label" class="text-center text-[8px] font-black uppercase tracking-[0.4em] text-pink-500/20 mb-10">Node Status: Ready</div>
 
-        <div id="result-ui" class="hidden space-y-6 animate-fade-in">
-            <div class="card-result">
-                <div class="relative group" onclick="document.getElementById('player').paused ? document.getElementById('player').play() : document.getElementById('player').pause()">
-                    <video id="player" playsinline class="w-full aspect-video bg-black" disablePictureInPicture controlsList="nodownload noplaybackrate"></video>
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <i class="fa-solid fa-play text-3xl opacity-20"></i>
-                    </div>
-                </div>
-                
-                <div id="video-title" class="p-5 text-[10px] font-bold text-white/50 truncate border-b border-white/5 uppercase">Detected Stream</div>
-                
-                <div id="link-nodes"></div>
+        <div id="results" class="hidden space-y-6 animate-fade-in">
+            <div class="result-box">
+                <video id="player" playsinline class="w-full aspect-video bg-black" controlsList="nodownload"></video>
+                <div id="v-title" class="p-5 text-[10px] font-bold text-white/50 truncate border-b border-white/5">Video Success</div>
+                <div id="dl-links"></div>
             </div>
-            
-            <p class="text-[7px] text-center text-white/10 uppercase font-black tracking-widest italic">PC: File will save directly to Downloads</p>
+            <p class="text-[7px] text-center text-white/10 uppercase font-black tracking-widest italic">iPhone: Use 'Files' app to save to Photos</p>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
     <script>
-        // CONFIG SYNC
+        // Use Firebase config from your image
         const firebaseConfig = { 
             apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
             databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let appSettings = {};
+        let settings = {};
 
-        // MAINTENANCE SYNC
         db.ref('settings').on('value', (snapshot) => {
-            appSettings = snapshot.val() || {};
-            if(appSettings.maintenanceMode) {
-                document.getElementById('m-overlay').style.display = 'flex';
-                document.getElementById('m-text').innerText = appSettings.maintenanceMsg;
+            settings = snapshot.val() || {};
+            if(settings.maintenanceMode) {
+                document.getElementById('m-mode').style.display = 'flex';
+                document.getElementById('m-msg').innerText = settings.maintenanceMsg;
             } else {
-                document.getElementById('m-overlay').style.display = 'none';
+                document.getElementById('m-mode').style.display = 'none';
             }
         });
 
-        const vCore = document.getElementById('v-core'), vText = document.getElementById('v-text'), statusLabel = document.getElementById('status-label');
+        const core = document.getElementById('core'), text = document.getElementById('core-text'), status = document.getElementById('status-label');
 
-        async function initiateSuck() {
+        async function triggerNeuralSuck() {
             try {
-                // Auto-Paste Clipboard
-                const clipUrl = await navigator.clipboard.readText();
-                if (!clipUrl.startsWith('http')) return alert("Copy a valid link first!");
+                const link = await navigator.clipboard.readText(); // Auto-paste
+                if (!link.startsWith('http')) return alert("Copy a valid link first!");
 
-                vCore.classList.add('vortex-active');
-                vText.innerHTML = "Sucking<br>Data...";
-                statusLabel.innerText = "Connecting to Neural Node...";
-                document.getElementById('result-ui').classList.add('hidden');
+                core.classList.add('pulse-active');
+                text.innerHTML = "Sucking...";
+                document.getElementById('results').classList.add('hidden');
 
-                // NEW API INTEGRATION
                 const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json', 
-                        'X-RapidAPI-Key': appSettings.videoKey, 
+                        'X-RapidAPI-Key': settings.videoKey, 
                         'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' 
                     },
-                    body: JSON.stringify({ url: clipUrl })
+                    body: JSON.stringify({ url: link })
                 });
                 
                 const data = await res.json();
                 if (data.medias) {
-                    renderFreshUI(data);
-                    vCore.classList.remove('vortex-active');
-                    vText.innerHTML = "Success<br>Ready";
-                    statusLabel.innerText = "Sync Complete";
-                    setTimeout(() => { vText.innerHTML = "Tap to<br>Suck Content"; }, 3000);
+                    renderUI(data);
+                    core.classList.remove('pulse-active');
+                    text.innerHTML = "Success";
+                    status.innerText = "Sync Complete";
+                    setTimeout(() => { text.innerHTML = "Tap to<br>Suck Content"; }, 3000);
                 } else { throw new Error(); }
-
             } catch (e) {
-                vCore.classList.remove('vortex-active');
-                vText.innerHTML = "Error<br>Retry";
-                statusLabel.innerText = "Node Overload. Tap to retry.";
+                core.classList.remove('pulse-active'); text.innerHTML = "Retry";
+                status.innerText = "Sync Failed. Tap again.";
             }
         }
 
-        // --- THE "FORCE DOWNLOAD" LOGIC (PC FIX) ---
-        async function neuralForceSave(fileUrl, btn) {
+        async function neuralForceSave(url, btn) {
             const originalText = btn.innerText;
             btn.innerText = "LOCKING...";
             btn.disabled = true;
 
-            const proxyNodes = ["", "https://api.allorigins.win/raw?url=", "https://corsproxy.io/?"];
-            let isSaved = false;
+            // Proxy Nodes to ensure valid file binary
+            const proxies = ["https://api.allorigins.win/raw?url=", "https://corsproxy.io/?", ""];
+            let saved = false;
 
-            for (let proxy of proxyNodes) {
-                if (isSaved) break;
+            for (let proxy of proxies) {
+                if (saved) break;
                 try {
-                    const finalUrl = proxy + encodeURIComponent(fileUrl);
-                    const response = await fetch(finalUrl);
-                    const blobData = await response.blob();
-                    const blobUrl = URL.createObjectURL(blobData);
+                    const response = await fetch(proxy + encodeURIComponent(url));
+                    if (!response.ok) throw new Error();
                     
+                    const blob = await response.blob();
+                    if (blob.size < 1000) throw new Error("Empty file detected"); // Corruption check
+
+                    const bUrl = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.style.display = 'none';
-                    a.href = blobUrl;
+                    a.href = bUrl;
                     a.download = `A2Z_VIDEO_${Math.floor(Date.now()/1000)}.mp4`;
                     document.body.appendChild(a);
                     a.click();
                     
-                    setTimeout(() => { URL.revokeObjectURL(blobUrl); document.body.removeChild(a); }, 1000);
+                    setTimeout(() => { URL.revokeObjectURL(bUrl); document.body.removeChild(a); }, 1000);
                     btn.innerText = "SAVED!";
-                    isSaved = true;
-                } catch (e) { console.warn("Node Blocked. Switching Path..."); }
+                    saved = true;
+                } catch (e) { console.log("Trying next path..."); }
             }
 
-            if (!isSaved) {
-                window.location.href = fileUrl; // Fallback
+            if (!saved) {
+                window.open(url, '_blank');
                 btn.innerText = "OPENED";
             }
             setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 3000);
         }
 
-        function renderFreshUI(data) {
+        function renderUI(data) {
             document.getElementById('player').src = data.medias[0].url; 
-            document.getElementById('video-title').innerText = data.title || "Vortex Content Detected";
-
-            const linkNodes = document.getElementById('link-nodes');
+            document.getElementById('v-title').innerText = data.title || "Neural Stream Detected";
             const m = data.medias;
-            
-            // Clean Quality Selection
-            const low = m.find(x => x.quality.includes('360') || x.quality.includes('480'));
-            const med = m.find(x => x.quality.includes('720') || x.quality.includes('1080'));
-            const high = m.find(x => x.quality.includes('4k') || x.quality.includes('2160'));
+            const norm = m.find(x => x.quality.includes('360') || x.quality.includes('480'));
+            const high = m.find(x => x.quality.includes('720') || x.quality.includes('1080'));
+            const ultra = m.find(x => x.quality.includes('4k') || x.quality.includes('2160'));
 
             const options = [];
-            if(low) options.push({label: 'Normal Quality', url: low.url});
-            if(med) options.push({label: 'High Quality (HD)', url: med.url});
-            if(high) options.push({label: '4K Ultra HD', url: high.url});
+            if(norm) options.push({q: 'Normal Quality', url: norm.url});
+            if(high) options.push({q: 'High (HD)', url: high.url});
+            if(ultra) options.push({q: '4K Ultra', url: ultra.url});
 
-            linkNodes.innerHTML = options.map(opt => `
-                <div class="quality-row">
-                    <p class="text-[9px] font-black uppercase tracking-widest text-white/40">${opt.label}</p>
+            document.getElementById('dl-links').innerHTML = options.map(opt => `
+                <div class="dl-row">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-white/40">${opt.q}</p>
                     <button onclick="neuralForceSave('${opt.url}', this)" class="save-btn">Save</button>
                 </div>
             `).join('');
-            document.getElementById('result-ui').classList.remove('hidden');
+            document.getElementById('results').classList.remove('hidden');
         }
     </script>
 </body>
