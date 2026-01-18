@@ -4,46 +4,129 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>A2Z STUDIO - Neural Hub</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;900&display=swap" rel="stylesheet"/>
+
     <style>
         :root { --neon-red: #ff0055; --dark-bg: #05000a; }
-        body { font-family: 'Montserrat', sans-serif; background: #05000a; color: white; background: radial-gradient(circle at 20% 0%, #2a0015, #05000a 75%); background-attachment: fixed; }
-        .glass-morph { background: rgba(20, 0, 10, 0.7); backdrop-filter: blur(30px); border: 1px solid rgba(255, 0, 85, 0.2); transition: 0.4s; }
-        .glass-morph:hover { transform: translateY(-10px); border-color: var(--neon-red); box-shadow: 0 0 30px var(--neon-red); }
-        .neon-text { text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red); }
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background-color: var(--dark-bg); 
+            color: white; 
+            margin: 0; 
+            overflow-x: hidden; 
+            background: radial-gradient(circle at 20% 0%, #2a0015, var(--dark-bg) 80%);
+            background-attachment: fixed;
+        }
+        
+        /* Compact Glassmorphism */
+        .glass-card { 
+            background: rgba(255, 0, 85, 0.03); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 0, 85, 0.15); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:active { 
+            transform: scale(0.95); 
+            background: rgba(255, 0, 85, 0.1);
+        }
+        
+        .neon-glow { text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red); }
+        .neon-border { box-shadow: 0 0 15px rgba(255, 0, 85, 0.2); }
+        
+        /* Utility */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
-    <nav class="p-6 border-b border-white/5 flex justify-between items-center glass-morph sticky top-0 z-50">
-        <h1 class="text-xl font-black italic uppercase"><span class="neon-text">A2Z</span> STUDIO</h1>
+<body class="min-h-screen flex flex-col">
+
+    <nav class="sticky top-0 z-[100] bg-black/40 backdrop-blur-md px-5 py-4 flex justify-between items-center border-b border-white/5">
+        <div class="flex items-center gap-2">
+            <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+            <h1 class="text-lg font-black italic tracking-tighter uppercase"><span class="text-pink-600">A2Z</span> STUDIO</h1>
+        </div>
+        <div class="text-[8px] font-bold text-red-500/40 uppercase tracking-[0.3em]">Neural Protocol</div>
     </nav>
 
-    <div class="max-w-6xl mx-auto px-6 py-20">
-        <div class="text-center mb-20">
-            <h2 class="text-7xl md:text-9xl font-black neon-text italic uppercase tracking-tighter">FREE TOOLS</h2>
-            <p class="text-pink-500/50 uppercase tracking-[0.5em] mt-4 font-bold text-xs">Select your neural engine</p>
+    <main class="flex-grow max-w-5xl mx-auto w-full px-5 py-10">
+        
+        <header class="text-center mb-12 animate-fade-in">
+            <h2 class="text-5xl md:text-8xl font-black neon-glow italic uppercase tracking-tighter leading-none">FREE TOOLS</h2>
+            <p class="text-[10px] md:text-xs text-pink-500/60 uppercase tracking-[0.4em] mt-4 font-bold">Select Your Neural Engine</p>
+        </header>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-16 animate-fade-in" style="animation-delay: 0.2s;">
+            
+            <a href="video.html" class="glass-card p-6 md:p-10 rounded-[2rem] text-center flex flex-col items-center justify-center gap-3 group">
+                <div class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full bg-pink-500/5 border border-pink-500/10 group-hover:border-pink-500/50 transition-colors">
+                    <i class="fa-solid fa-cloud-bolt text-2xl md:text-3xl text-pink-500"></i>
+                </div>
+                <h3 class="text-[9px] md:text-[11px] font-black uppercase tracking-widest text-white/90">Video Save</h3>
+            </a>
+
+            <a href="photo.html" class="glass-card p-6 md:p-10 rounded-[2rem] text-center flex flex-col items-center justify-center gap-3 group">
+                <div class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full bg-yellow-500/5 border border-yellow-500/10 group-hover:border-yellow-500/50 transition-colors">
+                    <i class="fa-solid fa-wand-magic-sparkles text-2xl md:text-3xl text-yellow-500"></i>
+                </div>
+                <h3 class="text-[9px] md:text-[11px] font-black uppercase tracking-widest text-white/90">Photo Fix</h3>
+            </a>
+
+            <a href="grading.html" class="glass-card p-6 md:p-10 rounded-[2rem] text-center flex flex-col items-center justify-center gap-3 group">
+                <div class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full bg-blue-500/5 border border-blue-500/10 group-hover:border-blue-500/50 transition-colors">
+                    <i class="fa-solid fa-palette text-2xl md:text-3xl text-blue-400"></i>
+                </div>
+                <h3 class="text-[9px] md:text-[11px] font-black uppercase tracking-widest text-white/90">AI Grading</h3>
+            </a>
+
+            <a href="caption.html" class="glass-card p-6 md:p-10 rounded-[2rem] text-center flex flex-col items-center justify-center gap-3 group">
+                <div class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full bg-pink-400/5 border border-pink-400/10 group-hover:border-pink-400/50 transition-colors">
+                    <i class="fa-solid fa-bolt-lightning text-2xl md:text-3xl text-pink-400"></i>
+                </div>
+                <h3 class="text-[9px] md:text-[11px] font-black uppercase tracking-widest text-white/90">Insta Pro</h3>
+            </a>
+
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <a href="video.html" class="glass-morph p-12 rounded-[3rem] text-center block">
-                <i class="fa-solid fa-cloud-bolt text-5xl text-pink-500 mb-6"></i>
-                <h3 class="font-black uppercase tracking-widest text-sm">Video Save</h3>
-            </a>
-            <a href="photo.html" class="glass-morph p-12 rounded-[3rem] text-center block">
-                <i class="fa-solid fa-wand-magic-sparkles text-5xl text-yellow-500 mb-6"></i>
-                <h3 class="font-black uppercase tracking-widest text-sm">Photo Fix</h3>
-            </a>
-            <a href="grading.html" class="glass-morph p-12 rounded-[3rem] text-center block">
-                <i class="fa-solid fa-palette text-5xl text-blue-500 mb-6"></i>
-                <h3 class="font-black uppercase tracking-widest text-sm">AI Grading</h3>
-            </a>
-            <a href="caption.html" class="glass-morph p-12 rounded-[3rem] text-center block">
-                <i class="fa-solid fa-bolt-lightning text-5xl text-pink-400 mb-6"></i>
-                <h3 class="font-black uppercase tracking-widest text-sm">Insta Pro</h3>
-            </a>
+        <section class="animate-fade-in" style="animation-delay: 0.4s;">
+            <div class="flex items-center gap-3 mb-6 px-2">
+                <div class="h-[1px] flex-grow bg-white/5"></div>
+                <h4 class="text-[9px] font-black text-red-500 uppercase tracking-[0.4em]">Neural Activity Log</h4>
+                <div class="h-[1px] flex-grow bg-white/5"></div>
+            </div>
+            <div id="hist-list" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                </div>
+        </section>
+
+    </main>
+
+    <footer class="p-6 text-center border-t border-white/5">
+        <div class="max-w-md mx-auto h-20 bg-white/5 rounded-2xl border border-dashed border-white/10 flex items-center justify-center">
+            <span class="text-[9px] text-gray-600 uppercase tracking-widest font-bold">Monetization Node Active</span>
         </div>
-    </div>
+    </footer>
+
+    <script>
+        // Simple History Renderer
+        function renderHistory() {
+            const list = document.getElementById('hist-list');
+            const logs = JSON.parse(localStorage.getItem('a2z_log')) || [];
+            if (logs.length === 0) {
+                list.innerHTML = `<p class="text-[9px] text-white/20 italic w-full text-center py-4 uppercase tracking-widest">No recent logs found</p>`;
+                return;
+            }
+            list.innerHTML = logs.map(l => `
+                <div class="glass-card min-w-[140px] p-4 rounded-2xl border-white/5">
+                    <p class="text-[8px] font-black text-pink-500 uppercase mb-1 tracking-tighter">${l.t}</p>
+                    <p class="text-[10px] text-white/50 truncate font-semibold">${l.i}</p>
+                </div>
+            `).join('');
+        }
+        window.onload = renderHistory;
+    </script>
+
 </body>
 </html>
