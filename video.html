@@ -2,184 +2,146 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Vortex Engine v21.0</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2Z Studio - Neural Force Engine v22.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
-
     <style>
         :root { --neon: #ff0055; --bg: #05000a; }
-        body { 
-            font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden;
-            background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
-        }
-
-        /* --- VORTEX UI --- */
-        .vortex-node { position: relative; width: 260px; height: 260px; margin: 40px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .bh-core {
-            position: relative; width: 160px; height: 160px; background: black; border-radius: 50%;
-            box-shadow: 0 0 50px 10px var(--neon), inset 0 0 30px var(--neon);
-            z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .bh-core span { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--neon); text-transform: uppercase; }
-        .ring { position: absolute; inset: 0; border: 1px dashed rgba(255, 0, 85, 0.15); border-radius: 50%; animation: rotate 12s linear infinite; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        .pulse-active { animation: pulse 0.6s infinite alternate !important; }
-        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1.05); opacity: 1; } }
-
-        /* --- RESULT CARDS --- */
-        .result-box { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 2rem; overflow: hidden; }
-        .dl-row { border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 18px 25px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; }
-        .save-btn { background: linear-gradient(45deg, #80002a, #ff0055); padding: 10px 25px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; letter-spacing: 1px; }
-
-        /* MAINTENANCE SYSTEM */
-        #m-mode { position: fixed; inset: 0; z-index: 9999; background: black; display: none; align-items: center; justify-content: center; text-align: center; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed; }
+        .engine-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(45px); border: 1px solid rgba(255, 0, 85, 0.3); border-radius: 3rem; width: 100%; max-width: 500px; padding: 50px; box-shadow: 0 0 60px rgba(255,0,85,0.15); }
+        .bar-bg { width: 100%; height: 10px; background: #000; border-radius: 20px; overflow: hidden; margin-top: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff0055, #ff80ab, #ff0055); background-size: 200% 100%; animation: move 2s linear infinite; transition: 0.2s; box-shadow: 0 0 20px var(--neon); }
+        @keyframes move { 0% { background-position: 100% 0%; } 100% { background-position: -100% 0%; } }
+        .neon-glow { text-shadow: 0 0 15px var(--neon); }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="p-6">
 
-    <div id="m-mode">
-        <div class="p-10 text-center">
-            <div class="w-16 h-16 border-2 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <h1 class="text-xl font-black text-pink-600 uppercase italic mb-2">Neural Node Paused</h1>
-            <p id="m-msg" class="text-white/30 text-[9px] tracking-widest uppercase font-bold"></p>
-        </div>
-    </div>
+    <div class="engine-card space-y-10 animate-fade-in text-center">
+        <header>
+            <h1 class="text-3xl font-black italic uppercase tracking-tighter neon-glow"><span class="text-pink-600">A2Z</span> FORCE ENGINE</h1>
+            <p id="main-status" class="text-[9px] font-black text-white/30 uppercase tracking-[0.4em] mt-3 animate-pulse">Neural Node Initializing...</p>
+        </header>
 
-    <nav class="p-6 flex justify-between items-center">
-        <a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> Hub</a>
-        <div class="flex items-center gap-2 opacity-30">
-            <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-            <span class="text-[7px] font-black uppercase text-white">Vortex v21.0</span>
-        </div>
-    </nav>
-
-    <div class="max-w-xl mx-auto px-6 pb-20">
-        
-        <div class="vortex-node" onclick="triggerNeuralSuck()">
-            <div class="ring"></div>
-            <div class="bh-core" id="core">
-                <span id="core-text">Tap to<br>Suck Content</span>
-            </div>
-        </div>
-
-        <div id="status-label" class="text-center text-[8px] font-black uppercase tracking-[0.4em] text-pink-500/20 mb-10">Waiting for Link...</div>
-
-        <div id="results" class="hidden space-y-6 animate-fade-in">
-            <div class="result-box">
-                <video id="player" playsinline class="w-full aspect-video bg-black" controlsList="nodownload"></video>
-                <div id="v-title" class="p-5 text-[10px] font-bold text-white/50 truncate border-b border-white/5 uppercase italic">Video Ready</div>
-                
-                <div id="dl-links"></div>
+        <div class="bg-black/40 p-8 rounded-[2.5rem] border border-white/5 space-y-6">
+            <div class="flex justify-between items-end text-left">
+                <div class="space-y-1">
+                    <p class="text-[8px] font-black text-pink-500 uppercase tracking-widest">Binary Intercept</p>
+                    <p id="size-txt" class="text-[10px] font-bold text-white/40 uppercase">Connecting to Stream...</p>
+                </div>
+                <span id="percent-txt" class="text-5xl font-black italic text-white neon-text">0%</span>
             </div>
             
-            <p class="text-[7px] text-center text-white/10 uppercase font-black tracking-widest italic mt-4">Transmitting to Force Engine...</p>
+            <div class="bar-bg"><div id="progress-fill" class="bar-fill"></div></div>
+            
+            <div class="flex justify-between text-[7px] font-black uppercase text-white/20 tracking-widest">
+                <span id="node-info">Node Search: Active</span>
+                <span id="speed-info">0.0 MB/s</span>
+            </div>
         </div>
-    </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+        <div id="fallback-ui" class="hidden animate-bounce">
+            <p class="text-[10px] font-bold text-pink-500 uppercase mb-4">Auto-Save Failed? Try Manual:</p>
+            <a id="manual-link" href="#" class="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest">Download Directly</a>
+        </div>
+
+        <p class="text-[8px] font-black text-white/20 uppercase tracking-widest">Binary Bypassing Node v22.0</p>
+    </div>
 
     <script>
-        // Master Config from Master Control
-        const fbConfig = { 
-            apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
-            databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
-        };
-        firebase.initializeApp(fbConfig);
-        const db = firebase.database();
-        let settings = {};
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoUrl = urlParams.get('url');
 
-        // Syncing with Admin Settings
-        db.ref('settings').on('value', (snapshot) => {
-            settings = snapshot.val() || {};
-            if(settings.maintenanceMode) {
-                document.getElementById('m-mode').style.display = 'flex';
-                document.getElementById('m-msg').innerText = settings.maintenanceMsg;
-            } else {
-                document.getElementById('m-mode').style.display = 'none';
-            }
-        });
+        if (!videoUrl) {
+            alert("No link detected!");
+            window.location.href = "index.html";
+        } else {
+            document.getElementById('manual-link').href = videoUrl;
+            window.onload = () => { triggerAggressiveFetch(videoUrl); };
+        }
 
-        const core = document.getElementById('core'), text = document.getElementById('core-text'), status = document.getElementById('status-label');
+        async function triggerAggressiveFetch(url) {
+            const fill = document.getElementById('progress-fill');
+            const percent = document.getElementById('percent-txt');
+            const status = document.getElementById('main-status');
+            const sizeTxt = document.getElementById('size-txt');
+            const speedTxt = document.getElementById('speed-info');
+            const nodeTxt = document.getElementById('node-info');
 
-        // --- FETCHING LOGIC ---
-        async function triggerNeuralSuck() {
-            try {
-                // Clipboard Auto-Grab
-                const link = await navigator.clipboard.readText();
-                if (!link.startsWith('http')) return alert("Bhai, pehle link copy karo!");
+            // --- 5-NODE PROXY CHAIN ---
+            const nodes = [
+                "https://api.allorigins.win/raw?url=",
+                "https://corsproxy.io/?",
+                "https://thingproxy.freeboard.io/fetch/",
+                "https://api.codetabs.com/v1/proxy?quest=",
+                "" // Final direct attempt
+            ];
 
-                core.classList.add('pulse-active');
-                text.innerHTML = "Sucking...";
-                document.getElementById('results').classList.add('hidden');
+            let success = false;
+            let startTime = Date.now();
 
-                const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'X-RapidAPI-Key': settings.videoKey, 
-                        'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' 
-                    },
-                    body: JSON.stringify({ url: link })
-                });
+            for (let node of nodes) {
+                if (success) break;
                 
-                const data = await res.json();
-                if (data.medias) {
-                    renderUI(data);
-                    core.classList.remove('pulse-active');
-                    text.innerHTML = "Success";
-                    status.innerText = "Stream Captured";
-                    setTimeout(() => { text.innerHTML = "Tap to<br>Suck Content"; }, 3000);
-                } else { throw new Error(); }
+                let idx = nodes.indexOf(node) + 1;
+                nodeTxt.innerText = `Node Search: Node ${idx}`;
+                status.innerText = `FORCE LOCKING VIA NODE ${idx}...`;
 
-            } catch (e) {
-                core.classList.remove('pulse-active');
-                text.innerHTML = "Retry";
-                status.innerText = "Neural Sync Failed.";
+                try {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', node + encodeURIComponent(url), true);
+                    xhr.responseType = 'blob';
+
+                    // Anti-Stuck Check: 6s timeout for zero progress
+                    let hasProgress = false;
+                    const stuckLimit = setTimeout(() => { if(!hasProgress) xhr.abort(); }, 6000);
+
+                    xhr.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            hasProgress = true;
+                            const p = Math.floor((e.loaded / e.total) * 100);
+                            const duration = (Date.now() - startTime) / 1000;
+                            const mbps = (e.loaded / duration / 1048576).toFixed(1);
+                            
+                            fill.style.width = p + "%";
+                            percent.innerText = p + "%";
+                            speedTxt.innerText = `${mbps} MB/s`;
+                            sizeTxt.innerText = `${(e.loaded/1048576).toFixed(2)} MB / ${(e.total/1048576).toFixed(2)} MB`;
+                        }
+                    };
+
+                    const downloadTask = new Promise((resolve, reject) => {
+                        xhr.onload = () => {
+                            if (xhr.status === 200) {
+                                const blob = xhr.response;
+                                // Corruption Filter
+                                if (blob.size < 100000) return reject(); 
+
+                                const bUrl = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = bUrl;
+                                a.download = `A2Z_STUDIO_VIDEO_${Date.now()}.mp4`;
+                                document.body.appendChild(a);
+                                a.click();
+                                setTimeout(() => { URL.revokeObjectURL(bUrl); document.body.removeChild(a); window.close(); }, 2000);
+                                resolve(true);
+                            } else { reject(); }
+                        };
+                        xhr.onerror = () => reject();
+                    });
+
+                    success = await downloadTask;
+                    clearTimeout(stuckLimit);
+                } catch (e) { console.log(`Node ${idx} Failed. Switching...`); }
             }
-        }
 
-        // --- THE FORCE ENGINE TRANSMITTER ---
-        function sendToForceEngine(url, btn) {
-            btn.innerText = "LAUNCHING...";
-            btn.disabled = true;
-
-            // Redirecting link to the dedicated force.html engine
-            const target = "force.html?url=" + encodeURIComponent(url);
-            window.open(target, '_blank'); 
-
-            setTimeout(() => { 
-                btn.innerText = "SAVE"; 
-                btn.disabled = false; 
-            }, 3000);
-        }
-
-        function renderUI(data) {
-            document.getElementById('player').src = data.medias[0].url; 
-            document.getElementById('v-title').innerText = data.title || "Vortex Video Detected";
-
-            const linksBox = document.getElementById('dl-links');
-            const m = data.medias;
-            
-            // Clean Quality Filter
-            const options = [
-                m.find(x => x.quality.includes('360') || x.quality.includes('480')),
-                m.find(x => x.quality.includes('720') || x.quality.includes('1080')),
-                m.find(x => x.quality.includes('4k'))
-            ].filter(Boolean);
-
-            document.getElementById('dl-links').innerHTML = options.map(opt => `
-                <div class="dl-row">
-                    <p class="text-[9px] font-black uppercase tracking-widest text-white/40">${opt.quality}</p>
-                    <button onclick="sendToForceEngine('${opt.url}', this)" class="save-btn">Save</button>
-                </div>
-            `).join('');
-            document.getElementById('results').classList.remove('hidden');
+            if (!success) {
+                status.innerText = "ALL NODES BLOCKED. USE MANUAL.";
+                document.getElementById('fallback-ui').classList.remove('hidden');
+                window.location.href = url; // Redirect fallback
+            }
         }
     </script>
 </body>
