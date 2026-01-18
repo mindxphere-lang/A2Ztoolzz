@@ -1,63 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A2Z Studio - Video Save</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>A2Z Studio - Vortex Downloader</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
+
     <style>
-        :root { --neon-red: #ff0055; }
-        body { font-family: 'Montserrat', sans-serif; background: #05000a; color: white; background: radial-gradient(circle at 20% 0%, #2a0015, #05000a 75%); min-height: 100vh; }
-        .glass { background: rgba(20, 0, 10, 0.7); backdrop-filter: blur(30px); border: 1px solid rgba(255, 0, 85, 0.2); border-radius: 3rem; }
-        .black-hole { width: 180px; height: 180px; background: black; border-radius: 50%; box-shadow: 0 0 60px var(--neon-red), inset 0 0 40px var(--neon-red); display: flex; align-items: center; justify-content: center; margin: 0 auto; transition: 0.5s; }
-        .vortex { position: absolute; width: 250px; height: 250px; border: 2px dashed var(--neon-red); border-radius: 50%; animation: rotate 5s linear infinite; opacity: 0.4; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .bh-loading { animation: suck 0.8s infinite alternate; }
-        @keyframes suck { to { transform: scale(0.7); filter: blur(10px); } }
-        .btn-neon { background: linear-gradient(45deg, #80002a, #ff0055); box-shadow: 0 0 20px var(--neon-red); }
+        :root { --neon-red: #ff0055; --bg: #05000a; }
+        body { 
+            font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden;
+            background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
+        }
+
+        /* --- ENHANCED VORTEX UI --- */
+        .vortex-wrapper { position: relative; width: 300px; height: 300px; margin: 40px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        
+        .black-hole {
+            position: relative; width: 180px; height: 180px; background: black; border-radius: 50%;
+            box-shadow: 0 0 60px 10px var(--neon-red), inset 0 0 40px var(--neon-red);
+            z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .black-hole:hover { transform: scale(1.05); box-shadow: 0 0 80px 20px var(--neon-red); }
+        .black-hole span { font-size: 11px; font-weight: 900; letter-spacing: 2px; color: var(--neon-red); }
+
+        /* VORTEX ANIMATIONS */
+        .vortex-ring {
+            position: absolute; inset: 0; border: 2px dashed rgba(255, 0, 85, 0.3); border-radius: 50%;
+            animation: spin 8s linear infinite;
+        }
+        .vortex-ring:nth-child(2) { inset: 20px; border-style: dotted; animation: spin-rev 12s linear infinite; opacity: 0.5; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spin-rev { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+        /* HYPER-PULSE (Downloading Effect) */
+        .hyper-pulse { animation: hyper 0.5s infinite alternate !important; }
+        @keyframes hyper { 
+            0% { transform: scale(0.9) blur(0px); box-shadow: 0 0 50px var(--neon-red); }
+            100% { transform: scale(1.1) blur(2px); box-shadow: 0 0 120px 30px var(--neon-red); }
+        }
+
+        /* CLEAN DOWNLOAD CARDS */
+        .dl-card {
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 1.5rem;
+            padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+            transition: 0.3s;
+        }
+        .dl-card:hover { background: rgba(255, 0, 85, 0.08); border-color: var(--neon-red); transform: translateX(5px); }
+        
+        .btn-save {
+            background: linear-gradient(45deg, #80002a, #ff0055);
+            padding: 8px 20px; border-radius: 12px; font-size: 10px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(255, 0, 85, 0.3);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="p-6">
-    <a href="index.html" class="text-pink-500 font-bold uppercase text-[10px] tracking-widest mb-10 inline-block"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Hub</a>
-    
-    <div class="max-w-2xl mx-auto text-center">
-        <div class="h-24 border border-dashed border-white/10 mb-10 flex items-center justify-center text-[10px] text-gray-600">ADSTERRA BANNER HERE</div>
+<body class="min-h-screen">
+
+    <nav class="p-6 flex justify-between items-center">
+        <a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-[0.3em]">
+            <i class="fa-solid fa-arrow-left mr-2"></i> Back to Hub
+        </a>
+        <div class="text-[8px] font-bold text-red-500/30 uppercase tracking-[0.4em]">Engine: Rapid-Vortex</div>
+    </nav>
+
+    <div class="max-w-xl mx-auto px-6 py-4">
         
-        <div class="relative flex items-center justify-center mb-10">
-            <div class="vortex"></div>
-            <div class="black-hole" id="main-hole"><span class="text-[10px] font-black text-pink-500 tracking-widest animate-pulse">PASTE LINK</span></div>
+        <div class="vortex-wrapper" onclick="startProcess()">
+            <div class="vortex-ring"></div>
+            <div class="vortex-ring"></div>
+            <div class="black-hole" id="bh-core">
+                <span id="bh-text">TAP TO<br>PASTE LINK</span>
+            </div>
         </div>
 
-        <div class="glass p-8">
-            <input type="text" id="v-url" placeholder="Enter Video URL..." class="w-full bg-black/50 border border-pink-500/30 p-5 rounded-2xl outline-none text-center mb-6">
-            <button onclick="fetchVideo()" class="btn-neon w-full py-5 rounded-2xl font-black text-xs uppercase tracking-widest">Suck Content</button>
+        <div id="status-msg" class="text-center text-[10px] font-black uppercase tracking-[0.3em] h-6 text-pink-500/50">
+            System Ready
         </div>
 
-        <div id="v-results" class="hidden mt-10 space-y-6">
-            <img id="v-thumb" class="w-full rounded-3xl border-2 border-pink-500/30 shadow-2xl">
-            <div id="v-links" class="space-y-4"></div>
+        <div id="v-results" class="hidden mt-12 space-y-10 animate-fade-in">
+            <div class="relative group">
+                <img id="v-thumb" class="w-full rounded-[2.5rem] border-2 border-pink-500/20 shadow-2xl transition group-hover:border-pink-500/50">
+                <div class="absolute inset-0 rounded-[2.5rem] bg-gradient-to-t from-black/80 to-transparent"></div>
+                <h4 id="v-title" class="absolute bottom-6 left-6 right-6 text-xs font-bold truncate">Video Title</h4>
+            </div>
+
+            <div class="space-y-3" id="v-links">
+                </div>
         </div>
+
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
-        firebase.initializeApp(firebaseConfig); const db = firebase.database(); let keys = {};
+        // FIREBASE SETUP
+        const firebaseConfig = { 
+            apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
+            databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let keys = {};
+
+        // SYNC MASTER KEYS
         db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
 
-        async function fetchVideo() {
-            const url = document.getElementById('v-url').value; const hole = document.getElementById('main-hole');
-            if(!url || !keys.videoKey) return alert("System Syncing...");
-            hole.classList.add('bh-loading');
+        const core = document.getElementById('bh-core');
+        const text = document.getElementById('bh-text');
+        const status = document.getElementById('status-msg');
+
+        async function startProcess() {
+            // 1. Get Link via Prompt
+            const url = prompt("Paste your Video Link here:");
+            if (!url) return;
+
+            // 2. Start Animation & Loading State
+            core.classList.add('hyper-pulse');
+            text.innerHTML = "SUCKING<br>DATA...";
+            status.innerText = "Connecting to Neural Node...";
+            document.getElementById('v-results').classList.add('hidden');
+
             try {
-                const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': keys.videoKey, 'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' }, body: JSON.stringify({ url }) });
-                const d = await res.json();
-                document.getElementById('v-thumb').src = d.picture;
-                document.getElementById('v-links').innerHTML = d.medias.map(m => `<a href="${m.url}" download class="btn-neon block p-4 rounded-xl text-center text-[10px] font-black">${m.quality} SAVE</a>`).join('');
-                document.getElementById('v-results').classList.remove('hidden');
-            } catch (e) { alert("Error!"); } hole.classList.remove('bh-loading');
+                // 3. API Fetching
+                const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'X-RapidAPI-Key': keys.videoKey, 
+                        'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' 
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                const data = await res.json();
+                
+                if (data.medias) {
+                    renderResults(data);
+                    // 4. Success State
+                    core.classList.remove('hyper-pulse');
+                    text.innerHTML = "SUCCESSFUL<br>READY";
+                    status.innerText = "Content Retreived Successfully!";
+                    
+                    // Reset after 3 seconds
+                    setTimeout(() => {
+                        text.innerHTML = "TAP TO<br>PASTE LINK";
+                        status.innerText = "System Ready";
+                    }, 3000);
+                } else {
+                    throw new Error();
+                }
+
+            } catch (e) {
+                alert("Invalid Link or API Limit!");
+                core.classList.remove('hyper-pulse');
+                text.innerHTML = "ERROR<br>RETRY";
+                status.innerText = "Sync Failed.";
+            }
+        }
+
+        function renderResults(data) {
+            document.getElementById('v-thumb').src = data.picture;
+            document.getElementById('v-title').innerText = data.title;
+            
+            // Clean Download Cards Rendering
+            const linksBox = document.getElementById('v-links');
+            linksBox.innerHTML = data.medias.map(m => `
+                <div class="dl-card animate-fade-in">
+                    <div class="flex items-center gap-4">
+                        <div class="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center">
+                            <i class="fa-solid fa-video text-[10px] text-pink-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest">${m.quality}</p>
+                            <p class="text-[8px] text-white/30 font-bold uppercase">${m.extension} • ${m.formattedSize || 'HD'}</p>
+                        </div>
+                    </div>
+                    <a href="${m.url}" target="_blank" class="btn-save">Save</a>
+                </div>
+            `).join('');
+
+            document.getElementById('v-results').classList.remove('hidden');
         }
     </script>
 </body>
