@@ -3,102 +3,99 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Toolzz - Ultimate AI Studio</title>
+    <title>A2Z STUDIO - Viral AI Tools</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;900&display=swap" rel="stylesheet"/>
 
     <style>
-        :root { --neon-red: #ff0055; --dark-bg: #05000a; --comp-slider-color: #eab308; }
+        :root { --neon-red: #ff0055; --dark-bg: #05000a; --comp-color: #eab308; }
         body { 
             font-family: 'Montserrat', sans-serif; background-color: var(--dark-bg); color: white; margin: 0; overflow-x: hidden; 
             background: radial-gradient(circle at 20% 0%, #2a0015, var(--dark-bg) 75%); background-attachment: fixed;
         }
         .glass-morph { background: rgba(20, 0, 10, 0.7); backdrop-filter: blur(30px); border: 1px solid rgba(255, 0, 85, 0.2); }
-        .neon-text-red { color: white; text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red), 0 0 40px var(--neon-red); }
+        .neon-text-red { color: white; text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red); }
         
-        /* --- BEFORE/AFTER SLIDER CSS --- */
-        .comp-container { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; rounded: 2.5rem; border: 3px solid var(--comp-slider-color); border-radius: 2rem; }
+        /* --- BEFORE/AFTER SLIDER --- */
+        .comp-container { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; border: 3px solid var(--comp-color); border-radius: 2rem; }
         .comp-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .comp-overlay { position: absolute; top: 0; left: 0; width: 50%; height: 100%; overflow: hidden; border-right: 3px solid var(--comp-slider-color); transition: width 0.1s ease; z-index: 10; }
-        .comp-slider-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: var(--comp-slider-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--comp-slider-color); z-index: 20; pointer-events: none; }
+        .comp-overlay { position: absolute; top: 0; left: 0; width: 50%; height: 100%; overflow: hidden; border-right: 3px solid var(--comp-color); z-index: 10; }
+        .comp-slider-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: var(--comp-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 20; box-shadow: 0 0 20px var(--comp-color); }
         .comp-range { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: col-resize; z-index: 30; }
 
-        /* --- UI Elements --- */
-        .neon-box:hover { box-shadow: 0 0 40px var(--neon-red); border-color: var(--neon-red); transform: translateY(-8px); }
+        /* --- NEON UI --- */
         .btn-neon { background: linear-gradient(45deg, #80002a, #ff0055); box-shadow: 0 0 20px var(--neon-red); border: none; transition: 0.4s; }
-        .btn-action { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
-        .btn-action.active { background: var(--neon-red); border-color: var(--neon-red); box-shadow: 0 0 20px var(--neon-red); }
         .input-neon { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,0,85,0.4); color: white; border-radius: 2rem; outline: none; text-align: center; }
         .slider-neon { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 5px; background: rgba(255,255,255,0.1); outline: none; }
-        .slider-neon::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--neon-red); cursor: pointer; box-shadow: 0 0 10px var(--neon-red); }
+        .slider-neon::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--neon-red); cursor: pointer; }
 
-        /* --- ANIMATIONS (Black Hole & Scan) --- */
-        .black-hole-container { position: relative; width: 240px; height: 240px; margin: 0 auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .black-hole { width: 170px; height: 170px; background: black; border-radius: 50%; box-shadow: 0 0 60px 15px var(--neon-red), inset 0 0 40px var(--neon-red); z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center; transition: 0.5s; }
-        .black-hole span { font-size: 11px; font-weight: 900; letter-spacing: 2px; color: var(--neon-red); animation: pulse 2s infinite; }
-        .vortex { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px dashed var(--neon-red); opacity: 0.5; animation: rotate 5s linear infinite; }
-        .bh-loading { animation: suck-in 0.8s infinite alternate !important; box-shadow: 0 0 100px 30px var(--neon-red) !important; }
+        /* --- BLACK HOLE & SCAN --- */
+        .black-hole-container { position: relative; width: 220px; height: 220px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+        .black-hole { width: 160px; height: 160px; background: black; border-radius: 50%; box-shadow: 0 0 50px 10px var(--neon-red), inset 0 0 30px var(--neon-red); z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .black-hole span { font-size: 10px; font-weight: 900; color: var(--neon-red); animation: pulse 2s infinite; }
+        .vortex { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px dashed var(--neon-red); opacity: 0.4; animation: rotate 5s linear infinite; }
+        .bh-loading { animation: suck-in 0.8s infinite alternate !important; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { transform: scale(0.95); opacity: 0.5; } 50% { transform: scale(1.05); opacity: 1; } }
-        @keyframes suck-in { to { transform: scale(0.7); filter: blur(5px); } }
-        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: #eab308; box-shadow: 0 0 20px #eab308, 0 0 40px #eab308; animation: scanning 2s ease-in-out infinite; z-index: 20; }
-        @keyframes scanning { 0% { top: 0%; opacity: 0; } 100% { top: 100%; opacity: 0; } }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes suck-in { to { transform: scale(0.7); filter: blur(10px); } }
 
+        /* AD SLOTS */
+        .ad-slot { background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); min-height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 1rem; margin: 10px 0; font-size: 10px; color: gray; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .animate-up { animation: fadeInUp 0.8s forwards; opacity: 0; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <nav class="sticky top-0 z-[100] glass-morph px-6 py-5 flex justify-between items-center border-b border-red-500/10">
-        <h1 class="text-xl font-black italic tracking-tighter uppercase"><span class="neon-text-red">A2Z</span> STUDIO</h1>
-        <div class="text-[9px] font-bold tracking-[0.4em] text-red-500/50">VINE RED PROTOCOL</div>
+    <nav class="sticky top-0 z-[100] glass-morph px-6 py-4 flex justify-between items-center border-b border-red-500/10">
+        <h1 class="text-xl font-black italic uppercase"><span class="neon-text-red">A2Z</span> STUDIO</h1>
+        <div class="text-[8px] font-bold text-red-500/40">COMMERCIAL v3.0</div>
     </nav>
 
-    <div class="max-w-6xl mx-auto px-6 py-16">
-        <div class="mb-20 text-center animate-up">
+    <div class="max-w-4xl mx-auto px-6 mt-4"><div class="ad-slot">ADSTERRA BANNER 728x90</div></div>
+
+    <div class="max-w-6xl mx-auto px-6 py-12">
+        <div class="mb-16 text-center">
             <h2 class="text-7xl md:text-9xl font-black neon-text-red italic tracking-tighter uppercase">FREE TOOL</h2>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-24 animate-up" style="animation-delay: 0.2s;">
-            <div class="glass-morph neon-box p-10 rounded-[3rem] text-center cursor-pointer group transition-all" onclick="openM('downloader')">
-                <i class="fa-solid fa-cloud-bolt text-4xl neon-text-red mb-6 group-hover:scale-125 transition"></i>
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-red-100">Video Save</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-20">
+            <div class="glass-morph p-8 rounded-[2.5rem] text-center cursor-pointer transition-all hover:border-red-500" onclick="openM('downloader')">
+                <i class="fa-solid fa-cloud-bolt text-3xl neon-text-red mb-4"></i>
+                <h3 class="text-[10px] font-black uppercase tracking-widest">Video Save</h3>
             </div>
-            <div class="glass-morph neon-box p-10 rounded-[3rem] text-center cursor-pointer group transition-all" onclick="openM('enhancer')">
-                <i class="fa-solid fa-wand-magic-sparkles text-4xl text-yellow-500 mb-6 group-hover:scale-125 transition" style="text-shadow: 0 0 15px #eab308;"></i>
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-red-100">Photo Fix</h3>
+            <div class="glass-morph p-8 rounded-[2.5rem] text-center cursor-pointer transition-all hover:border-yellow-500" onclick="openM('enhancer')">
+                <i class="fa-solid fa-wand-magic-sparkles text-3xl text-yellow-500 mb-4"></i>
+                <h3 class="text-[10px] font-black uppercase tracking-widest">Photo Fix</h3>
             </div>
-            <div class="glass-morph neon-box p-10 rounded-[3rem] text-center cursor-pointer group transition-all" onclick="openM('toning')">
-                <i class="fa-solid fa-sliders text-4xl text-blue-400 mb-6 group-hover:scale-125 transition" style="text-shadow: 0 0 15px #3b82f6;"></i>
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-red-100">AI Grading</h3>
+            <div class="glass-morph p-8 rounded-[2.5rem] text-center cursor-pointer transition-all hover:border-blue-500" onclick="openM('toning')">
+                <i class="fa-solid fa-palette text-3xl text-blue-400 mb-4"></i>
+                <h3 class="text-[10px] font-black uppercase tracking-widest">AI Grading</h3>
             </div>
-            <div class="glass-morph neon-box p-10 rounded-[3rem] text-center cursor-pointer group transition-all" onclick="openM('social')">
-                <i class="fa-brands fa-instagram text-4xl text-pink-500 mb-6 group-hover:scale-125 transition" style="text-shadow: 0 0 15px #ec4899;"></i>
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-red-100">Insta Pro</h3>
+            <div class="glass-morph p-8 rounded-[2.5rem] text-center cursor-pointer transition-all hover:border-pink-500" onclick="openM('social')">
+                <i class="fa-brands fa-instagram text-3xl text-pink-500 mb-4"></i>
+                <h3 class="text-[10px] font-black uppercase tracking-widest">Insta Pro</h3>
             </div>
         </div>
 
-        <div class="animate-up" style="animation-delay: 0.4s;">
-            <h4 class="text-[10px] font-black text-red-500 uppercase tracking-[0.4em] mb-8 pl-4">Neural Activity Log (Tap to Play)</h4>
-            <div id="hist-list" class="flex gap-5 overflow-x-auto pb-8 no-scrollbar px-4"></div>
+        <div>
+            <h4 class="text-[10px] font-black text-red-500 uppercase tracking-[0.4em] mb-6 pl-2">Activity Log (Tap to Play)</h4>
+            <div id="hist-list" class="flex gap-4 overflow-x-auto pb-6 no-scrollbar"></div>
         </div>
     </div>
 
     <div id="downloader-modal" class="fixed inset-0 z-[200] hidden items-end md:items-center justify-center p-0 md:p-6">
         <div class="absolute inset-0 bg-black/95 backdrop-blur-3xl" onclick="closeM('downloader')"></div>
-        <div class="glass-morph w-full md:max-w-2xl h-[92vh] md:h-auto rounded-t-[4rem] md:rounded-[4rem] p-10 relative z-10 border-t-4 border-[var(--neon-red)] overflow-y-auto no-scrollbar">
-            <h2 class="text-xl font-black mb-10 italic uppercase neon-text-red tracking-widest text-center">Black Hole Engine</h2>
+        <div class="glass-morph w-full md:max-w-2xl h-[90vh] md:h-auto rounded-t-[3rem] md:rounded-[3rem] p-8 relative z-10 border-t-2 border-[var(--neon-red)] overflow-y-auto no-scrollbar">
             <div class="black-hole-container" onclick="document.getElementById('v-url').focus()">
                 <div class="vortex"></div><div class="black-hole" id="main-hole"><span>CLICK & PASTE LINK</span></div>
             </div>
-            <input type="text" id="v-url" placeholder="Paste link into the vortex..." class="input-neon p-5 text-sm w-full mt-10"/>
-            <button onclick="fetchVideo()" class="btn-neon w-full py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] mt-6">SUCK CONTENT</button>
-            <div id="v-results" class="hidden mt-12 space-y-8 animate-up">
-                <img id="v-thumb" class="w-full rounded-[2.5rem] border-2 border-[var(--neon-red)] shadow-2xl"/>
+            <div class="ad-slot my-6">MODAL AD 300x250</div>
+            <input type="text" id="v-url" placeholder="Paste link..." class="input-neon p-4 text-sm w-full mt-4"/>
+            <button onclick="fetchVideo()" class="btn-neon w-full py-4 rounded-2xl font-black text-xs mt-6">SUCK CONTENT</button>
+            <div id="v-results" class="hidden mt-8 space-y-6">
+                <img id="v-thumb" class="w-full rounded-2xl border-2 border-[var(--neon-red)]"/>
                 <div id="v-links" class="space-y-4"></div>
             </div>
         </div>
@@ -106,110 +103,46 @@
 
     <div id="enhancer-modal" class="fixed inset-0 z-[200] hidden items-end md:items-center justify-center p-0 md:p-6">
         <div class="absolute inset-0 bg-black/95 backdrop-blur-3xl" onclick="closeM('enhancer')"></div>
-        <div class="glass-morph w-full md:max-w-2xl h-[90vh] md:h-auto rounded-t-[4rem] md:rounded-[4rem] p-10 relative z-10 border-t-4 border-yellow-500 overflow-y-auto no-scrollbar" style="--comp-slider-color: #eab308;">
-            <h2 class="text-xl font-black mb-8 italic uppercase text-yellow-500 tracking-widest text-center">Neural Enhancer</h2>
-            
-            <div id="p-zone" class="border-2 border-dashed border-yellow-500/30 rounded-[3rem] p-16 text-center cursor-pointer" onclick="document.getElementById('p-input').click()">
+        <div class="glass-morph w-full md:max-w-2xl h-[90vh] md:h-auto rounded-t-[3rem] md:rounded-[3rem] p-8 relative z-10 border-t-2 border-yellow-500 overflow-y-auto no-scrollbar" style="--comp-color: #eab308;">
+            <div id="p-zone" class="border-2 border-dashed border-yellow-500/20 rounded-[2rem] p-12 text-center cursor-pointer" onclick="document.getElementById('p-input').click()">
                 <input type="file" id="p-input" class="hidden" accept="image/*" onchange="previewImg(event, 'p')"/>
-                <p class="text-[11px] font-black text-yellow-500/60 uppercase tracking-widest">Inject Image Data</p>
+                <p class="text-[10px] font-black text-yellow-500/50">UPLOAD TO FIX</p>
             </div>
-
-            <div id="p-processing" class="hidden text-center py-12 relative">
-                <div class="relative w-64 h-64 mx-auto rounded-[2rem] overflow-hidden border-2 border-yellow-500/50">
-                    <img id="p-scan-preview" class="w-full h-full object-cover opacity-50 blur-sm"/>
-                    <div class="scan-line"></div>
-                </div>
-                <p class="text-xs font-black text-yellow-500 animate-pulse mt-6 tracking-[0.2em]">NEURAL UPSCALING...</p>
-            </div>
-
-            <div id="p-res" class="hidden mt-8 space-y-6 animate-up">
-                <div class="comp-container" id="p-comp">
+            <div id="p-res" class="hidden mt-6 space-y-6">
+                 <div class="comp-container" id="p-comp">
                     <img id="p-after-img" class="comp-img" src=""/>
-                    <div class="comp-overlay" style="width: 50%;">
-                        <img id="p-before-img" class="comp-img" src=""/>
-                    </div>
-                    <div class="comp-slider-btn" style="left: 50%;"><i class="fa-solid fa-left-right text-black"></i></div>
+                    <div class="comp-overlay" style="width: 50%;"><img id="p-before-img" class="comp-img" src=""/></div>
+                    <div class="comp-slider-btn"><i class="fa-solid fa-left-right text-black text-xs"></i></div>
                     <input type="range" min="0" max="100" value="50" class="comp-range" oninput="updateSlider(this, 'p-comp')">
                 </div>
-                <div class="text-center text-[9px] font-bold text-yellow-500/50 uppercase tracking-widest mb-4">Swipe to compare Before / After</div>
-                
-                <a id="p-download-btn" class="block w-full bg-yellow-600 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest text-white text-center shadow-[0_0_20px_rgba(234,179,8,0.3)]">DOWNLOAD RESULT</a>
+                <a id="p-dl" download="Fixed.png" class="btn-neon block w-full py-4 rounded-2xl text-center font-black text-xs text-white uppercase">Download Result</a>
             </div>
         </div>
     </div>
 
     <div id="toning-modal" class="fixed inset-0 z-[200] hidden items-end md:items-center justify-center p-0 md:p-6">
         <div class="absolute inset-0 bg-black/95 backdrop-blur-3xl" onclick="closeM('toning')"></div>
-        <div class="glass-morph w-full md:max-w-2xl h-[95vh] md:h-auto rounded-t-[4rem] md:rounded-[4rem] p-8 relative z-10 border-t-4 border-blue-500 overflow-y-auto no-scrollbar" style="--comp-slider-color: #3b82f6;">
-            <h2 class="text-xl font-black mb-6 italic uppercase text-blue-500 tracking-widest text-center">AI Grading Studio</h2>
-            
-            <div id="t-zone" class="border-2 border-dashed border-blue-500/30 rounded-[3rem] p-12 text-center cursor-pointer mb-8" onclick="document.getElementById('t-input').click()">
-                <input type="file" id="t-input" class="hidden" accept="image/*" onchange="previewImg(event, 't')"/>
-                <p class="text-[11px] font-black text-blue-500/60 uppercase tracking-widest">Select Image</p>
+        <div class="glass-morph w-full md:max-w-2xl h-[95vh] md:h-auto rounded-t-[3rem] md:rounded-[4rem] p-8 relative z-10 border-t-2 border-blue-500 overflow-y-auto no-scrollbar" style="--comp-color: #3b82f6;">
+            <div id="t-zone" class="border-2 border-dashed border-blue-500/20 rounded-[2rem] p-10 text-center cursor-pointer mb-6" onclick="document.getElementById('t-input').click()">
+                <input type="file" id="t-input" class="hidden" onchange="previewImg(event, 't')"/>
+                <p class="text-[10px] font-black text-blue-500/50">SELECT IMAGE</p>
             </div>
-
-            <div id="t-interface" class="hidden space-y-6 animate-up">
+            <div id="t-interface" class="hidden space-y-6">
                 <div class="comp-container h-64" id="t-comp">
-                    <img id="t-after-img" class="comp-img" src=""/>
-                    <div class="comp-overlay" style="width: 100%;"> <img id="t-before-img" class="comp-img" src=""/>
-                    </div>
-                    <div class="comp-slider-btn" style="left: 100%;"><i class="fa-solid fa-left-right text-black"></i></div>
-                    <input type="range" min="0" max="100" value="100" class="comp-range" oninput="updateSlider(this, 't-comp')">
+                    <img id="t-after-img" class="comp-img"/><div class="comp-overlay"><img id="t-before-img" class="comp-img"/></div>
+                    <div class="comp-slider-btn"><i class="fa-solid fa-left-right text-black text-xs"></i></div>
+                    <input type="range" class="comp-range" oninput="updateSlider(this, 't-comp')">
                 </div>
-                
-                <div class="flex gap-2 mb-4">
-                    <button onclick="switchTab('presets')" class="tab-btn flex-1 btn-action active py-3 rounded-xl text-[9px] font-black uppercase">Presets</button>
-                    <button onclick="switchTab('manual')" class="tab-btn flex-1 btn-action py-3 rounded-xl text-[9px] font-black uppercase">Manual (Sliders)</button>
-                    <button onclick="switchTab('ai')" class="tab-btn flex-1 btn-action py-3 rounded-xl text-[9px] font-black uppercase">AI Magic</button>
-                </div>
-
-                <div id="tab-presets" class="tab-content space-y-4">
-                    <div class="flex gap-3">
-                         <button onclick="applyCloudinary('e_art:incognito')" class="flex-1 bg-blue-900/50 py-4 rounded-2xl text-[9px] font-black uppercase border border-blue-500/20">Cinematic</button>
-                        <button onclick="applyCloudinary('e_vibrant:50,e_contrast:30')" class="flex-1 bg-blue-700/50 py-4 rounded-2xl text-[9px] font-black uppercase border border-blue-500/20">Vibrant</button>
-                        <button onclick="applyCloudinary('e_skin_tune,e_improve')" class="flex-1 bg-blue-500/50 py-4 rounded-2xl text-[9px] font-black uppercase border border-blue-500/20">Skin Fix</button>
+                <div class="space-y-4 bg-black/40 p-6 rounded-3xl">
+                    <div><p class="text-[9px] uppercase text-blue-300 mb-1">Neural Brightness</p><input type="range" id="s-b" min="-50" max="50" value="0" class="slider-neon" onchange="applyManual()"></div>
+                    <div><p class="text-[9px] uppercase text-blue-300 mb-1">Neural Contrast</p><input type="range" id="s-c" min="-50" max="50" value="0" class="slider-neon" onchange="applyManual()"></div>
+                    <div class="flex gap-2">
+                        <button onclick="applyEffect('e_background_blur:200')" class="flex-1 py-3 bg-blue-900/30 rounded-xl text-[8px] font-black uppercase">Blur BG</button>
+                        <button onclick="applyEffect('e_gen_remove:prompt_object')" class="flex-1 py-3 bg-red-900/30 rounded-xl text-[8px] font-black uppercase">AI Remove</button>
                     </div>
                 </div>
-
-                <div id="tab-manual" class="tab-content hidden space-y-4">
-                    <div>
-                        <p class="text-[9px] uppercase text-blue-300 mb-2">Brightness</p>
-                        <input type="range" id="slider-bright" min="-50" max="50" value="0" class="slider-neon">
-                    </div>
-                    <div>
-                        <p class="text-[9px] uppercase text-blue-300 mb-2">Contrast</p>
-                        <input type="range" id="slider-contrast" min="-50" max="50" value="0" class="slider-neon">
-                    </div>
-                     <div>
-                        <p class="text-[9px] uppercase text-blue-300 mb-2">Saturation</p>
-                        <input type="range" id="slider-sat" min="-50" max="50" value="0" class="slider-neon">
-                    </div>
-                    <button onclick="applyManualSliders()" class="btn-neon w-full py-4 rounded-2xl text-[10px] font-black uppercase">APPLY SLIDERS</button>
-                </div>
-
-                <div id="tab-ai" class="tab-content hidden space-y-6">
-                    <button onclick="applyCloudinary('e_background_blur:200')" class="w-full bg-purple-900/50 py-4 rounded-2xl text-[10px] font-black uppercase border border-purple-500/20">Blur Background</button>
-                    <div class="space-y-2">
-                         <p class="text-[9px] uppercase text-pink-300">Generative Remove (Type object)</p>
-                        <div class="flex gap-2">
-                            <input type="text" id="remove-prompt" placeholder="e.g., tree, person..." class="input-neon flex-grow p-4 text-xs"/>
-                            <button onclick="applyGenRemove()" class="btn-neon px-6 rounded-2xl text-[10px] font-black uppercase">REMOVE</button>
-                        </div>
-                    </div>
-                </div>
-                 <p id="t-status" class="text-[9px] text-center text-blue-400 animate-pulse h-4"></p>
-                <a id="t-download-btn" class="hidden w-full bg-blue-600 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest text-white text-center shadow-[0_0_20px_rgba(59,130,246,0.3)]">DOWNLOAD RESULT</a>
+                <a id="t-dl" class="btn-neon block w-full py-4 rounded-2xl text-center text-xs font-black text-white">SAVE RESULT</a>
             </div>
-        </div>
-    </div>
-
-    <div id="social-modal" class="fixed inset-0 z-[200] hidden items-end md:items-center justify-center p-0 md:p-6">
-        <div class="absolute inset-0 bg-black/95 backdrop-blur-3xl" onclick="closeM('social')"></div>
-        <div class="glass-morph w-full md:max-w-2xl h-[85vh] md:h-auto rounded-t-[4rem] md:rounded-[4rem] p-10 relative z-10 border-t-4 border-pink-500 overflow-y-auto no-scrollbar">
-            <h2 class="text-xl font-black mb-10 italic uppercase text-pink-500 tracking-widest text-center">Neural Captioning</h2>
-            <textarea id="ai-prompt" class="input-neon w-full h-44 mb-8 p-6 text-sm resize-none" placeholder="Describe photo to AI..."></textarea>
-            <button onclick="generateAI()" id="ai-btn" class="btn-neon w-full py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest">GENERATE VIRAL CONTENT</button>
-            <div id="ai-result" class="mt-8 p-8 glass-morph rounded-[2.5rem] text-sm leading-relaxed hidden border-pink-500/20"></div>
         </div>
     </div>
 
@@ -218,134 +151,68 @@
 
     <script>
     //<![CDATA[
-        // CONFIG
-        const cloudName = "dgikim3w1"; const uploadPreset = "my_preset"; 
+        // Credentials
+        const cloudName = "dgikim3w1", uploadPreset = "my_preset";
         const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "a2ztools-6ea22" };
         firebase.initializeApp(firebaseConfig); const db = firebase.database(); let keys = {}; 
         db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
 
-        // GLOBAL VARS
-        let currentFile = null; let currentPublicId = null;
+        let currentFile = null, currentPId = null;
 
-        // UI HANDLERS
         function openM(id) { document.getElementById(id + '-modal').classList.replace('hidden', 'flex'); }
         function closeM(id) { document.getElementById(id + '-modal').classList.replace('flex', 'hidden'); }
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-        function updateSlider(range, containerId) {
-            const container = document.getElementById(containerId);
-            container.querySelector('.comp-overlay').style.width = range.value + "%";
-            container.querySelector('.comp-slider-btn').style.left = range.value + "%";
-        }
+        function updateSlider(r, c) { document.getElementById(c).querySelector('.comp-overlay').style.width = r.value + "%"; document.getElementById(c).querySelector('.comp-slider-btn').style.left = r.value + "%"; }
 
-        // 1. VIDEO ENGINE
+        // VIDEO
         async function fetchVideo() {
             const url = document.getElementById('v-url').value; const hole = document.getElementById('main-hole');
-            if(!url || !keys.videoKey) return alert("System Syncing...");
-            hole.classList.add('bh-loading'); hole.innerHTML = "<span>SUCKING...</span>";
+            if(!url || !keys.videoKey) return; hole.classList.add('bh-loading');
             try {
                 const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': keys.videoKey, 'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' }, body: JSON.stringify({ url }) });
                 const d = await res.json();
                 document.getElementById('v-thumb').src = d.picture;
-                document.getElementById('v-links').innerHTML = d.medias.map(m => `<div class="glass-morph p-4 rounded-2xl flex justify-between items-center border-red-500/10"><span class="text-[10px] font-black text-red-100/70">${m.quality}</span><a href="${m.url}" download="A2Z_Video.${m.extension}" class="btn-neon px-6 py-2 rounded-xl text-[10px] font-black uppercase text-white">DOWNLOAD</a></div>`).join('');
+                document.getElementById('v-links').innerHTML = d.medias.map(m => `<a href="${m.url}" download class="btn-neon block p-4 rounded-xl text-center text-[10px] font-black">${m.quality} SAVE</a>`).join('');
                 document.getElementById('v-results').classList.remove('hidden'); saveLog('Video', d.title, url);
-            } catch (e) { alert("Error!"); } hole.classList.remove('bh-loading'); hole.innerHTML = "<span>READY</span>";
+            } catch (e) { alert("Error!"); } hole.classList.remove('bh-loading');
         }
 
-        // COMMON IMAGE HANDLER
+        // IMAGE HANDLER (Cloudinary Node)
         async function previewImg(e, type) {
             currentFile = e.target.files[0]; const imgUrl = URL.createObjectURL(currentFile);
-            document.getElementById(`${type}-before-img`).src = imgUrl;
-            if(type === 'p') document.getElementById('p-scan-preview').src = imgUrl;
-            document.getElementById(`${type}-zone`).classList.add('hidden');
-            if(type === 't') document.getElementById('t-interface').classList.remove('hidden');
+            document.getElementById(type + '-before-img').src = imgUrl;
+            document.getElementById(type + '-zone').classList.add('hidden');
             
-            // Auto-upload to get Public ID for Toning interactions
-            if(type === 't') {
-                 const status = document.getElementById('t-status'); status.innerText = "Preparing Image Base...";
-                 const formData = new FormData(); formData.append("file", currentFile); formData.append("upload_preset", uploadPreset);
-                 const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: formData });
-                 const data = await res.json(); currentPublicId = data.public_id;
-                 document.getElementById('t-after-img').src = data.secure_url; // Set initial "after" to original
-                 status.innerText = "Ready for Grading.";
+            // Auto-upload for ID
+            const formData = new FormData(); formData.append("file", currentFile); formData.append("upload_preset", uploadPreset);
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: formData });
+            const data = await res.json(); currentPId = data.public_id;
+
+            if(type === 'p') {
+                const fixUrl = data.secure_url.replace("/upload/", "/upload/e_improve,e_upscale,w_1500/");
+                document.getElementById('p-after-img').src = fixUrl; document.getElementById('p-dl').href = fixUrl;
+                document.getElementById('p-res').classList.remove('hidden');
+            } else {
+                document.getElementById('t-after-img').src = data.secure_url;
+                document.getElementById('t-interface').classList.remove('hidden');
             }
-             // Auto-start Photo Fix
-            if(type === 'p') enhancePhoto();
         }
 
-        // 2. PHOTO FIX ENGINE (Auto + Before/After)
-        async function enhancePhoto() {
-             document.getElementById('p-processing').classList.remove('hidden');
-             const formData = new FormData(); formData.append("file", currentFile); formData.append("upload_preset", uploadPreset);
-             const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: formData });
-             const data = await res.json();
-             const enhancedUrl = data.secure_url.replace("/upload/", "/upload/e_improve,e_upscale,w_1500/");
-             
-             const afterImg = document.getElementById('p-after-img');
-             afterImg.onload = () => {
-                  document.getElementById('p-processing').classList.add('hidden');
-                  document.getElementById('p-res').classList.remove('hidden');
-                  // Reset slider to middle to show comparison
-                  document.querySelector('#p-comp .comp-range').value = 50; updateSlider(document.querySelector('#p-comp .comp-range'), 'p-comp');
-             };
-             afterImg.src = enhancedUrl;
-             document.getElementById('p-download-btn').href = enhancedUrl.replace("/upload/", "/upload/fl_attachment/");
-             saveLog('Photo Fix', 'HD Upscale', '');
+        async function applyEffect(trans) {
+            const url = `https://res.cloudinary.com/${cloudName}/image/upload/${trans}/${currentPId}`;
+            const after = document.getElementById('t-after-img');
+            after.src = url; document.getElementById('t-dl').href = url;
+            // Reset slider to show result
+            document.querySelector('#t-comp .comp-range').value = 0; updateSlider(document.querySelector('#t-comp .comp-range'), 't-comp');
         }
 
-        // 3. AI TONING ENGINE (Sliders + AI Tools)
-        async function applyCloudinary(transform) {
-            if(!currentPublicId) return alert("Image not ready!");
-            const status = document.getElementById('t-status'); status.innerText = "Applying Neural Transform...";
-            const finalUrl = `https://res.cloudinary.com/${cloudName}/image/upload/${transform}/${currentPublicId}`;
-            updateToningResult(finalUrl);
+        function applyManual() {
+            const b = document.getElementById('s-b').value, c = document.getElementById('s-c').value;
+            applyEffect(`e_brightness:${b},e_contrast:${c}`);
         }
 
-        async function applyManualSliders() {
-            const b = document.getElementById('slider-bright').value;
-            const c = document.getElementById('slider-contrast').value;
-            const s = document.getElementById('slider-sat').value;
-            applyCloudinary(`e_brightness:${b},e_contrast:${c},e_saturation:${s}`);
-        }
-
-        async function applyGenRemove() {
-            const prompt = document.getElementById('remove-prompt').value;
-            if(!prompt) return alert("Enter object name!");
-            applyCloudinary(`e_gen_remove:prompt_${prompt}`);
-        }
-
-        function updateToningResult(url) {
-            const afterImg = document.getElementById('t-after-img');
-            const status = document.getElementById('t-status');
-            const dlBtn = document.getElementById('t-download-btn');
-            
-            status.innerText = "Rendering..."; dlBtn.classList.add('hidden');
-            afterImg.onload = () => {
-                 status.innerText = "Effect Applied. Swipe to compare.";
-                 dlBtn.href = url.replace("/upload/", "/upload/fl_attachment/"); dlBtn.classList.remove('hidden');
-                 // Move slider to show result
-                 document.querySelector('#t-comp .comp-range').value = 0; updateSlider(document.querySelector('#t-comp .comp-range'), 't-comp');
-            };
-            afterImg.src = url;
-        }
-
-        // 4. INSTA PRO
-        async function generateAI() {
-            const p = document.getElementById('ai-prompt').value; if(!p || !keys.geminiKey) return alert("Key Missing!");
-            const resDiv = document.getElementById('ai-result'); resDiv.classList.add('hidden');
-            try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${keys.geminiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: "Viral captions for: " + p }] }] }) });
-                const d = await res.json(); resDiv.innerText = d.candidates[0].content.parts[0].text; resDiv.classList.remove('hidden');
-            } catch (e) { alert("Limit reached!"); }
-        }
-
-        // HISTORY & MISC
-        function saveLog(t, i, url) { let logs = JSON.parse(localStorage.getItem('a2z_log')) || []; logs.unshift({ t, i, url, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) }); localStorage.setItem('a2z_log', JSON.stringify(logs.slice(0, 10))); renderHistory(); }
-        function renderHistory() { const list = document.getElementById('hist-list'); const logs = JSON.parse(localStorage.getItem('a2z_log')) || []; list.innerHTML = logs.map(l => `<div class="glass-morph min-w-[170px] p-5 rounded-[2.5rem] border-red-500/10 cursor-pointer" onclick="playH('${l.url}')"><p class="neon-text-red font-black uppercase text-[9px] mb-2">${l.t}</p><p class="text-white/40 truncate text-[10px]">${l.i}</p></div>`).join(''); }
+        // HISTORY
+        function saveLog(t, i, url) { let logs = JSON.parse(localStorage.getItem('a2z_log')) || []; logs.unshift({ t, i, url, time: new Date().toLocaleTimeString() }); localStorage.setItem('a2z_log', JSON.stringify(logs.slice(0, 10))); renderHistory(); }
+        function renderHistory() { const list = document.getElementById('hist-list'); const logs = JSON.parse(localStorage.getItem('a2z_log')) || []; list.innerHTML = logs.map(l => `<div class="glass-morph min-w-[150px] p-4 rounded-[2rem] border-red-500/10 cursor-pointer" onclick="playH('${l.url}')"><p class="neon-text-red font-black text-[9px] uppercase">${l.t}</p><p class="text-white/30 truncate text-[10px]">${l.i}</p></div>`).join(''); }
         function playH(u) { if(!u) return; openM('downloader'); document.getElementById('v-url').value = u; fetchVideo(); }
         window.onload = renderHistory;
     //]]>
