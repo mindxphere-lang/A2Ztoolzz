@@ -25,15 +25,12 @@
         .hyper-pulse { animation: hyper 0.5s infinite alternate !important; }
         @keyframes hyper { 0% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1.05); opacity: 1; } }
         
-        /* Minimal Video Box */
-        .video-box { position: relative; width: 100%; border-radius: 2rem; overflow: hidden; background: #000; border: 1px solid rgba(255, 0, 85, 0.2); }
+        .video-box { position: relative; width: 100%; border-radius: 2rem; overflow: hidden; background: #000; border: 1px solid rgba(255, 0, 85, 0.2); cursor: pointer; }
         .video-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 15px; font-size: 10px; font-weight: bold; z-index: 10; pointer-events: none; }
         
         .dl-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 1.2rem; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; }
         .btn-save { background: linear-gradient(45deg, #80002a, #ff0055); padding: 8px 20px; border-radius: 10px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; }
-        .btn-save:disabled { opacity: 0.5; background: #222; }
-
-        /* Custom Play Overlay */
+        
         .play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 40px; color: white; opacity: 0.7; z-index: 20; pointer-events: none; }
     </style>
 </head>
@@ -56,19 +53,17 @@
                 <div id="v-name" class="video-label truncate text-white/70">Video Loading...</div>
             </div>
             <div id="v-links" class="space-y-2"></div>
-            <p class="text-[8px] text-center text-white/20 uppercase font-bold tracking-widest">iPhone Users: Check 'Files' app after saving</p>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        // FIREBASE SYNC
         const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig); const db = firebase.database();
         let keys = {}; db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
 
-        const core = document.getElementById('bh-core'), text = document.getElementById('bh-text'), player = document.getElementById('v-player'), icon = document.getElementById('play-icon');
+        const core = document.getElementById('bh-core'), text = document.getElementById('bh-text'), player = document.getElementById('v-player'), icon = document.getElementById('play-icon'), statusMsg = document.getElementById('status-msg');
 
         function togglePlay() { if(player.paused) player.play(); else player.pause(); }
         function hideIcon() { icon.style.display = 'none'; }
@@ -76,11 +71,12 @@
 
         async function startProcess() {
             try {
-                // AUTO-PASTE
                 const url = await navigator.clipboard.readText();
-                if (!url.startsWith('http')) throw new Error();
+                if (!url.startsWith('http')) throw new Error("Copy link first");
 
-                core.classList.add('hyper-pulse'); text.innerHTML = "SUCKING...";
+                core.classList.add('hyper-pulse'); 
+                text.innerHTML = "FETCHING...";
+                statusMsg.innerText = "Syncing with Rapid Node...";
                 document.getElementById('v-results').classList.add('hidden');
 
                 const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
@@ -90,62 +86,59 @@
                 });
                 
                 const data = await res.json();
+                
+                // Fix for API Limit or Error
                 if (data.medias) {
                     renderResults(data);
-                    core.classList.remove('hyper-pulse'); text.innerHTML = "SUCCESSFUL";
+                    core.classList.remove('hyper-pulse'); 
+                    text.innerHTML = "SUCCESS";
+                    statusMsg.innerText = "Ready to download";
                     setTimeout(() => { text.innerHTML = "TAP TO<br>AUTO-PASTE"; }, 3000);
-                } else { throw new Error(); }
+                } else {
+                    throw new Error("API Limit reached. Tap again.");
+                }
             } catch (e) { 
-                alert("Copy Link first! Or API limit reached."); 
-                core.classList.remove('hyper-pulse'); text.innerHTML = "FAILED"; 
+                core.classList.remove('hyper-pulse'); 
+                text.innerHTML = "RETRY"; 
+                statusMsg.innerText = "Error: Tap again to sync.";
+                console.error(e);
             }
         }
 
-        // --- FINAL FORCE DOWNLOAD LOGIC (PC & MOBILE) ---
+        // --- ENHANCED DOWNLOAD LOGIC (PC & IPHONE FIX) ---
         async function neuralDownload(fileUrl, btn) {
             const originalText = btn.innerText;
-            btn.innerText = "WAIT...";
+            btn.innerText = "FETCHING...";
             btn.disabled = true;
 
             try {
-                // Using XHR for better progress handling and Blob conversion
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', fileUrl, true);
-                xhr.responseType = 'blob';
-
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        const blob = xhr.response;
-                        const blobUrl = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = blobUrl;
-                        a.download = `A2Z_STUDIO_${Date.now()}.mp4`; // Forces download
-                        document.body.appendChild(a);
-                        a.click();
-                        setTimeout(() => {
-                            window.URL.revokeObjectURL(blobUrl);
-                            document.body.removeChild(a);
-                        }, 100);
-                        btn.innerText = "SAVED!";
-                    } else {
-                        throw new Error();
-                    }
-                };
-
-                xhr.onerror = function() {
-                    // Fallback for CORS restricted links
-                    window.location.href = fileUrl; 
-                    btn.innerText = "PLAYED";
-                };
-
-                xhr.send();
+                // Background fetch to convert video into a Blob
+                const response = await fetch(fileUrl);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                // Unique filename to force download instead of play
+                a.download = `A2Z_VIDEO_${Math.floor(Date.now() / 1000)}.mp4`;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(blobUrl);
+                    document.body.removeChild(a);
+                }, 1000);
+                
+                btn.innerText = "SAVED!";
             } catch (e) {
-                // Ultimate Fallback: Direct Anchor
+                // Fallback for CORS restricted links
                 const a = document.createElement('a');
                 a.href = fileUrl;
-                a.download = 'video.mp4';
+                a.setAttribute('download', 'video.mp4');
+                a.target = '_blank';
                 a.click();
+                btn.innerText = "OPENED";
             } finally {
                 setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 3000);
             }
@@ -153,12 +146,12 @@
 
         function renderResults(data) {
             player.src = data.medias[0].url; 
-            document.getElementById('v-name').innerText = data.title || "Video Success";
+            document.getElementById('v-name').innerText = data.title || "Vortex Video Found";
 
             const linksBox = document.getElementById('v-links');
             const m = data.medias;
             
-            // Filters for Normal, High, 4K
+            // Filter Normal, High, 4K
             const n = m.find(x => x.quality.includes('360') || x.quality.includes('480'));
             const h = m.find(x => x.quality.includes('720') || x.quality.includes('1080'));
             const f = m.find(x => x.quality.includes('4k') || x.quality.includes('2160'));
