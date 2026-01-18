@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Vortex Engine v4.0</title>
+    <title>A2Z Studio - Vortex Engine v5.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
@@ -11,43 +11,35 @@
         :root { --neon: #ff0055; --bg: #05000a; }
         body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden; background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed; }
         
-        /* THE VORTEX */
         .vortex-wrapper { position: relative; width: 280px; height: 280px; margin: 30px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .black-hole { position: relative; width: 170px; height: 170px; background: black; border-radius: 50%; box-shadow: 0 0 50px var(--neon), inset 0 0 30px var(--neon); z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center; transition: 0.5s; }
+        .black-hole { position: relative; width: 170px; height: 170px; background: black; border-radius: 50%; box-shadow: 0 0 50px var(--neon), inset 0 0 30px var(--neon); z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center; }
         .black-hole span { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--neon); }
         .vortex-ring { position: absolute; inset: 0; border: 2px dashed rgba(255, 0, 85, 0.2); border-radius: 50%; animation: spin 10s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .hyper-pulse { animation: hyper 0.5s infinite alternate !important; }
-        @keyframes hyper { 0% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1.05); opacity: 1; } }
+        @keyframes hyper { 0% { transform: scale(0.95); } 100% { transform: scale(1.05); } }
 
-        /* MINIMAL VIDEO BOX */
         .video-box { position: relative; width: 100%; border-radius: 2rem; overflow: hidden; background: #000; border: 1px solid rgba(255, 0, 85, 0.2); cursor: pointer; }
         .video-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 15px; font-size: 10px; font-weight: bold; z-index: 10; pointer-events: none; }
         .play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 40px; color: white; opacity: 0.7; z-index: 20; pointer-events: none; }
 
-        /* DOWNLOAD CARDS */
         .dl-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 1.2rem; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        .btn-save { background: linear-gradient(45deg, #80002a, #ff0055); padding: 10px 25px; border-radius: 10px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; transition: 0.3s; }
-        .btn-save:disabled { background: #222; opacity: 0.5; }
-
-        /* MAINTENANCE SCREEN */
+        .btn-save { background: linear-gradient(45deg, #80002a, #ff0055); padding: 10px 25px; border-radius: 10px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; }
+        
         #m-screen { position: fixed; inset: 0; z-index: 3000; background: black; display: none; align-items: center; justify-content: center; text-align: center; }
     </style>
 </head>
-<body class="min-h-screen">
+<body>
 
     <div id="m-screen">
-        <div class="p-10">
+        <div class="p-10 text-center">
             <div class="w-20 h-20 border-4 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-8"></div>
             <h1 class="text-3xl font-black neon-text text-pink-600 uppercase italic mb-4">Maintenance Mode</h1>
             <p id="m-msg-display" class="text-white/50 text-[10px] tracking-widest uppercase font-bold"></p>
         </div>
     </div>
 
-    <nav class="p-4 flex justify-between items-center">
-        <a href="index.html" class="text-pink-500 font-black uppercase text-[9px] tracking-widest"><i class="fa-solid fa-arrow-left mr-1"></i> HUB</a>
-        <div id="api-status" class="text-[7px] font-black text-green-500 uppercase tracking-widest">Node Active</div>
-    </nav>
+    <nav class="p-4"><a href="index.html" class="text-pink-500 font-black uppercase text-[9px] tracking-widest"><i class="fa-solid fa-arrow-left mr-1"></i> HUB</a></nav>
 
     <div class="max-w-xl mx-auto px-6">
         <div class="vortex-wrapper" onclick="startNeuralFetch()">
@@ -61,7 +53,7 @@
             <div class="video-box" onclick="controlVideo()">
                 <div id="play-icon" class="play-btn"><i class="fa-solid fa-play"></i></div>
                 <video id="v-player" playsinline class="w-full aspect-video bg-black" onplay="hideIcon()" onpause="showIcon()" disablePictureInPicture controlsList="nodownload noplaybackrate"></video>
-                <div id="v-name" class="video-label truncate text-white/70">Video Loading...</div>
+                <div id="v-name" class="video-label truncate text-white/70">Video Loaded</div>
             </div>
             <div id="v-links" class="space-y-2"></div>
         </div>
@@ -70,14 +62,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
-            databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
-        };
+        const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig); const db = firebase.database();
         let keys = {}; 
 
-        // SYNC MASTER CONTROLS
         db.ref('settings').on('value', (s) => { 
             keys = s.val() || {}; 
             if(keys.maintenanceMode) {
@@ -113,73 +101,64 @@
                     renderResults(data);
                     core.classList.remove('hyper-pulse'); text.innerHTML = "SUCCESS";
                     setTimeout(() => { text.innerHTML = "TAP TO<br>AUTO-PASTE"; }, 3000);
-                } else { throw new Error("API Limit"); }
+                }
             } catch (e) { 
                 core.classList.remove('hyper-pulse'); text.innerHTML = "RETRY"; 
-                document.getElementById('api-status').innerText = "Node Overload - Retry";
             }
         }
 
-        // --- THE "PERFECT" NEURAL DOWNLOADER (FORCED BLOB RE-STREAMING) ---
+        // --- NEW ULTIMATE RE-STREAMER (PC FIX) ---
         async function neuralDownload(fileUrl, btn) {
             const originalText = btn.innerText;
-            btn.innerText = "LOCKING...";
+            btn.innerText = "WAIT...";
             btn.disabled = true;
 
-            // List of Ultra-Proxies to bypass CORS and Force Download
-            const proxies = ["", "https://api.allorigins.win/raw?url=", "https://corsproxy.io/?"];
-            let success = false;
+            const proxies = [
+                "https://api.allorigins.win/raw?url=", 
+                "https://corsproxy.io/?",
+                "" // Direct Fallback
+            ];
+
+            let downloadStarted = false;
 
             for (let proxy of proxies) {
-                if (success) break;
+                if (downloadStarted) break;
                 try {
-                    const fetchUrl = proxy + encodeURIComponent(fileUrl);
-                    // Using XHR because it's more robust for binary blobs on older PC browsers
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('GET', fetchUrl, true);
-                    xhr.responseType = 'blob';
+                    const finalUrl = proxy + encodeURIComponent(fileUrl);
+                    const response = await fetch(finalUrl);
+                    if (!response.ok) throw new Error();
 
-                    const downloadPromise = new Promise((resolve, reject) => {
-                        xhr.onload = function() {
-                            if (xhr.status === 200) {
-                                const blob = xhr.response;
-                                const blobUrl = window.URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.style.display = 'none';
-                                a.href = blobUrl;
-                                // Forcing filename with a timestamp to trick PC browsers
-                                a.download = `A2Z_VIDEO_${Math.floor(Date.now() / 1000)}.mp4`;
-                                document.body.appendChild(a);
-                                a.click();
-                                setTimeout(() => {
-                                    window.URL.revokeObjectURL(blobUrl);
-                                    document.body.removeChild(a);
-                                }, 500);
-                                resolve(true);
-                            } else { reject(); }
-                        };
-                        xhr.onerror = () => reject();
-                    });
-
-                    xhr.send();
-                    success = await downloadPromise;
-                    if(success) btn.innerText = "SAVED!";
-                } catch (e) { console.log("Path Blocked, Trying Proxy..."); }
+                    const blob = await response.blob();
+                    const blobUrl = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = blobUrl;
+                    a.download = `A2Z_STUDIO_VIDEO_${Math.floor(Date.now()/1000)}.mp4`;
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    setTimeout(() => {
+                        URL.revokeObjectURL(blobUrl);
+                        document.body.removeChild(a);
+                    }, 1000);
+                    
+                    btn.innerText = "DONE!";
+                    downloadStarted = true;
+                } catch (e) { continue; }
             }
 
-            if (!success) {
-                // LAST RESORT: Open link but warn user for PC
-                alert("PC Bug: Browser blocked direct save. Right-click the video and 'Save Video As' if it opens in a new tab.");
-                window.open(fileUrl, '_blank');
-                btn.innerText = "FAILED";
+            if (!downloadStarted) {
+                // Silent Fallback if all proxies fail
+                window.location.href = fileUrl;
+                btn.innerText = "OPENED";
             }
             setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 3000);
         }
 
         function renderResults(data) {
             player.src = data.medias[0].url; 
-            document.getElementById('v-name').innerText = data.title || "Video Vortex Found";
-
+            document.getElementById('v-name').innerText = data.title || "Neural Video Found";
             const linksBox = document.getElementById('v-links');
             const m = data.medias;
             
