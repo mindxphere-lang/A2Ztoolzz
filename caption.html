@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Insta Pro AI</title>
+    <title>A2Z Studio - Insta Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
@@ -12,110 +12,44 @@
         body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; overflow-x: hidden; background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed; }
         .glass-card { background: rgba(255, 0, 85, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 0, 85, 0.15); border-radius: 2.5rem; }
         .neon-btn { background: linear-gradient(45deg, #80002a, #ff0055); box-shadow: 0 0 20px rgba(255, 0, 85, 0.3); transition: 0.3s; }
-        .neon-btn:disabled { opacity: 0.5; filter: grayscale(1); }
-        textarea { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,0,85,0.1); border-radius: 1.5rem; padding: 20px; color: white; outline: none; transition: 0.3s; width: 100%; font-size: 14px; }
+        textarea { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,0,85,0.1); border-radius: 1.5rem; padding: 20px; color: white; outline: none; width: 100%; font-size: 14px; }
         textarea:focus { border-color: var(--neon); box-shadow: 0 0 15px rgba(255,0,85,0.2); }
     </style>
 </head>
 <body class="min-h-screen p-6">
-
     <nav class="mb-10"><a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> HUB</a></nav>
-
     <div class="max-w-xl mx-auto space-y-8">
-        <header class="text-center">
-            <h1 class="text-4xl font-black italic uppercase text-white neon-text">Insta <span class="text-pink-600">Pro</span></h1>
-            <p class="text-[9px] text-white/30 uppercase tracking-[0.4em] mt-2 font-bold text-center">Neural Caption Generator</p>
-        </header>
-
+        <header class="text-center"><h1 class="text-4xl font-black italic uppercase">Insta <span class="text-pink-600">Pro</span></h1><p class="text-[9px] text-white/30 uppercase tracking-widest mt-2">Neural Caption Engine</p></header>
         <div class="glass-card p-8 space-y-6">
-            <textarea id="ai-input" rows="4" placeholder="Describe your photo or video (e.g., 'Boy sitting on a bullet bike in mountains')"></textarea>
-            
-            <button id="gen-btn" onclick="generateNeuralCaption()" class="neon-btn w-full py-5 rounded-2xl font-black text-xs uppercase tracking-widest">
-                Consulting AI...
-            </button>
+            <textarea id="ai-input" rows="4" placeholder="Kiske baare me caption chahiye? (e.g. Bullet bike ride)"></textarea>
+            <button id="gen-btn" onclick="generateCaption()" class="neon-btn w-full py-5 rounded-2xl font-black text-xs uppercase tracking-widest">Generate Caption</button>
         </div>
-
         <div id="ai-result-box" class="hidden glass-card p-8 animate-fade-in">
-            <h3 class="text-[10px] font-black uppercase tracking-widest text-pink-500 mb-4">AI Generated Captions</h3>
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-pink-500 mb-4">AI Result</h3>
             <div id="ai-output" class="text-sm leading-relaxed text-white/80 whitespace-pre-line"></div>
-            <button onclick="copyCaption()" class="mt-6 text-[10px] font-bold uppercase text-white/40 hover:text-pink-500 transition">
-                <i class="fa-regular fa-copy mr-2"></i> Copy All
-            </button>
+            <button onclick="navigator.clipboard.writeText(document.getElementById('ai-output').innerText); alert('Copied!');" class="mt-6 text-[10px] font-bold uppercase text-white/40"><i class="fa-regular fa-copy mr-2"></i> Copy All</button>
         </div>
     </div>
-
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
     <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
-            databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        let keys = {};
-
-        // Fetch Keys from Master Control
-        db.ref('settings').on('value', (s) => { 
-            keys = s.val() || {}; 
-            document.getElementById('gen-btn').innerText = "GENERATE CAPTION";
-        });
-
-        async function generateNeuralCaption() {
-            const input = document.getElementById('ai-input').value;
-            const btn = document.getElementById('gen-btn');
-            const resultBox = document.getElementById('ai-result-box');
-            const output = document.getElementById('ai-output');
-
-            if(!input) return alert("Kuch toh likho bhai!");
-            if(!keys.geminiKey) return alert("Admin: API Key missing!"); // Key check
-
-            btn.disabled = true;
-            btn.innerText = "THINKING...";
-            resultBox.classList.add('hidden');
-
+        firebase.initializeApp({ apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" });
+        const db = firebase.database(); let keys = {}; db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
+        async function generateCaption() {
+            const input = document.getElementById('ai-input').value; if(!input) return alert("Pehle topic likho!");
+            const btn = document.getElementById('gen-btn'); btn.disabled = true; btn.innerText = "THINKING...";
             try {
-                // Using Groq Node (via your Master Control key)
                 const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${keys.geminiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "mixtral-8x7b-32768",
-                        messages: [{
-                            role: "user",
-                            content: `Create 3 viral Instagram captions with hashtags for this: ${input}. Keep them stylish and professional.`
-                        }],
-                        temperature: 0.7
-                    })
+                    headers: { "Authorization": `Bearer ${keys.geminiKey}`, "Content-Type": "application/json" },
+                    body: JSON.stringify({ model: "llama3-8b-8192", messages: [{ role: "user", content: `Create 3 viral Instagram captions with hashtags for: ${input}` }] })
                 });
-
                 const data = await res.json();
-                
-                if(data.choices && data.choices[0].message.content) {
-                    output.innerText = data.choices[0].message.content;
-                    resultBox.classList.remove('hidden');
-                    btn.innerText = "GENERATE AGAIN";
-                } else {
-                    throw new Error("API Limit");
-                }
-
-            } catch (e) {
-                console.error(e);
-                alert("AI Timeout! Please try again or check your API key in Master Control.");
-                btn.innerText = "RETRY GENERATION";
-            } finally {
-                btn.disabled = false;
-            }
-        }
-
-        function copyCaption() {
-            const text = document.getElementById('ai-output').innerText;
-            navigator.clipboard.writeText(text);
-            alert("Captions Copied!");
+                document.getElementById('ai-output').innerText = data.choices[0].message.content;
+                document.getElementById('ai-result-box').classList.remove('hidden');
+                btn.innerText = "GENERATE AGAIN";
+            } catch (e) { alert("AI Lag! Check API Key."); btn.innerText = "RETRY"; }
+            finally { btn.disabled = false; }
         }
     </script>
 </body>
