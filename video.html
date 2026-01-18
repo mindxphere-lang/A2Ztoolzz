@@ -107,21 +107,20 @@
             }
         }
 
-        // --- FIXED DOWNLOAD with Cloudflare Worker Proxy (perfect force download) ---
+        // --- FINAL DOWNLOAD with Cloudflare Worker (Perfect Force Download) ---
         async function neuralDownload(fileUrl, btn) {
             const originalText = btn.innerText;
             btn.innerText = "DOWNLOADING...";
             btn.disabled = true;
 
-            // Yeh line change karo: apna Cloudflare Worker URL daalo (jo deploy kiya tha)
-            const proxyBase = "https://a2z-video-proxy.mindxphere.workers.dev/";  // ← YAHAN APNA WORKER URL DAAL DO
+            const proxyBase = "https://a2z-video-proxy.mindxpheredev.workers.dev/";  // ← Tumhara Worker URL
 
             try {
                 const proxyUrl = proxyBase + "?url=" + encodeURIComponent(fileUrl);
 
                 const a = document.createElement('a');
                 a.href = proxyUrl;
-                a.download = `A2Z_Vortex_${Date.now()}.mp4`;  // unique name for force download
+                a.download = `A2Z_Vortex_${Date.now()}.mp4`;  // Force download name
                 a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
@@ -131,7 +130,7 @@
             } catch (e) {
                 console.error("Download error:", e);
                 btn.innerText = "FAILED";
-                alert("Download fail hua – Worker check karo ya retry karo");
+                alert("Download fail hua – retry karo ya Worker test karo");
             } finally {
                 setTimeout(() => {
                     btn.innerText = originalText;
