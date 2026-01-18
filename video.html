@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2Z Studio - Video Save</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
+    <style>
+        :root { --neon-red: #ff0055; }
+        body { font-family: 'Montserrat', sans-serif; background: #05000a; color: white; background: radial-gradient(circle at 20% 0%, #2a0015, #05000a 75%); min-height: 100vh; }
+        .glass { background: rgba(20, 0, 10, 0.7); backdrop-filter: blur(30px); border: 1px solid rgba(255, 0, 85, 0.2); border-radius: 3rem; }
+        .black-hole { width: 180px; height: 180px; background: black; border-radius: 50%; box-shadow: 0 0 60px var(--neon-red), inset 0 0 40px var(--neon-red); display: flex; align-items: center; justify-content: center; margin: 0 auto; transition: 0.5s; }
+        .vortex { position: absolute; width: 250px; height: 250px; border: 2px dashed var(--neon-red); border-radius: 50%; animation: rotate 5s linear infinite; opacity: 0.4; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .bh-loading { animation: suck 0.8s infinite alternate; }
+        @keyframes suck { to { transform: scale(0.7); filter: blur(10px); } }
+        .btn-neon { background: linear-gradient(45deg, #80002a, #ff0055); box-shadow: 0 0 20px var(--neon-red); }
+    </style>
+</head>
+<body class="p-6">
+    <a href="index.html" class="text-pink-500 font-bold uppercase text-[10px] tracking-widest mb-10 inline-block"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Hub</a>
+    
+    <div class="max-w-2xl mx-auto text-center">
+        <div class="h-24 border border-dashed border-white/10 mb-10 flex items-center justify-center text-[10px] text-gray-600">ADSTERRA BANNER HERE</div>
+        
+        <div class="relative flex items-center justify-center mb-10">
+            <div class="vortex"></div>
+            <div class="black-hole" id="main-hole"><span class="text-[10px] font-black text-pink-500 tracking-widest animate-pulse">PASTE LINK</span></div>
+        </div>
+
+        <div class="glass p-8">
+            <input type="text" id="v-url" placeholder="Enter Video URL..." class="w-full bg-black/50 border border-pink-500/30 p-5 rounded-2xl outline-none text-center mb-6">
+            <button onclick="fetchVideo()" class="btn-neon w-full py-5 rounded-2xl font-black text-xs uppercase tracking-widest">Suck Content</button>
+        </div>
+
+        <div id="v-results" class="hidden mt-10 space-y-6">
+            <img id="v-thumb" class="w-full rounded-3xl border-2 border-pink-500/30 shadow-2xl">
+            <div id="v-links" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        firebase.initializeApp(firebaseConfig); const db = firebase.database(); let keys = {};
+        db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
+
+        async function fetchVideo() {
+            const url = document.getElementById('v-url').value; const hole = document.getElementById('main-hole');
+            if(!url || !keys.videoKey) return alert("System Syncing...");
+            hole.classList.add('bh-loading');
+            try {
+                const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': keys.videoKey, 'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' }, body: JSON.stringify({ url }) });
+                const d = await res.json();
+                document.getElementById('v-thumb').src = d.picture;
+                document.getElementById('v-links').innerHTML = d.medias.map(m => `<a href="${m.url}" download class="btn-neon block p-4 rounded-xl text-center text-[10px] font-black">${m.quality} SAVE</a>`).join('');
+                document.getElementById('v-results').classList.remove('hidden');
+            } catch (e) { alert("Error!"); } hole.classList.remove('bh-loading');
+        }
+    </script>
+</body>
+</html>

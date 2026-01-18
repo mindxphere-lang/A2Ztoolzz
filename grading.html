@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2Z Studio - AI Grading</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        body { background: #05000a; color: white; font-family: 'Montserrat', sans-serif; }
+        .glass { background: rgba(20, 0, 10, 0.7); backdrop-filter: blur(30px); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 3rem; }
+        .btn-blue { background: linear-gradient(45deg, #1e3a8a, #3b82f6); box-shadow: 0 0 20px #3b82f6; }
+        input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.1); height: 6px; border-radius: 5px; width: 100%; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: #3b82f6; border-radius: 50%; }
+    </style>
+</head>
+<body class="p-6">
+    <a href="index.html" class="text-blue-500 font-bold uppercase text-[10px] mb-10 inline-block"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Hub</a>
+    
+    <div class="max-w-2xl mx-auto space-y-8">
+        <div class="glass p-10 text-center" id="t-zone" onclick="document.getElementById('t-input').click()">
+            <input type="file" id="t-input" class="hidden" onchange="loadImg(event)">
+            <p class="text-[10px] font-black text-blue-500/50 uppercase">Select Image for Grading</p>
+        </div>
+
+        <div id="t-ui" class="hidden space-y-6">
+            <img id="t-preview" class="w-full rounded-3xl border-2 border-blue-500/30">
+            <div class="glass p-8 space-y-6">
+                <div><p class="text-[9px] uppercase text-blue-400 mb-2">Neural Brightness</p><input type="range" id="br" min="-50" max="50" value="0"></div>
+                <div class="flex gap-4">
+                    <button onclick="apply('e_background_blur:200')" class="flex-1 py-4 bg-blue-900/30 rounded-xl text-[9px] font-black uppercase">Blur BG</button>
+                    <button onclick="apply('e_art:incognito')" class="flex-1 py-4 bg-blue-900/30 rounded-xl text-[9px] font-black uppercase">Cinematic</button>
+                </div>
+                <button onclick="apply(`e_brightness:${document.getElementById('br').value}`)" class="btn-blue w-full py-4 rounded-xl text-[10px] font-black uppercase">Apply Sliders</button>
+            </div>
+            <a id="t-dl" class="btn-blue block w-full py-5 rounded-3xl text-center text-xs font-black text-white uppercase">Save Result</a>
+        </div>
+    </div>
+
+    <script>
+        const cloudName = "dgikim3w1", preset = "my_preset"; let pId = "";
+        async function loadImg(e) {
+            const formData = new FormData(); formData.append("file", e.target.files[0]); formData.append("upload_preset", preset);
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: formData });
+            const data = await res.json(); pId = data.public_id;
+            document.getElementById('t-preview').src = data.secure_url;
+            document.getElementById('t-ui').classList.remove('hidden'); document.getElementById('t-zone').classList.add('hidden');
+        }
+        function apply(t) { 
+            const url = `https://res.cloudinary.com/${cloudName}/image/upload/${t}/${pId}`;
+            document.getElementById('t-preview').src = url; document.getElementById('t-dl').href = url.replace("/upload/", "/upload/fl_attachment/");
+        }
+    </script>
+</body>
+</html>
