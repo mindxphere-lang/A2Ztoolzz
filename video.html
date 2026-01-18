@@ -3,105 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A2Z Video Downloader</title>
-    
+    <title>A2Z Video Downloader - Insta Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet"/>
-
     <style>
-        body { 
-            font-family: 'Montserrat', sans-serif; 
-            background-color: #0f172a; 
-            color: white; 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            padding: 20px;
-        }
-        .main-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 40px;
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-        }
-        input {
-            width: 100%;
-            background: #1e293b;
-            border: 1px solid #334155;
-            padding: 15px 20px;
-            border-radius: 12px;
-            color: white;
-            outline: none;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        input:focus { border-color: #6366f1; }
-        .btn-primary {
-            background: #6366f1;
-            padding: 15px 30px;
-            border-radius: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            width: 100%;
-            transition: 0.3s;
-        }
-        .btn-primary:hover { background: #4f46e5; transform: translateY(-2px); }
-        .result-box {
-            margin-top: 30px;
-            background: #1e293b;
-            border-radius: 15px;
-            padding: 20px;
-            display: none;
-            width: 100%;
-        }
-        .dl-btn {
-            background: #10b981;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 12px;
-            margin-top: 10px;
-            display: inline-block;
-        }
-        #m-overlay {
-            position: fixed; inset: 0; z-index: 9999; background: #0f172a;
-            display: none; align-items: center; justify-content: center; text-align: center;
-        }
+        body { font-family: 'Montserrat', sans-serif; background-color: #05000a; color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0; padding: 20px; }
+        .main-card { background: rgba(255, 0, 85, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 0, 85, 0.15); border-radius: 30px; padding: 40px; width: 100%; max-width: 600px; text-align: center; }
+        input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,0,85,0.1); padding: 15px 20px; border-radius: 15px; color: white; outline: none; margin-bottom: 20px; font-size: 14px; transition: 0.3s; }
+        input:focus { border-color: #ff0055; box-shadow: 0 0 15px rgba(255,0,85,0.2); }
+        .btn-primary { background: linear-gradient(45deg, #80002a, #ff0055); padding: 15px 30px; border-radius: 15px; font-weight: 800; text-transform: uppercase; width: 100%; transition: 0.3s; box-shadow: 0 10px 20px rgba(255,0,85,0.2); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(255,0,85,0.4); }
+        .result-box { margin-top: 30px; background: rgba(0,0,0,0.5); border-radius: 20px; padding: 25px; display: none; width: 100%; border: 1px solid rgba(255,255,255,0.05); }
+        .dl-btn { background: #ff0055; padding: 12px 25px; border-radius: 10px; font-weight: 900; font-size: 10px; text-transform: uppercase; margin-top: 10px; display: block; width: 100%; text-align: center; }
+        #m-overlay { position: fixed; inset: 0; z-index: 9999; background: #000; display: none; align-items: center; justify-content: center; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="m-overlay">
-        <div>
-            <h1 class="text-3xl font-black text-indigo-500 mb-2">SYSTEM OFFLINE</h1>
-            <p id="m-text" class="text-slate-400 uppercase font-bold tracking-widest text-xs"></p>
-        </div>
+        <div><h1 class="text-3xl font-black text-pink-600 mb-2 italic">SYSTEM PAUSED</h1><p id="m-text" class="text-white/30 uppercase font-bold tracking-widest text-[10px]"></p></div>
     </div>
 
     <div class="main-card animate-fade-in">
-        <h1 class="text-3xl font-black mb-8 uppercase tracking-tighter italic">A2Z <span class="text-indigo-500">Downloader</span></h1>
+        <h1 class="text-4xl font-black mb-8 uppercase tracking-tighter italic text-white">VORTEX <span class="text-pink-600">v18.1</span></h1>
         
-        <input type="text" id="video-url" placeholder="Paste video link here (Instagram/YouTube/etc.)">
+        <input type="text" id="video-url" placeholder="Paste Instagram/YouTube link here...">
         
-        <button id="search-btn" onclick="fetchVideo()" class="btn-primary">
-            SEARCH VIDEO
-        </button>
+        <button id="search-btn" onclick="fetchVideo()" class="btn-primary text-xs tracking-widest">EXTRACT VIDEO</button>
 
-        <p id="status-msg" class="text-[10px] font-bold text-slate-500 mt-4 uppercase tracking-widest">Ready to Download</p>
+        <p id="status-msg" class="text-[9px] font-black text-white/20 mt-6 uppercase tracking-[0.3em]">Neural Node Ready</p>
 
         <div id="result-ui" class="result-box">
-            <h3 id="v-title" class="text-sm font-bold truncate mb-4 text-slate-300">Video Found</h3>
-            <div id="dl-links" class="flex flex-col gap-2"></div>
+            <h3 id="v-title" class="text-[10px] font-black uppercase text-pink-500 mb-4 tracking-widest">Stream Detected</h3>
+            <div id="dl-links" class="space-y-3"></div>
         </div>
     </div>
 
@@ -109,7 +44,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
-        // Use your Firebase settings
         const fbConfig = { 
             apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
             databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
@@ -118,7 +52,6 @@
         const db = firebase.database();
         let appSettings = {};
 
-        // Sync Maintenance Mode
         db.ref('settings').on('value', (snapshot) => {
             appSettings = snapshot.val() || {};
             if(appSettings.maintenanceMode) {
@@ -130,20 +63,19 @@
         });
 
         async function fetchVideo() {
-            const url = document.getElementById('video-url').value;
+            const urlInput = document.getElementById('video-url').value;
             const btn = document.getElementById('search-btn');
             const status = document.getElementById('status-msg');
             const resultUI = document.getElementById('result-ui');
 
-            if(!url) return alert("Pehle link dalo bhai!");
+            if(!urlInput) return alert("Pehle link dalo!");
             
             btn.disabled = true;
-            btn.innerText = "SEARCHING...";
-            status.innerText = "Connecting to API...";
+            btn.innerText = "PENETRATING...";
+            status.innerText = "Bypassing Instagram Security...";
             resultUI.style.display = 'none';
 
             try {
-                // Using Social Download API
                 const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
                     method: 'POST',
                     headers: { 
@@ -151,39 +83,44 @@
                         'X-RapidAPI-Key': appSettings.videoKey, 
                         'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' 
                     },
-                    body: JSON.stringify({ url: url })
+                    body: JSON.stringify({ url: urlInput })
                 });
                 
                 const data = await res.json();
-                
-                if(data.medias) {
+                console.log("API Response:", data); // Check console for debug
+
+                if(data.medias && data.medias.length > 0) {
                     displayLinks(data);
-                    status.innerText = "Success! Select Quality Below";
+                    status.innerText = "Success! Neural Lock Complete.";
+                } else if (data.message) {
+                    throw new Error(data.message);
                 } else {
-                    throw new Error("Invalid Link");
+                    throw new Error("No Media Found");
                 }
             } catch (e) {
-                status.innerText = "API Error. Check your Key in Master Control.";
-                alert("API Key check karein!");
+                console.error("Fetch Error:", e);
+                status.innerText = "Error: " + e.message;
+                alert("Instagram Alert: API Limit ya Link expired ho sakta hai!");
             } finally {
                 btn.disabled = false;
-                btn.innerText = "SEARCH VIDEO";
+                btn.innerText = "EXTRACT VIDEO";
             }
         }
 
         function displayLinks(data) {
             const linksBox = document.getElementById('dl-links');
-            document.getElementById('v-title').innerText = data.title || "Video Found";
+            document.getElementById('v-title').innerText = data.title || "Vortex Result Found";
             linksBox.innerHTML = "";
 
-            // Filtering links
             data.medias.forEach(m => {
-                const btn = document.createElement('a');
-                btn.href = m.url;
-                btn.target = "_blank"; // Direct open for download
-                btn.className = "dl-btn text-center";
-                btn.innerText = `DOWNLOAD ${m.quality}`;
-                linksBox.appendChild(btn);
+                const a = document.createElement('a');
+                a.href = m.url;
+                a.target = "_blank";
+                a.className = "dl-btn";
+                // Formatting quality text
+                let qText = m.quality || "Normal";
+                a.innerText = `SAVE VIDEO - ${qText.toUpperCase()}`;
+                linksBox.appendChild(a);
             });
 
             document.getElementById('result-ui').style.display = 'block';
