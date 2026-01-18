@@ -3,112 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A2Z IDM - Pro Download Manager</title>
+    <title>A2Z IDM - Neural Grabber v14.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
     <style>
         :root { --neon: #ff0055; --bg: #05000a; }
-        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed; }
-        .idm-window { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px); border: 1px solid rgba(255, 0, 85, 0.2); border-radius: 2rem; }
-        .progress-bar-bg { width: 100%; height: 8px; background: #111; border-radius: 20px; overflow: hidden; }
-        .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff0055, #ff6b9d); transition: 0.1s; box-shadow: 0 0 15px var(--neon); }
-        .neon-glow { text-shadow: 0 0 10px var(--neon); }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed; overflow: hidden; }
+        .idm-window { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(40px); border: 1px solid rgba(255, 0, 85, 0.2); border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .bar-bg { width: 100%; height: 10px; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #80002a, #ff0055); transition: 0.3s; box-shadow: 0 0 20px var(--neon); }
+        .neon-text { text-shadow: 0 0 15px var(--neon); }
+        .status-pill { background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.2); padding: 4px 12px; border-radius: 20px; font-size: 8px; font-weight: 900; color: #ff0055; text-transform: uppercase; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-2xl w-full idm-window p-10 space-y-8 animate-fade-in">
-        <header class="flex justify-between items-center border-b border-white/10 pb-6">
+    <div class="max-w-xl w-full idm-window p-8 md:p-12 space-y-8 animate-fade-in">
+        <header class="flex justify-between items-center border-b border-white/5 pb-6">
             <div>
-                <h1 class="text-2xl font-black italic uppercase tracking-tighter neon-glow"><span class="text-pink-600">A2Z</span> IDM PRO</h1>
-                <p class="text-[8px] font-bold text-white/30 uppercase tracking-[0.3em]">Neural Binary Grabber v13.0</p>
+                <h1 class="text-2xl font-black italic tracking-tighter neon-text uppercase"><span class="text-pink-600">A2Z</span> IDM PRO</h1>
+                <p class="text-[8px] font-black text-white/30 uppercase tracking-[0.3em]">Binary Vortex v14.0</p>
             </div>
-            <i class="fa-solid fa-cloud-arrow-down text-3xl text-pink-600 animate-bounce"></i>
+            <div class="status-pill animate-pulse" id="node-label">Node: Standby</div>
         </header>
 
-        <div id="loader-state" class="space-y-4">
-            <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl">
-                <div class="w-12 h-12 bg-pink-600/20 rounded-xl flex items-center justify-center text-pink-500">
-                    <i class="fa-solid fa-file-video text-xl"></i>
-                </div>
+        <div class="space-y-6">
+            <div class="bg-white/5 p-4 rounded-2xl flex items-center gap-4 border border-white/5">
+                <div class="w-10 h-10 bg-pink-600/20 rounded-xl flex items-center justify-center text-pink-500"><i class="fa-solid fa-link"></i></div>
                 <div class="overflow-hidden">
-                    <p class="text-[10px] font-black text-white/40 uppercase">Target Stream Detected</p>
-                    <p id="video-url-display" class="text-xs font-bold truncate text-pink-500/80">Connecting...</p>
+                    <p class="text-[8px] font-black text-white/20 uppercase">Target Stream URL</p>
+                    <p id="target-display" class="text-[10px] font-bold truncate text-pink-500/60">Loading...</p>
                 </div>
             </div>
 
-            <div id="idm-console" class="hidden space-y-4 bg-black/40 p-6 rounded-2xl border border-white/5">
+            <div id="idm-console" class="hidden space-y-5 bg-black/40 p-6 rounded-3xl border border-white/5">
                 <div class="flex justify-between items-end">
                     <div class="space-y-1">
-                        <p class="text-[9px] font-black text-pink-500 uppercase">Transfer Status</p>
-                        <p id="status-text" class="text-[10px] font-bold text-white/60 uppercase tracking-widest">Intercepting Data...</p>
+                        <p id="transfer-status" class="text-[9px] font-black text-pink-500 uppercase">Neural Intercepting...</p>
+                        <p id="size-info" class="text-[10px] font-bold text-white/40 uppercase">Connecting to Stream...</p>
                     </div>
-                    <span id="percent-val" class="text-3xl font-black italic">0%</span>
+                    <span id="percent-txt" class="text-4xl font-black italic text-white">0%</span>
                 </div>
-                <div class="progress-bar-bg"><div id="progress-fill" class="progress-bar-fill"></div></div>
-                <div class="flex justify-between text-[8px] font-bold text-white/20 uppercase tracking-widest">
-                    <span>Neural Tunneling: Active</span>
-                    <span id="size-info">Calculating...</span>
-                </div>
+                <div class="bar-bg"><div id="bar-fill" class="bar-fill"></div></div>
+                <p class="text-[7px] text-white/20 uppercase font-black tracking-widest">Multi-Node Tunneling Active</p>
             </div>
         </div>
 
-        <div class="flex gap-3">
-            <button id="start-btn" onclick="startIdmSuck()" class="flex-1 py-5 rounded-2xl bg-pink-600 font-black text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(255,0,85,0.3)] transition active:scale-95">
-                Start Download
-            </button>
-            <button onclick="window.close()" class="px-8 rounded-2xl bg-white/5 border border-white/10 font-black text-[10px] uppercase text-white/40">Cancel</button>
+        <div class="flex gap-4">
+            <button id="main-btn" onclick="startEngine()" class="flex-1 py-5 rounded-2xl bg-pink-600 font-black text-xs uppercase tracking-widest shadow-[0_10px_40px_rgba(255,0,85,0.4)] active:scale-95 transition">Start Download</button>
+            <button onclick="window.close()" class="px-8 rounded-2xl bg-white/5 border border-white/10 text-[9px] font-black uppercase text-white/30">Close</button>
         </div>
     </div>
 
     <script>
-        // Get URL from Query String (?url=...)
         const urlParams = new URLSearchParams(window.location.search);
         const videoUrl = urlParams.get('url');
-        
-        if (videoUrl) {
-            document.getElementById('video-url-display').innerText = videoUrl;
-        } else {
-            alert("No Link Found! Redirecting to Hub...");
-            window.location.href = "index.html";
-        }
+        if (videoUrl) document.getElementById('target-display').innerText = videoUrl;
 
-        async function startIdmSuck() {
-            const btn = document.getElementById('start-btn');
+        let downloadStarted = false;
+
+        async function startEngine() {
+            if(!videoUrl) return;
+            const btn = document.getElementById('main-btn');
             const consoleBox = document.getElementById('idm-console');
-            const fill = document.getElementById('progress-fill');
-            const percent = document.getElementById('percent-val');
-            const status = document.getElementById('status-text');
+            const fill = document.getElementById('bar-fill');
+            const percent = document.getElementById('percent-txt');
+            const status = document.getElementById('transfer-status');
             const sizeDisplay = document.getElementById('size-info');
+            const nodeLabel = document.getElementById('node-label');
 
-            btn.disabled = true;
-            btn.classList.add('opacity-50');
+            btn.disabled = true; btn.classList.add('opacity-30');
             consoleBox.classList.remove('hidden');
 
-            // IDM Proxies to force download
-            const proxies = ["https://api.allorigins.win/raw?url=", "https://corsproxy.io/?"];
-            let downloaded = false;
+            // --- ADVANCED PROXY NODES ---
+            const nodes = [
+                "https://api.allorigins.win/raw?url=",
+                "https://corsproxy.io/?",
+                "https://thingproxy.freeboard.io/fetch/"
+            ];
 
-            for (let proxy of proxies) {
-                if (downloaded) break;
+            for (let node of nodes) {
+                if (downloadStarted) break;
+                
+                let currentNodeIndex = nodes.indexOf(node) + 1;
+                nodeLabel.innerText = "Node: " + currentNodeIndex;
+                status.innerText = "Tunneling via Node " + currentNodeIndex;
+
                 try {
-                    status.innerText = "Tunneling via Node " + (proxies.indexOf(proxy) + 1);
-                    
                     const xhr = new XMLHttpRequest();
-                    xhr.open('GET', proxy + encodeURIComponent(videoUrl), true);
+                    xhr.open('GET', node + encodeURIComponent(videoUrl), true);
                     xhr.responseType = 'blob';
 
-                    // Progress Logic
+                    // Anti-Stuck Logic: Agar 6 seconds tak 0% raha to switch node
+                    let progressMade = false;
+                    const stuckTimeout = setTimeout(() => {
+                        if(!progressMade) {
+                            xhr.abort();
+                            console.log("Node " + currentNodeIndex + " stuck. Switching...");
+                        }
+                    }, 6000);
+
                     xhr.onprogress = (e) => {
                         if (e.lengthComputable) {
+                            progressMade = true;
                             const p = Math.floor((e.loaded / e.total) * 100);
-                            const totalMB = (e.total / (1024 * 1024)).toFixed(2);
-                            const currentMB = (e.loaded / (1024 * 1024)).toFixed(2);
-                            
                             fill.style.width = p + "%";
                             percent.innerText = p + "%";
-                            sizeDisplay.innerText = `${currentMB}MB / ${totalMB}MB`;
+                            sizeDisplay.innerText = `${(e.loaded/1048576).toFixed(1)}MB / ${(e.total/1048576).toFixed(1)}MB`;
                         }
                     };
 
@@ -118,26 +120,27 @@
                                 const bUrl = URL.createObjectURL(xhr.response);
                                 const a = document.createElement('a');
                                 a.href = bUrl;
-                                a.download = `A2Z_IDM_SAVE_${Date.now()}.mp4`;
-                                document.body.appendChild(a);
-                                a.click();
-                                setTimeout(() => URL.revokeObjectURL(bUrl), 1000);
+                                a.download = `A2Z_STUDIO_${Date.now()}.mp4`;
+                                document.body.appendChild(a); a.click();
                                 resolve(true);
                             } else { reject(); }
                         };
                         xhr.onerror = () => reject();
                     });
 
-                    downloaded = await task;
-                    if(downloaded) {
-                        status.innerText = "Download Complete!";
-                        btn.innerText = "FILE SAVED";
+                    downloadStarted = await task;
+                    if(downloadStarted) {
+                        status.innerText = "Neural Lock Success!";
+                        btn.innerText = "DOWNLOAD FINISHED";
+                        nodeLabel.innerText = "Node: Finished";
+                        clearTimeout(stuckTimeout);
                     }
-                } catch (e) { status.innerText = "Node Blocked. Switching..."; }
+                } catch (e) { console.log("Node Failed."); }
             }
 
-            if(!downloaded) {
-                status.innerText = "IDM Failed. Fallback Active.";
+            if(!downloadStarted) {
+                // Final Fallback
+                status.innerText = "All Nodes Blocked. Manual Bypass Active.";
                 window.location.href = videoUrl;
             }
         }
