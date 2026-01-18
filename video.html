@@ -82,45 +82,83 @@
         function hideIcon() { icon.style.display = 'none'; }
         function showIcon() { icon.style.display = 'block'; }
 
+        // --- MULTIPLE API FALLBACK + Cloudflare Worker Download ---
         async function startNeuralFetch() {
             try {
                 const url = await navigator.clipboard.readText();
-                if (!url.startsWith('http')) throw new Error();
+                if (!url.startsWith('http')) throw new Error("Copy valid link first");
 
-                core.classList.add('hyper-pulse'); text.innerHTML = "SUCKING...";
+                core.classList.add('hyper-pulse'); 
+                text.innerHTML = "SUCKING...";
+                document.getElementById('status-msg').innerText = "Trying APIs...";
                 document.getElementById('v-results').classList.add('hidden');
 
-                const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': keys.videoKey, 'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' },
-                    body: JSON.stringify({ url })
-                });
-                
-                const data = await res.json();
-                if (data.medias) {
-                    renderResults(data);
-                    core.classList.remove('hyper-pulse'); text.innerHTML = "SUCCESS";
+                const apis = keys.videoApis || [];
+                if (apis.length === 0) throw new Error("No video APIs configured in Firebase!");
+
+                let successData = null;
+
+                for (let i = 0; i < apis.length; i++) {
+                    const api = apis[i];
+                    document.getElementById('status-msg').innerText = `Trying ${api.name || 'API'} (${i+1}/${apis.length})...`;
+
+                    try {
+                        const res = await fetch(api.endpoint, {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json', 
+                                'X-RapidAPI-Key': api.key,
+                                'X-RapidAPI-Host': api.host
+                            },
+                            body: JSON.stringify({ url })
+                        });
+
+                        if (!res.ok) throw new Error(`API ${i+1} returned ${res.status}`);
+
+                        const data = await res.json();
+
+                        if (data.medias || data.links || data.videos || data.url || data.data) {
+                            successData = data;
+                            successData.medias = data.medias || data.links || data.videos || data.data || [];
+                            break;
+                        }
+                    } catch (apiError) {
+                        console.warn(`API ${i+1} failed:`, apiError);
+                    }
+                }
+
+                if (successData) {
+                    renderResults(successData);
+                    core.classList.remove('hyper-pulse'); 
+                    text.innerHTML = "SUCCESS";
+                    document.getElementById('status-msg').innerText = "Ready to download";
                     setTimeout(() => { text.innerHTML = "TAP TO<br>AUTO-PASTE"; }, 3000);
+                } else {
+                    throw new Error("All APIs failed");
                 }
             } catch (e) { 
-                core.classList.remove('hyper-pulse'); text.innerHTML = "RETRY"; 
+                core.classList.remove('hyper-pulse'); 
+                text.innerHTML = "RETRY"; 
+                document.getElementById('status-msg').innerText = "Error: " + (e.message || "All APIs down, try later");
+                document.getElementById('status-msg').classList.add('text-red-500');
+                console.error("Full fetch error:", e);
             }
         }
 
-        // --- FINAL DOWNLOAD with Cloudflare Worker (Perfect Force Download) ---
+        // --- Cloudflare Worker Force Download ---
         async function neuralDownload(fileUrl, btn) {
             const originalText = btn.innerText;
             btn.innerText = "DOWNLOADING...";
             btn.disabled = true;
 
-            const proxyBase = "https://a2z-video-proxy.mindxpheredev.workers.dev/";  // ← Tumhara Worker URL
+            const proxyBase = "https://a2z-video-proxy.mindxpheredev.workers.dev/";  // Tumhara Worker URL
 
             try {
                 const proxyUrl = proxyBase + "?url=" + encodeURIComponent(fileUrl);
 
                 const a = document.createElement('a');
                 a.href = proxyUrl;
-                a.download = `A2Z_Vortex_${Date.now()}.mp4`;  // Force download name
+                a.download = `A2Z_Vortex_${Date.now()}.mp4`;
                 a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
@@ -140,19 +178,25 @@
         }
 
         function renderResults(data) {
-            player.src = data.medias[0].url; 
+            player.src = data.medias[0]?.url || ''; 
             document.getElementById('v-name').innerText = data.title || "Neural Video Found";
+
             const linksBox = document.getElementById('v-links');
-            const m = data.medias;
-            
-            const n = m.find(x => x.quality.includes('360') || x.quality.includes('480'));
-            const h = m.find(x => x.quality.includes('720') || x.quality.includes('1080'));
-            const f = m.find(x => x.quality.includes('4k') || x.quality.includes('2160'));
+            const m = data.medias || [];
+
+            const n = m.find(x => x.quality?.includes('360') || x.quality?.includes('480'));
+            const h = m.find(x => x.quality?.includes('720') || x.quality?.includes('1080'));
+            const f = m.find(x => x.quality?.includes('4k') || x.quality?.includes('2160'));
 
             const options = [];
-            if(n) options.push({q: 'Normal (SD)', url: n.url});
-            if(h) options.push({q: 'High (HD)', url: h.url});
-            if(f) options.push({q: '4K Ultra', url: f.url});
+            if(n) options.push({q: 'Normal (SD)', url: n.url || n.link});
+            if(h) options.push({q: 'High (HD)', url: h.url || h.link});
+            if(f) options.push({q: '4K Ultra', url: f.url || f.link});
+
+            // Agar options khali hain toh fallback single link
+            if (options.length === 0 && data.url) {
+                options.push({q: 'Best Quality', url: data.url});
+            }
 
             linksBox.innerHTML = options.map(l => `
                 <div class="dl-card">
@@ -160,6 +204,7 @@
                     <button onclick="neuralDownload('${l.url}', this)" class="btn-save">Save</button>
                 </div>
             `).join('');
+
             document.getElementById('v-results').classList.remove('hidden');
         }
     </script>
