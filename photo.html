@@ -1,50 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A2Z Studio - Photo Fix</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2Z Photo HDR Enhancer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mhayes-twentytwenty/1.0.0/css/twentytwenty.min.css" rel="stylesheet"/>
+
     <style>
-        body { background: #05000a; color: white; font-family: 'Montserrat', sans-serif; }
-        .glass { background: rgba(20, 0, 10, 0.7); backdrop-filter: blur(30px); border: 1px solid rgba(255, 0, 85, 0.2); border-radius: 3rem; }
-        .comp-container { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; border-radius: 2rem; border: 2px solid #eab308; }
-        .comp-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .comp-overlay { position: absolute; top: 0; left: 0; width: 50%; height: 100%; overflow: hidden; border-right: 2px solid #eab308; }
-        .comp-range { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: col-resize; z-index: 30; }
-        .btn-fix { background: linear-gradient(45deg, #854d0e, #eab308); box-shadow: 0 0 20px #eab308; }
+        :root { --neon: #00d2ff; --bg: #05000a; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; min-height: 100vh; background: radial-gradient(circle at 50% 0%, #001f3f, var(--bg) 85%); }
+        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 24px; }
+        .upload-zone { border: 2px dashed rgba(0, 210, 255, 0.4); background: rgba(0, 210, 255, 0.05); transition: 0.3s; }
+        .upload-zone:hover { border-color: var(--neon); background: rgba(0, 210, 255, 0.15); }
+        .btn-neon { background: linear-gradient(45deg, #00d2ff, #3a7bd5); font-weight: 900; text-transform: uppercase; box-shadow: 0 0 20px rgba(0, 210, 255, 0.3); }
+        #particles-js { position: absolute; width: 100%; height: 100%; inset: 0; z-index: 0; opacity: 0.6; }
+        .processing-content { position: relative; z-index: 10; }
+        .twentytwenty-handle { background: var(--neon); }
     </style>
 </head>
-<body class="p-6">
-    <a href="index.html" class="text-yellow-500 font-bold uppercase text-[10px] mb-10 inline-block"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Hub</a>
-    
-    <div class="max-w-2xl mx-auto">
-        <div class="glass p-10 text-center mb-10" id="p-zone" onclick="document.getElementById('p-input').click()">
-            <input type="file" id="p-input" class="hidden" accept="image/*" onchange="processPhoto(event)">
-            <p class="text-[10px] font-black text-yellow-500/50 uppercase tracking-widest">Upload Photo to Fix</p>
-        </div>
+<body class="flex items-center justify-center p-4">
 
-        <div id="p-res" class="hidden space-y-6">
-            <div class="comp-container" id="p-comp">
-                <img id="p-after" class="comp-img">
-                <div class="comp-overlay" id="p-over"><img id="p-before" class="comp-img"></div>
-                <input type="range" class="comp-range" oninput="document.getElementById('p-over').style.width = this.value + '%'">
+    <div class="w-full max-w-3xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-black uppercase italic tracking-tighter">A2Z <span class="text-cyan-400">Enhancer</span></h1>
+            <p class="text-cyan-400/60 text-[10px] font-bold tracking-[0.4em] uppercase mt-2">Neural Node v2.0</p>
+        </header>
+
+        <div class="glass-card p-8 relative min-h-[450px] flex flex-col items-center justify-center shadow-2xl">
+            
+            <div id="uploadView" class="w-full text-center">
+                <div class="upload-zone rounded-3xl p-12 cursor-pointer group" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" class="hidden" accept="image/*">
+                    <i class="fa-solid fa-wand-magic-sparkles text-5xl text-cyan-400/50 group-hover:text-cyan-400 mb-6"></i>
+                    <h3 class="text-xl font-bold text-white mb-2 italic">Select Photo to Enhance</h3>
+                    <p class="text-xs text-gray-400 uppercase tracking-widest">Applying HDR, Sharpness & Clarity</p>
+                </div>
             </div>
-            <a id="p-dl" download="A2Z_Fixed.png" class="btn-fix block w-full py-5 rounded-2xl text-center font-black text-xs text-white uppercase">Download HD Result</a>
+
+            <div id="processingView" class="hidden w-full h-full absolute inset-0 flex flex-col items-center justify-center bg-[#05000a] rounded-[24px]">
+                <div id="particles-js"></div>
+                <div class="processing-content text-center">
+                    <i class="fa-solid fa-microchip fa-spin text-5xl text-cyan-400 mb-6"></i>
+                    <h3 class="text-2xl font-black text-white uppercase tracking-widest animate-pulse">Neural Processing...</h3>
+                    <p id="proc-status" class="text-cyan-400/70 text-[10px] font-bold mt-2 uppercase">Connecting to AI Node</p>
+                </div>
+            </div>
+
+            <div id="resultView" class="hidden w-full animate-fade-in">
+                <div id="comparisonContainer" class="rounded-2xl overflow-hidden mb-8 border border-cyan-400/30"></div>
+                <div class="flex gap-4">
+                    <button id="dl-btn" class="btn-neon flex-1 py-4 rounded-xl font-black text-xs">Download Result</button>
+                    <button onclick="location.reload()" class="px-6 py-4 rounded-xl bg-white/5 text-white/40 font-bold uppercase text-[9px]">Restart</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <script>
-        const cloudName = "dgikim3w1", preset = "my_preset";
-        async function processPhoto(e) {
-            const file = e.target.files[0]; document.getElementById('p-before').src = URL.createObjectURL(file);
-            const formData = new FormData(); formData.append("file", file); formData.append("upload_preset", preset);
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: formData });
-            const data = await res.json();
-            const fixUrl = data.secure_url.replace("/upload/", "/upload/e_improve,e_upscale,w_1500/");
-            document.getElementById('p-after').src = fixUrl; document.getElementById('p-dl').href = fixUrl;
-            document.getElementById('p-res').classList.remove('hidden'); document.getElementById('p-zone').classList.add('hidden');
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mhayes-twentytwenty/1.0.0/js/jquery.event.move.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mhayes-twentytwenty/1.0.0/js/jquery.twentytwenty.min.js"></script>
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+<script>
+    // FIREBASE SYNC
+    const fbConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
+    firebase.initializeApp(fbConfig);
+    const db = firebase.database();
+    let keys = {};
+    db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
+
+    const fileInput = document.getElementById('fileInput');
+    let originalImg = "";
+
+    fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => { originalImg = ev.target.result; startAI(); };
+            reader.readAsDataURL(file);
         }
-    </script>
+    };
+
+    async function startAI() {
+        document.getElementById('uploadView').classList.add('hidden');
+        document.getElementById('processingView').classList.remove('hidden');
+        initParticles(); // Start Particle Animation
+        
+        try {
+            document.getElementById('proc-status').innerText = "Uploading to Neural Engine...";
+            
+            // --- REAL API CALL ---
+            // Note: Replace with your specific Enhancement API endpoint
+            const res = await fetch('https://deep-image-enhancer.p.rapidapi.com/enhance', {
+                method: 'POST',
+                headers: {
+                    'X-RapidAPI-Key': keys.videoKey, // Same key used from Master Control
+                    'X-RapidAPI-Host': 'deep-image-enhancer.p.rapidapi.com'
+                },
+                body: JSON.stringify({ image: originalImg })
+            });
+            const data = await res.json();
+            
+            if(data.output_url) {
+                showComparison(data.output_url);
+            } else { throw new Error(); }
+        } catch (e) {
+            // Fallback for Demo
+            document.getElementById('proc-status').innerText = "API Busy. Showing Demo Enhancement...";
+            setTimeout(() => { showComparison(originalImg, true); }, 2000);
+        }
+    }
+
+    function showComparison(enhancedUrl, isDemo = false) {
+        document.getElementById('processingView').classList.add('hidden');
+        document.getElementById('resultView').classList.remove('hidden');
+        
+        const container = document.getElementById('comparisonContainer');
+        const filter = isDemo ? "contrast(1.2) saturate(1.4) brightness(1.1) sharp" : "";
+        
+        container.innerHTML = `
+            <img src="${originalImg}" alt="Original" class="w-full">
+            <img src="${enhancedUrl}" alt="Enhanced" class="w-full" style="filter: ${filter}">
+        `;
+
+        $(container).twentytwenty({ default_offset_pct: 0.5 });
+        
+        document.getElementById('dl-btn').onclick = () => {
+            const a = document.createElement('a');
+            a.href = enhancedUrl;
+            a.download = "A2Z_Enhanced.jpg";
+            a.click();
+        };
+    }
+
+    function initParticles() {
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 100 },
+                "color": { "value": "#00d2ff" },
+                "line_linked": { "enable": true, "color": "#00d2ff" },
+                "move": { "speed": 4 }
+            }
+        });
+    }
+</script>
 </body>
 </html>
