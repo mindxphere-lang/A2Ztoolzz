@@ -13,50 +13,33 @@
             font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden;
             background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
         }
-        .vortex-wrapper { position: relative; width: 300px; height: 300px; margin: 40px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .vortex-wrapper { position: relative; width: 280px; height: 280px; margin: 30px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .black-hole {
-            position: relative; width: 180px; height: 180px; background: black; border-radius: 50%;
-            box-shadow: 0 0 60px 10px var(--neon-red), inset 0 0 40px var(--neon-red);
+            position: relative; width: 170px; height: 170px; background: black; border-radius: 50%;
+            box-shadow: 0 0 50px 10px var(--neon-red), inset 0 0 30px var(--neon-red);
             z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center;
         }
-        .black-hole span { font-size: 11px; font-weight: 900; letter-spacing: 2px; color: var(--neon-red); }
-        .vortex-ring { position: absolute; inset: 0; border: 2px dashed rgba(255, 0, 85, 0.3); border-radius: 50%; animation: spin 8s linear infinite; }
+        .black-hole span { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--neon-red); }
+        .vortex-ring { position: absolute; inset: 0; border: 2px dashed rgba(255, 0, 85, 0.2); border-radius: 50%; animation: spin 10s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .hyper-pulse { animation: hyper 0.5s infinite alternate !important; }
-        @keyframes hyper { 0% { transform: scale(0.9); } 100% { transform: scale(1.1); } }
+        @keyframes hyper { 0% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1.05); opacity: 1; } }
         
-        /* Minimalist Video Box */
-        .video-box { 
-            position: relative; width: 100%; border-radius: 2.5rem; overflow: hidden; 
-            background: #000; border: 2px solid rgba(255, 0, 85, 0.2); cursor: pointer;
-        }
-        /* Custom Play Overlay */
-        .play-overlay {
-            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.3); transition: 0.3s; z-index: 30;
-        }
-        .play-overlay i { font-size: 50px; color: white; filter: drop-shadow(0 0 10px var(--neon-red)); }
+        /* Minimal Video Box */
+        .video-box { position: relative; width: 100%; border-radius: 2rem; overflow: hidden; background: #000; border: 1px solid rgba(255, 0, 85, 0.2); }
+        .video-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 15px; font-size: 10px; font-weight: bold; z-index: 10; pointer-events: none; }
         
-        .video-label { 
-            position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.9)); 
-            padding: 20px; font-size: 11px; font-weight: bold; color: #fff; z-index: 40; pointer-events: none;
-        }
+        .dl-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 1.2rem; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; }
+        .btn-save { background: linear-gradient(45deg, #80002a, #ff0055); padding: 8px 20px; border-radius: 10px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; }
+        .btn-save:disabled { opacity: 0.5; background: #222; }
 
-        .dl-card {
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 1.5rem;
-            padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
-        }
-        .btn-save {
-            background: linear-gradient(45deg, #80002a, #ff0055);
-            padding: 10px 25px; border-radius: 12px; font-size: 10px; font-weight: 900;
-            text-transform: uppercase; color: white; transition: 0.3s;
-        }
+        /* Custom Play Overlay */
+        .play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 40px; color: white; opacity: 0.7; z-index: 20; pointer-events: none; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <nav class="p-6"><a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest">Back</a></nav>
+    <nav class="p-4"><a href="index.html" class="text-pink-500 font-black uppercase text-[9px] tracking-widest"><i class="fa-solid fa-arrow-left mr-1"></i> Back</a></nav>
 
     <div class="max-w-xl mx-auto px-6">
         <div class="vortex-wrapper" onclick="startProcess()">
@@ -64,45 +47,40 @@
             <div class="black-hole" id="bh-core"><span id="bh-text">TAP TO<br>AUTO-PASTE</span></div>
         </div>
 
-        <div id="status-msg" class="text-center text-[10px] font-black uppercase tracking-widest text-pink-500/50 mb-10">System Ready</div>
+        <div id="status-msg" class="text-center text-[9px] font-black uppercase tracking-widest text-pink-500/30 mb-8">System Ready</div>
 
-        <div id="v-results" class="hidden space-y-8 animate-fade-in">
+        <div id="v-results" class="hidden space-y-6 animate-fade-in mb-20">
             <div class="video-box" onclick="togglePlay()">
-                <div id="play-ui" class="play-overlay"><i class="fa-solid fa-play"></i></div>
-                <video id="v-player" playsinline class="w-full aspect-video bg-black" onplay="hideUI()" onpause="showUI()" disablePictureInPicture controlsList="noplaybackrate"></video>
-                <div id="v-name" class="video-label truncate">Video Detected</div>
+                <div id="play-icon" class="play-btn"><i class="fa-solid fa-play"></i></div>
+                <video id="v-player" playsinline class="w-full aspect-video bg-black" onplay="hideIcon()" onpause="showIcon()" disablePictureInPicture controlsList="nodownload noplaybackrate"></video>
+                <div id="v-name" class="video-label truncate text-white/70">Video Loading...</div>
             </div>
-            <div id="v-links" class="space-y-3"></div>
+            <div id="v-links" class="space-y-2"></div>
+            <p class="text-[8px] text-center text-white/20 uppercase font-bold tracking-widest">iPhone Users: Check 'Files' app after saving</p>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
-            databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
-        };
-        firebase.initializeApp(firebaseConfig); 
-        const db = firebase.database();
-        let keys = {}; 
-        db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
+        // FIREBASE SYNC
+        const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        firebase.initializeApp(firebaseConfig); const db = firebase.database();
+        let keys = {}; db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
 
-        const core = document.getElementById('bh-core'), 
-              text = document.getElementById('bh-text'),
-              player = document.getElementById('v-player'),
-              playUI = document.getElementById('play-ui');
+        const core = document.getElementById('bh-core'), text = document.getElementById('bh-text'), player = document.getElementById('v-player'), icon = document.getElementById('play-icon');
 
         function togglePlay() { if(player.paused) player.play(); else player.pause(); }
-        function hideUI() { playUI.style.opacity = '0'; }
-        function showUI() { playUI.style.opacity = '1'; playUI.innerHTML = '<i class="fa-solid fa-play"></i>'; }
+        function hideIcon() { icon.style.display = 'none'; }
+        function showIcon() { icon.style.display = 'block'; }
 
         async function startProcess() {
             try {
+                // AUTO-PASTE
                 const url = await navigator.clipboard.readText();
                 if (!url.startsWith('http')) throw new Error();
 
-                core.classList.add('hyper-pulse'); text.innerHTML = "FETCHING...";
+                core.classList.add('hyper-pulse'); text.innerHTML = "SUCKING...";
                 document.getElementById('v-results').classList.add('hidden');
 
                 const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
@@ -116,37 +94,60 @@
                     renderResults(data);
                     core.classList.remove('hyper-pulse'); text.innerHTML = "SUCCESSFUL";
                     setTimeout(() => { text.innerHTML = "TAP TO<br>AUTO-PASTE"; }, 3000);
-                }
-            } catch (e) { alert("Copy Link First!"); core.classList.remove('hyper-pulse'); text.innerHTML = "RETRY"; }
+                } else { throw new Error(); }
+            } catch (e) { 
+                alert("Copy Link first! Or API limit reached."); 
+                core.classList.remove('hyper-pulse'); text.innerHTML = "FAILED"; 
+            }
         }
 
-        // FORCE BLOB DOWNLOAD (Works on Mobile & PC)
-        async function forceDownload(videoUrl, btn) {
+        // --- FINAL FORCE DOWNLOAD LOGIC (PC & MOBILE) ---
+        async function neuralDownload(fileUrl, btn) {
             const originalText = btn.innerText;
-            btn.innerText = "STARTING..."; 
+            btn.innerText = "WAIT...";
             btn.disabled = true;
 
             try {
-                const response = await fetch(videoUrl);
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = `A2Z_Video_${Date.now()}.mp4`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                btn.innerText = "SAVED!";
+                // Using XHR for better progress handling and Blob conversion
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', fileUrl, true);
+                xhr.responseType = 'blob';
+
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        const blob = xhr.response;
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = blobUrl;
+                        a.download = `A2Z_STUDIO_${Date.now()}.mp4`; // Forces download
+                        document.body.appendChild(a);
+                        a.click();
+                        setTimeout(() => {
+                            window.URL.revokeObjectURL(blobUrl);
+                            document.body.removeChild(a);
+                        }, 100);
+                        btn.innerText = "SAVED!";
+                    } else {
+                        throw new Error();
+                    }
+                };
+
+                xhr.onerror = function() {
+                    // Fallback for CORS restricted links
+                    window.location.href = fileUrl; 
+                    btn.innerText = "PLAYED";
+                };
+
+                xhr.send();
             } catch (e) {
-                // Fallback for CORS issues
+                // Ultimate Fallback: Direct Anchor
                 const a = document.createElement('a');
-                a.href = videoUrl;
-                a.setAttribute('download', '');
+                a.href = fileUrl;
+                a.download = 'video.mp4';
                 a.click();
-                btn.innerText = "OPENED";
             } finally {
-                setTimeout(() => { btn.innerText = "SAVE"; btn.disabled = false; }, 3000);
+                setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 3000);
             }
         }
 
@@ -155,21 +156,22 @@
             document.getElementById('v-name').innerText = data.title || "Video Success";
 
             const linksBox = document.getElementById('v-links');
-            const filtered = [];
             const m = data.medias;
             
+            // Filters for Normal, High, 4K
             const n = m.find(x => x.quality.includes('360') || x.quality.includes('480'));
             const h = m.find(x => x.quality.includes('720') || x.quality.includes('1080'));
             const f = m.find(x => x.quality.includes('4k') || x.quality.includes('2160'));
 
-            if(n) filtered.push({q: 'NORMAL', url: n.url});
-            if(h) filtered.push({q: 'HIGH (HD)', url: h.url});
-            if(f) filtered.push({q: '4K ULTRA', url: f.url});
+            const final = [];
+            if(n) final.push({q: 'Normal (SD)', url: n.url});
+            if(h) final.push({q: 'High (HD)', url: h.url});
+            if(f) final.push({q: '4K Ultra', url: f.url});
 
-            linksBox.innerHTML = filtered.map(l => `
+            linksBox.innerHTML = final.map(l => `
                 <div class="dl-card">
-                    <p class="text-[10px] font-black tracking-widest uppercase">${l.q}</p>
-                    <button onclick="forceDownload('${l.url}', this)" class="btn-save">SAVE</button>
+                    <p class="text-[9px] font-black tracking-widest uppercase">${l.q}</p>
+                    <button onclick="neuralDownload('${l.url}', this)" class="btn-save">Save</button>
                 </div>
             `).join('');
             document.getElementById('v-results').classList.remove('hidden');
