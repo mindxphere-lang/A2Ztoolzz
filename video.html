@@ -2,82 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Vortex Engine v21.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2Z Video Downloader</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet"/>
 
     <style>
-        :root { --neon: #ff0055; --bg: #05000a; }
         body { 
-            font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden;
-            background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
+            font-family: 'Montserrat', sans-serif; 
+            background-color: #0f172a; 
+            color: white; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
         }
-
-        /* --- VORTEX UI --- */
-        .vortex-node { position: relative; width: 260px; height: 260px; margin: 40px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .bh-core {
-            position: relative; width: 160px; height: 160px; background: black; border-radius: 50%;
-            box-shadow: 0 0 50px 10px var(--neon), inset 0 0 30px var(--neon);
-            z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .main-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
         }
-        .bh-core span { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--neon); text-transform: uppercase; }
-        .ring { position: absolute; inset: 0; border: 1px dashed rgba(255, 0, 85, 0.15); border-radius: 50%; animation: rotate 12s linear infinite; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        .pulse-active { animation: pulse 0.6s infinite alternate !important; }
-        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1.05); opacity: 1; } }
-
-        /* --- RESULT CARDS --- */
-        .result-box { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 2rem; overflow: hidden; }
-        .dl-row { border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 18px 25px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; }
-        .save-btn { background: linear-gradient(45deg, #80002a, #ff0055); padding: 10px 25px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; letter-spacing: 1px; }
-
-        /* MAINTENANCE SYSTEM */
-        #m-mode { position: fixed; inset: 0; z-index: 9999; background: black; display: none; align-items: center; justify-content: center; text-align: center; }
+        input {
+            width: 100%;
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        input:focus { border-color: #6366f1; }
+        .btn-primary {
+            background: #6366f1;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .btn-primary:hover { background: #4f46e5; transform: translateY(-2px); }
+        .result-box {
+            margin-top: 30px;
+            background: #1e293b;
+            border-radius: 15px;
+            padding: 20px;
+            display: none;
+            width: 100%;
+        }
+        .dl-btn {
+            background: #10b981;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        #m-overlay {
+            position: fixed; inset: 0; z-index: 9999; background: #0f172a;
+            display: none; align-items: center; justify-content: center; text-align: center;
+        }
     </style>
 </head>
-<body class="min-h-screen">
+<body>
 
-    <div id="m-mode">
-        <div class="p-10 text-center">
-            <div class="w-16 h-16 border-2 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <h1 class="text-xl font-black text-pink-600 uppercase italic mb-2">Neural Node Paused</h1>
-            <p id="m-msg" class="text-white/30 text-[9px] tracking-widest uppercase font-bold"></p>
+    <div id="m-overlay">
+        <div>
+            <h1 class="text-3xl font-black text-indigo-500 mb-2">SYSTEM OFFLINE</h1>
+            <p id="m-text" class="text-slate-400 uppercase font-bold tracking-widest text-xs"></p>
         </div>
     </div>
 
-    <nav class="p-6 flex justify-between items-center">
-        <a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> Hub</a>
-        <div class="flex items-center gap-2 opacity-30">
-            <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-            <span class="text-[7px] font-black uppercase text-white">Vortex v21.0</span>
-        </div>
-    </nav>
-
-    <div class="max-w-xl mx-auto px-6 pb-20">
+    <div class="main-card animate-fade-in">
+        <h1 class="text-3xl font-black mb-8 uppercase tracking-tighter italic">A2Z <span class="text-indigo-500">Downloader</span></h1>
         
-        <div class="vortex-node" onclick="triggerNeuralSuck()">
-            <div class="ring"></div>
-            <div class="bh-core" id="core">
-                <span id="core-text">Tap to<br>Suck Content</span>
-            </div>
-        </div>
+        <input type="text" id="video-url" placeholder="Paste video link here (Instagram/YouTube/etc.)">
+        
+        <button id="search-btn" onclick="fetchVideo()" class="btn-primary">
+            SEARCH VIDEO
+        </button>
 
-        <div id="status-label" class="text-center text-[8px] font-black uppercase tracking-[0.4em] text-pink-500/20 mb-10">Waiting for Link...</div>
+        <p id="status-msg" class="text-[10px] font-bold text-slate-500 mt-4 uppercase tracking-widest">Ready to Download</p>
 
-        <div id="results" class="hidden space-y-6 animate-fade-in">
-            <div class="result-box">
-                <video id="player" playsinline class="w-full aspect-video bg-black" controlsList="nodownload"></video>
-                <div id="v-title" class="p-5 text-[10px] font-bold text-white/50 truncate border-b border-white/5 uppercase italic">Video Ready</div>
-                
-                <div id="dl-links"></div>
-            </div>
-            
-            <p class="text-[7px] text-center text-white/10 uppercase font-black tracking-widest italic mt-4">Transmitting to Force Engine...</p>
+        <div id="result-ui" class="result-box">
+            <h3 id="v-title" class="text-sm font-bold truncate mb-4 text-slate-300">Video Found</h3>
+            <div id="dl-links" class="flex flex-col gap-2"></div>
         </div>
     </div>
 
@@ -85,101 +109,84 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
-        // Master Config from Master Control
+        // Use your Firebase settings
         const fbConfig = { 
             apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
             databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
         };
         firebase.initializeApp(fbConfig);
         const db = firebase.database();
-        let settings = {};
+        let appSettings = {};
 
-        // Syncing with Admin Settings
+        // Sync Maintenance Mode
         db.ref('settings').on('value', (snapshot) => {
-            settings = snapshot.val() || {};
-            if(settings.maintenanceMode) {
-                document.getElementById('m-mode').style.display = 'flex';
-                document.getElementById('m-msg').innerText = settings.maintenanceMsg;
+            appSettings = snapshot.val() || {};
+            if(appSettings.maintenanceMode) {
+                document.getElementById('m-overlay').style.display = 'flex';
+                document.getElementById('m-text').innerText = appSettings.maintenanceMsg;
             } else {
-                document.getElementById('m-mode').style.display = 'none';
+                document.getElementById('m-overlay').style.display = 'none';
             }
         });
 
-        const core = document.getElementById('core'), text = document.getElementById('core-text'), status = document.getElementById('status-label');
+        async function fetchVideo() {
+            const url = document.getElementById('video-url').value;
+            const btn = document.getElementById('search-btn');
+            const status = document.getElementById('status-msg');
+            const resultUI = document.getElementById('result-ui');
 
-        // --- FETCHING LOGIC ---
-        async function triggerNeuralSuck() {
+            if(!url) return alert("Pehle link dalo bhai!");
+            
+            btn.disabled = true;
+            btn.innerText = "SEARCHING...";
+            status.innerText = "Connecting to API...";
+            resultUI.style.display = 'none';
+
             try {
-                // Clipboard Auto-Grab
-                const link = await navigator.clipboard.readText();
-                if (!link.startsWith('http')) return alert("Bhai, pehle link copy karo!");
-
-                core.classList.add('pulse-active');
-                text.innerHTML = "Sucking...";
-                document.getElementById('results').classList.add('hidden');
-
+                // Using Social Download API
                 const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json', 
-                        'X-RapidAPI-Key': settings.videoKey, 
+                        'X-RapidAPI-Key': appSettings.videoKey, 
                         'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' 
                     },
-                    body: JSON.stringify({ url: link })
+                    body: JSON.stringify({ url: url })
                 });
                 
                 const data = await res.json();
-                if (data.medias) {
-                    renderUI(data);
-                    core.classList.remove('pulse-active');
-                    text.innerHTML = "Success";
-                    status.innerText = "Stream Captured";
-                    setTimeout(() => { text.innerHTML = "Tap to<br>Suck Content"; }, 3000);
-                } else { throw new Error(); }
-
+                
+                if(data.medias) {
+                    displayLinks(data);
+                    status.innerText = "Success! Select Quality Below";
+                } else {
+                    throw new Error("Invalid Link");
+                }
             } catch (e) {
-                core.classList.remove('pulse-active');
-                text.innerHTML = "Retry";
-                status.innerText = "Neural Sync Failed.";
+                status.innerText = "API Error. Check your Key in Master Control.";
+                alert("API Key check karein!");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "SEARCH VIDEO";
             }
         }
 
-        // --- THE FORCE ENGINE TRANSMITTER ---
-        function sendToForceEngine(url, btn) {
-            btn.innerText = "LAUNCHING...";
-            btn.disabled = true;
-
-            // Redirecting link to the dedicated force.html engine
-            const target = "force.html?url=" + encodeURIComponent(url);
-            window.open(target, '_blank'); 
-
-            setTimeout(() => { 
-                btn.innerText = "SAVE"; 
-                btn.disabled = false; 
-            }, 3000);
-        }
-
-        function renderUI(data) {
-            document.getElementById('player').src = data.medias[0].url; 
-            document.getElementById('v-title').innerText = data.title || "Vortex Video Detected";
-
+        function displayLinks(data) {
             const linksBox = document.getElementById('dl-links');
-            const m = data.medias;
-            
-            // Clean Quality Filter
-            const options = [
-                m.find(x => x.quality.includes('360') || x.quality.includes('480')),
-                m.find(x => x.quality.includes('720') || x.quality.includes('1080')),
-                m.find(x => x.quality.includes('4k'))
-            ].filter(Boolean);
+            document.getElementById('v-title').innerText = data.title || "Video Found";
+            linksBox.innerHTML = "";
 
-            document.getElementById('dl-links').innerHTML = options.map(opt => `
-                <div class="dl-row">
-                    <p class="text-[9px] font-black uppercase tracking-widest text-white/40">${opt.quality}</p>
-                    <button onclick="sendToForceEngine('${opt.url}', this)" class="save-btn">Save</button>
-                </div>
-            `).join('');
-            document.getElementById('results').classList.remove('hidden');
+            // Filtering links
+            data.medias.forEach(m => {
+                const btn = document.createElement('a');
+                btn.href = m.url;
+                btn.target = "_blank"; // Direct open for download
+                btn.className = "dl-btn text-center";
+                btn.innerText = `DOWNLOAD ${m.quality}`;
+                linksBox.appendChild(btn);
+            });
+
+            document.getElementById('result-ui').style.display = 'block';
         }
     </script>
 </body>
