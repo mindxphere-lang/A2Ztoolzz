@@ -1,222 +1,216 @@
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-<style>
-    /* Scoped Styles for Blogger */
-    #downloader-app {
-        --primary: #00d2ff;
-        --secondary: #3a7bd5;
-        --dark-bg: #05000a;
-        --card-bg: #1e293b;
-        font-family: 'Segoe UI', sans-serif;
-        background-color: var(--dark-bg);
-        color: white;
-        border-radius: 10px;
-        overflow: hidden;
-        padding: 20px;
-        position: relative;
-    }
-
-    /* Glassmorphism Effect */
-    #downloader-app .glass-card {
-        background: rgba(30, 41, 59, 0.7);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    /* Gradient Text */
-    #downloader-app .gradient-text {
-        background: linear-gradient(to right, #00d2ff, #928DAB);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        display: inline-block;
-    }
-
-    /* Animation for Loading */
-    @keyframes pulse-ring {
-        0% { transform: scale(0.33); }
-        80%, 100% { opacity: 0; }
-    }
-    #downloader-app .pulse-ring {
-        position: absolute;
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        border: 4px solid var(--primary);
-        animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>UltraSaver - Mobile Pro</title>
     
-    .custom-scroll::-webkit-scrollbar { width: 6px; }
-    .custom-scroll::-webkit-scrollbar-track { background: #1e293b; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #3a7bd5; border-radius: 3px; }
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    #m-overlay {
-        position: fixed; inset: 0; z-index: 9999; background: #05000a;
-        display: none; align-items: center; justify-content: center; text-align: center;
-    }
-</style>
+    <style>
+        #downloader-app {
+            --primary: #00d2ff;
+            --dark-bg: #05000a;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            padding: 15px; /* Mobile responsive padding */
+        }
 
-<div id="m-overlay">
-    <div>
-        <h1 class="text-3xl font-black text-cyan-400 mb-2 italic uppercase">System Paused</h1>
-        <p id="m-text" class="text-white/30 uppercase font-bold tracking-widest text-[10px]"></p>
+        #downloader-app .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #downloader-app .gradient-text {
+            background: linear-gradient(to right, #00d2ff, #928DAB);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.33); }
+            80%, 100% { opacity: 0; }
+        }
+        #downloader-app .pulse-ring {
+            position: absolute; width: 60px; height: 60px; border-radius: 50%;
+            border: 4px solid var(--primary); animation: pulse-ring 1.25s infinite;
+        }
+        
+        #m-overlay {
+            position: fixed; inset: 0; z-index: 9999; background: #05000a;
+            display: none; align-items: center; justify-content: center; text-align: center;
+        }
+    </style>
+</head>
+<body class="bg-[#05000a]">
+
+    <div id="m-overlay">
+        <div>
+            <h1 class="text-2xl font-black text-cyan-400 mb-2 uppercase">System Offline</h1>
+            <p id="m-text" class="text-white/30 text-[10px] font-bold"></p>
+        </div>
     </div>
-</div>
 
-<div id="downloader-app" class="w-full flex flex-col items-center justify-center min-h-[600px]">
+    <div id="downloader-app" class="w-full min-h-screen flex flex-col items-center py-10">
 
-    <header class="w-full max-w-3xl flex justify-between items-center py-6 mb-4">
-        <div class="flex items-center gap-2">
-            <i class="fa-solid fa-cloud-arrow-down text-3xl text-cyan-400"></i>
-            <h1 class="text-2xl font-bold tracking-wider m-0">Ultra<span class="text-cyan-400">Saver</span></h1>
-        </div>
-        <div class="text-sm text-gray-400 bg-slate-800 px-3 py-1 rounded-full">
-            <i class="fa-solid fa-check-circle text-green-400 mr-1"></i> Ads Free
-        </div>
-    </header>
-
-    <div class="w-full max-w-2xl flex-grow flex flex-col items-center">
-        <div class="text-center mb-10">
-            <h2 class="text-3xl md:text-5xl font-extrabold mb-4 gradient-text">Download Anything.</h2>
-            <p class="text-gray-400 text-lg">YouTube, Instagram & TikTok (High Quality)</p>
-        </div>
-
-        <div class="w-full glass-card p-2 rounded-full shadow-2xl shadow-cyan-500/20 flex relative">
-            <div class="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400"><i class="fa-solid fa-link"></i></div>
-            <input type="text" id="urlInput" 
-                class="w-full bg-transparent border-none outline-none text-white pl-10 pr-4 py-3 text-lg placeholder-gray-500"
-                placeholder="Paste Video Link here..." oninput="detectPlatform()" />
-            <button onclick="fetchVideoDetails()" 
-                class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3 px-6 md:px-8 rounded-full transition-all transform hover:scale-105 shadow-lg whitespace-nowrap">
-                Get Video
-            </button>
-        </div>
-
-        <div class="flex gap-4 mt-6 text-gray-500 transition-all duration-300" id="platformIcons">
-            <div id="yt-icon" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-transparent opacity-50"><i class="fa-brands fa-youtube text-xl"></i> YouTube</div>
-            <div id="insta-icon" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-transparent opacity-50"><i class="fa-brands fa-instagram text-xl"></i> Instagram</div>
-            <div id="tiktok-icon" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-transparent opacity-50"><i class="fa-brands fa-tiktok text-xl"></i> TikTok</div>
-        </div>
-
-        <div id="processingSection" class="hidden mt-10 text-center relative h-32 w-full flex flex-col items-center justify-center">
-            <div class="relative flex justify-center items-center h-24 w-24">
-                <div class="pulse-ring"></div>
-                <i class="fa-solid fa-gear fa-spin text-3xl text-cyan-400 relative z-10"></i>
+        <header class="w-full max-w-lg flex justify-between items-center mb-10 px-2">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-down text-2xl text-cyan-400"></i>
+                <h1 class="text-xl font-bold tracking-tight m-0">Ultra<span class="text-cyan-400">Saver</span></h1>
             </div>
-            <p class="text-cyan-300 animate-pulse mt-2 uppercase text-[10px] font-bold tracking-widest">Neural Fetching...</p>
-        </div>
+            <div class="text-[10px] text-gray-400 bg-slate-800 px-3 py-1 rounded-full uppercase">Ads Free</div>
+        </header>
 
-        <div id="resultSection" class="hidden w-full mt-8 glass-card rounded-2xl p-6 border border-slate-700 animate-fade-in-up">
-            <div class="flex flex-col md:flex-row gap-6">
-                <div class="w-full md:w-1/3 aspect-video bg-slate-800 rounded-lg overflow-hidden relative group shadow-lg">
-                    <img id="videoThumb" src="" alt="Thumbnail" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition" />
+        <main class="w-full max-w-lg flex-grow">
+            <div class="text-center mb-8 px-4">
+                <h2 class="text-3xl font-extrabold mb-3 gradient-text">Download Anything.</h2>
+                <p class="text-gray-500 text-sm">YouTube, Instagram & TikTok (HD)</p>
+            </div>
+
+            <div class="mx-4 glass-card p-1.5 rounded-full shadow-xl shadow-cyan-500/10 flex relative mb-6">
+                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                    <i class="fa-solid fa-link"></i>
                 </div>
-                <div class="flex-1 flex flex-col">
-                    <h3 id="videoTitle" class="text-xl font-bold text-white mb-2 line-clamp-2">Select Quality</h3>
-                    <div id="qualityList" class="space-y-3 max-h-60 overflow-y-auto custom-scroll pr-2"></div>
+                <input type="text" id="urlInput" 
+                    class="w-full bg-transparent border-none outline-none text-white pl-9 pr-3 py-3 text-sm placeholder-gray-500"
+                    placeholder="Paste Video Link..." oninput="detectPlatform()" />
+                <button onclick="fetchVideoDetails()" 
+                    class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black py-3 px-5 rounded-full text-[10px] uppercase tracking-widest transition-all">
+                    Get
+                </button>
+            </div>
+
+            <div class="flex justify-center gap-3 mb-10 overflow-x-auto px-4 pb-2" id="platformIcons">
+                <div id="yt-icon" class="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-transparent opacity-30 text-[10px] font-bold"><i class="fa-brands fa-youtube"></i> YT</div>
+                <div id="insta-icon" class="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-transparent opacity-30 text-[10px] font-bold"><i class="fa-brands fa-instagram"></i> IG</div>
+                <div id="tiktok-icon" class="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-transparent opacity-30 text-[10px] font-bold"><i class="fa-brands fa-tiktok"></i> TT</div>
+            </div>
+
+            <div id="processingSection" class="hidden text-center py-10">
+                <div class="relative flex justify-center items-center h-16 w-16 mx-auto mb-4">
+                    <div class="pulse-ring"></div>
+                    <i class="fa-solid fa-gear fa-spin text-2xl text-cyan-400"></i>
+                </div>
+                <p class="text-cyan-400 text-[10px] font-bold tracking-[0.3em] uppercase animate-pulse">Neural Sync...</p>
+            </div>
+
+            <div id="resultSection" class="hidden mx-4 glass-card rounded-3xl p-5 border border-slate-700 animate-fade-in">
+                <div class="flex flex-col gap-4">
+                    <div class="w-full aspect-video bg-slate-800 rounded-2xl overflow-hidden shadow-lg">
+                        <img id="videoThumb" src="" alt="" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="space-y-4">
+                        <h3 id="videoTitle" class="text-sm font-bold text-white line-clamp-2">Stream Found</h3>
+                        <div id="qualityList" class="space-y-2"></div>
+                    </div>
                 </div>
             </div>
+        </main>
+
+        <footer class="w-full text-center py-10 text-[9px] text-gray-600 font-bold uppercase tracking-widest">
+            &copy; 2026 UltraSaver. Multi-Platform Compatibility.
+        </footer>
+
+        <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full border border-cyan-500 hidden z-50 text-xs">
+            <span id="toastMsg">Notification</span>
         </div>
     </div>
-
-    <footer class="w-full text-center py-6 text-gray-500 text-sm mt-auto">
-        <p>&copy; 2026 UltraSaver. Powered by Social Download API.</p>
-    </footer>
-
-    <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg border border-cyan-500 hidden transition-all z-50 whitespace-nowrap">
-        <span id="toastMsg">Notification</span>
-    </div>
-</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
 <script>
-// --- MASTER CONFIG ---
-const fbConfig = { 
-    apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
-    databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
-};
-firebase.initializeApp(fbConfig);
-const db = firebase.database();
-let keys = {};
+    // Firebase Setup
+    const fbConfig = { 
+        apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
+        databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
+    };
+    firebase.initializeApp(fbConfig);
+    const db = firebase.database();
+    let keys = {};
 
-db.ref('settings').on('value', (s) => {
-    keys = s.val() || {};
-    if(keys.maintenanceMode) {
-        document.getElementById('m-overlay').style.display = 'flex';
-        document.getElementById('m-text').innerText = keys.maintenanceMsg;
-    } else { document.getElementById('m-overlay').style.display = 'none'; }
-});
-
-function detectPlatform() {
-    const url = document.getElementById('urlInput').value.toLowerCase();
-    const yt = document.getElementById('yt-icon'), ins = document.getElementById('insta-icon'), tik = document.getElementById('tiktok-icon');
-    yt.className = ins.className = tik.className = "flex items-center gap-2 px-4 py-2 rounded-lg border border-transparent opacity-50";
-
-    if(url.includes('youtube') || url.includes('youtu.be')) yt.className = "flex items-center gap-2 px-4 py-2 rounded-lg border border-red-500 bg-red-500/10 text-red-400 opacity-100";
-    else if(url.includes('instagram')) ins.className = "flex items-center gap-2 px-4 py-2 rounded-lg border border-pink-500 bg-pink-500/10 text-pink-400 opacity-100";
-    else if(url.includes('tiktok')) tik.className = "flex items-center gap-2 px-4 py-2 rounded-lg border border-white bg-white/10 text-white opacity-100";
-}
-
-async function fetchVideoDetails() {
-    const url = document.getElementById('urlInput').value;
-    if(!url) return showToast("Bhai, link toh dalo!");
-
-    const processing = document.getElementById('processingSection');
-    const results = document.getElementById('resultSection');
-    
-    processing.classList.remove('hidden');
-    results.classList.add('hidden');
-
-    try {
-        const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json', 
-                'X-RapidAPI-Key': keys.videoKey, 
-                'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' 
-            },
-            body: JSON.stringify({ url: url })
-        });
-        const data = await res.json();
-        if(data.medias) {
-            renderQualities(data);
-            processing.classList.add('hidden');
-            results.classList.remove('hidden');
-        } else { throw new Error(); }
-    } catch (e) {
-        processing.classList.add('hidden');
-        showToast("❌ Error: API Key check karein!");
-    }
-}
-
-function renderQualities(data) {
-    const list = document.getElementById('qualityList');
-    document.getElementById('videoTitle').innerText = data.title || "Video Found";
-    document.getElementById('videoThumb').src = data.picture || "";
-    list.innerHTML = "";
-
-    data.medias.forEach(m => {
-        const btn = document.createElement('div');
-        btn.className = "flex items-center justify-between bg-slate-800 p-3 rounded-lg hover:bg-slate-700 cursor-pointer border border-slate-600 transition-all";
-        btn.innerHTML = `
-            <div class="flex items-center gap-3">
-                <span class="bg-cyan-600 text-[9px] font-bold px-2 py-1 rounded uppercase">${m.extension}</span>
-                <div class="flex flex-col"><span class="text-xs font-bold text-white capitalize">${m.quality}</span></div>
-            </div>
-            <a href="${m.url}" target="_blank" class="text-cyan-400 text-[10px] font-black uppercase no-underline"><i class="fa-solid fa-download"></i> Save</a>
-        `;
-        btn.onclick = () => window.open(m.url, '_blank');
-        list.appendChild(btn);
+    db.ref('settings').on('value', (s) => {
+        keys = s.val() || {};
+        if(keys.maintenanceMode) {
+            document.getElementById('m-overlay').style.display = 'flex';
+            document.getElementById('m-text').innerText = keys.maintenanceMsg;
+        } else { document.getElementById('m-overlay').style.display = 'none'; }
     });
-}
 
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    document.getElementById('toastMsg').innerText = msg;
-    t.classList.remove('hidden');
-    setTimeout(() => t.classList.add('hidden'), 3000);
-}
+    function detectPlatform() {
+        const url = document.getElementById('urlInput').value.toLowerCase();
+        const yt = document.getElementById('yt-icon'), ins = document.getElementById('insta-icon'), tik = document.getElementById('tiktok-icon');
+        yt.className = ins.className = tik.className = "flex items-center gap-1.5 px-3 py-2 rounded-lg border border-transparent opacity-30 text-[10px] font-bold";
+
+        if(url.includes('youtube') || url.includes('youtu.be')) yt.className = "flex items-center gap-1.5 px-3 py-2 rounded-lg border border-red-500 bg-red-500/10 text-red-400 opacity-100";
+        else if(url.includes('instagram')) ins.className = "flex items-center gap-1.5 px-3 py-2 rounded-lg border border-pink-500 bg-pink-500/10 text-pink-400 opacity-100";
+        else if(url.includes('tiktok')) tik.className = "flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white bg-white/10 text-white opacity-100";
+    }
+
+    async function fetchVideoDetails() {
+        const url = document.getElementById('urlInput').value;
+        if(!url) return showToast("Bhai, link toh dalo!");
+        
+        // Mobile Key Check Fix
+        if(!keys.videoKey) return showToast("API Key syncing... Try in 2 seconds.");
+
+        const processing = document.getElementById('processingSection');
+        const results = document.getElementById('resultSection');
+        processing.classList.remove('hidden');
+        results.classList.add('hidden');
+
+        try {
+            const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-RapidAPI-Key': keys.videoKey, 
+                    'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' 
+                },
+                body: JSON.stringify({ url: url })
+            });
+            const data = await res.json();
+            if(data.medias) {
+                renderQualities(data);
+                processing.classList.add('hidden');
+                results.classList.remove('hidden');
+            } else { throw new Error(); }
+        } catch (e) {
+            processing.classList.add('hidden');
+            showToast("❌ Connection Error or API Key Check!");
+        }
+    }
+
+    function renderQualities(data) {
+        const list = document.getElementById('qualityList');
+        document.getElementById('videoTitle').innerText = data.title || "Video Found";
+        document.getElementById('videoThumb').src = data.picture || "";
+        list.innerHTML = "";
+
+        data.medias.forEach(m => {
+            const btn = document.createElement('div');
+            btn.className = "flex items-center justify-between bg-slate-900/50 p-4 rounded-2xl border border-slate-700 active:scale-95 transition-all";
+            btn.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <span class="bg-cyan-600 text-[8px] font-black px-2 py-1 rounded uppercase">${m.extension}</span>
+                    <span class="text-[10px] font-bold text-white uppercase">${m.quality}</span>
+                </div>
+                <a href="${m.url}" target="_blank" class="text-cyan-400 text-[10px] font-black uppercase no-underline"><i class="fa-solid fa-download"></i> Save</a>
+            `;
+            btn.onclick = () => window.open(m.url, '_blank');
+            list.appendChild(btn);
+        });
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        document.getElementById('toastMsg').innerText = msg;
+        t.classList.remove('hidden');
+        setTimeout(() => t.classList.add('hidden'), 3000);
+    }
 </script>
+</body>
+</html>
