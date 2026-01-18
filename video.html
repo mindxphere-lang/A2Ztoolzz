@@ -107,53 +107,37 @@
             }
         }
 
-        // --- NEW ULTIMATE RE-STREAMER (PC FIX) ---
+        // --- FIXED DOWNLOAD with Cloudflare Worker Proxy (perfect force download) ---
         async function neuralDownload(fileUrl, btn) {
             const originalText = btn.innerText;
-            btn.innerText = "WAIT...";
+            btn.innerText = "DOWNLOADING...";
             btn.disabled = true;
 
-            const proxies = [
-                "https://api.allorigins.win/raw?url=", 
-                "https://corsproxy.io/?",
-                "" // Direct Fallback
-            ];
+            // Yeh line change karo: apna Cloudflare Worker URL daalo (jo deploy kiya tha)
+            const proxyBase = "https://a2z-video-proxy.mindxphere.workers.dev/";  // ← YAHAN APNA WORKER URL DAAL DO
 
-            let downloadStarted = false;
+            try {
+                const proxyUrl = proxyBase + "?url=" + encodeURIComponent(fileUrl);
 
-            for (let proxy of proxies) {
-                if (downloadStarted) break;
-                try {
-                    const finalUrl = proxy + encodeURIComponent(fileUrl);
-                    const response = await fetch(finalUrl);
-                    if (!response.ok) throw new Error();
+                const a = document.createElement('a');
+                a.href = proxyUrl;
+                a.download = `A2Z_Vortex_${Date.now()}.mp4`;  // unique name for force download
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
 
-                    const blob = await response.blob();
-                    const blobUrl = URL.createObjectURL(blob);
-                    
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = blobUrl;
-                    a.download = `A2Z_STUDIO_VIDEO_${Math.floor(Date.now()/1000)}.mp4`;
-                    document.body.appendChild(a);
-                    a.click();
-                    
-                    setTimeout(() => {
-                        URL.revokeObjectURL(blobUrl);
-                        document.body.removeChild(a);
-                    }, 1000);
-                    
-                    btn.innerText = "DONE!";
-                    downloadStarted = true;
-                } catch (e) { continue; }
+                btn.innerText = "DOWNLOAD STARTED!";
+            } catch (e) {
+                console.error("Download error:", e);
+                btn.innerText = "FAILED";
+                alert("Download fail hua – Worker check karo ya retry karo");
+            } finally {
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }, 3000);
             }
-
-            if (!downloadStarted) {
-                // Silent Fallback if all proxies fail
-                window.location.href = fileUrl;
-                btn.innerText = "OPENED";
-            }
-            setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 3000);
         }
 
         function renderResults(data) {
