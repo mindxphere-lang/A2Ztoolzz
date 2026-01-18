@@ -3,73 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Vortex Fresh v11.0</title>
+    <title>A2Z Studio - Mini IDM v12.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
     <style>
         :root { --neon: #ff0055; --bg: #05000a; }
-        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden; background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed; }
         
-        /* FRESH MINIMAL UI */
-        .vortex-hub { position: relative; width: 250px; height: 250px; margin: 40px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .core-node { position: relative; width: 150px; height: 150px; background: black; border-radius: 50%; box-shadow: 0 0 50px var(--neon), inset 0 0 20px var(--neon); z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center; transition: 0.3s; }
-        .core-node span { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--neon); text-transform: uppercase; line-height: 1.4; }
-        .outer-ring { position: absolute; inset: 0; border: 1px dashed rgba(255, 0, 85, 0.2); border-radius: 50%; animation: spin 15s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .pulse-engine { animation: pulse 0.8s infinite alternate !important; }
-        @keyframes pulse { 0% { transform: scale(0.95); } 100% { transform: scale(1.05); } }
-
-        .result-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 2rem; overflow: hidden; margin-top: 20px; }
-        .dl-option { padding: 18px 25px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, 0.03); }
-        .save-btn { background: linear-gradient(45deg, #80002a, #ff0055); padding: 10px 25px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; }
+        /* IDM CORE UI */
+        .vortex-node { position: relative; width: 220px; height: 220px; margin: 30px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .bh-core { position: relative; width: 140px; height: 140px; background: black; border-radius: 50%; box-shadow: 0 0 40px var(--neon), inset 0 0 20px var(--neon); z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .bh-core span { font-size: 9px; font-weight: 900; letter-spacing: 2px; color: var(--neon); text-transform: uppercase; }
         
-        #m-overlay { position: fixed; inset: 0; z-index: 9999; background: black; display: none; align-items: center; justify-content: center; text-align: center; }
+        /* PROGRESS BAR */
+        .idm-progress-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 0, 85, 0.2); border-radius: 1rem; padding: 15px; margin-top: 10px; display: none; }
+        .idm-bar-bg { width: 100%; height: 6px; background: #111; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .idm-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff0055, #ff6b9d); transition: 0.2s; }
+        
+        .result-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 2rem; overflow: hidden; }
+        .dl-row { padding: 15px 25px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, 0.03); }
+        .idm-btn { background: linear-gradient(45deg, #80002a, #ff0055); padding: 8px 20px; border-radius: 10px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <div id="m-overlay">
-        <div class="p-10 text-center"><div class="w-12 h-12 border-2 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div><h1 class="text-xl font-black text-pink-600 uppercase italic mb-2">Node Offline</h1><p id="m-txt" class="text-white/30 text-[9px] font-bold uppercase"></p></div>
-    </div>
-
-    <nav class="p-6 flex justify-between items-center"><a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> HUB</a></nav>
+    <nav class="p-4"><a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> HUB</a></nav>
 
     <div class="max-w-xl mx-auto px-6 pb-20">
-        <div class="vortex-hub" onclick="startSuckProcess()"><div class="outer-ring"></div><div class="core-node" id="v-node"><span id="v-text">Tap to<br>Suck Content</span></div></div>
-        <p id="status" class="text-center text-[8px] font-black uppercase tracking-[0.4em] text-pink-500/20 mb-10">Neural Node Active</p>
+        <div class="vortex-node" onclick="initIDM()">
+            <div class="bh-core" id="node-core"><span id="node-text">TAP TO<br>INITIATE IDM</span></div>
+        </div>
 
-        <div id="result-box" class="hidden animate-fade-in">
-            <div class="result-card">
-                <video id="v-player" playsinline class="w-full aspect-video bg-black" controlsList="nodownload"></video>
-                <div id="v-title" class="p-5 text-[10px] font-bold text-white/50 truncate border-b border-white/5 uppercase italic">Video Ready</div>
-                <div id="link-container"></div>
+        <div id="status" class="text-center text-[8px] font-black uppercase tracking-[0.4em] text-pink-500/20 mb-8">Ready to Grab Link</div>
+
+        <div id="idm-console" class="idm-progress-box animate-pulse">
+            <div class="flex justify-between text-[8px] font-black uppercase tracking-widest text-pink-500">
+                <span>Downloading...</span>
+                <span id="idm-percent">0%</span>
             </div>
-            <p class="text-[7px] text-center text-white/10 uppercase font-black tracking-widest italic mt-4">PC: Use 'Right Click > Save As' if download hangs</p>
+            <div class="idm-bar-bg"><div id="idm-fill" class="idm-bar-fill"></div></div>
+            <p class="text-[7px] text-white/30 uppercase font-bold">Neural Tunneling Active...</p>
+        </div>
+
+        <div id="results" class="hidden space-y-6 mt-10">
+            <div class="result-card">
+                <video id="player" playsinline class="w-full aspect-video bg-black" controlsList="nodownload"></video>
+                <div id="dl-container"></div>
+            </div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        // MASTER CONFIG
-        const fbConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
-        firebase.initializeApp(fbConfig); const db = firebase.database(); let keys = {};
+        firebase.initializeApp({ apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" });
+        const db = firebase.database(); let keys = {};
+        db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
 
-        db.ref('settings').on('value', (s) => {
-            keys = s.val() || {};
-            if(keys.maintenanceMode) {
-                document.getElementById('m-overlay').style.display = 'flex';
-                document.getElementById('m-txt').innerText = keys.maintenanceMsg;
-            } else { document.getElementById('m-overlay').style.display = 'none'; }
-        });
-
-        async function startSuckProcess() {
+        async function initIDM() {
             try {
-                const url = await navigator.clipboard.readText(); if(!url.startsWith('http')) return alert("Copy Link first!");
-                const node = document.getElementById('v-node'), txt = document.getElementById('v-text');
-                node.classList.add('pulse-engine'); txt.innerHTML = "FETCHING...";
-                document.getElementById('result-box').classList.add('hidden');
+                const url = await navigator.clipboard.readText(); if(!url.startsWith('http')) return alert("Copy Video Link!");
+                const core = document.getElementById('node-core'), txt = document.getElementById('node-text');
+                core.classList.add('animate-pulse'); txt.innerHTML = "GRABBING...";
 
                 const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
                     method: 'POST',
@@ -78,50 +74,72 @@
                 });
                 const data = await res.json();
                 if(data.medias) {
-                    renderUI(data); node.classList.remove('pulse-engine'); txt.innerHTML = "SUCCESS";
-                    setTimeout(() => { txt.innerHTML = "Tap to<br>Suck Content"; }, 3000);
-                } else { throw new Error(); }
-            } catch (e) { document.getElementById('v-node').classList.remove('pulse-engine'); document.getElementById('v-text').innerHTML = "RETRY"; }
+                    renderIDM(data); core.classList.remove('animate-pulse'); txt.innerHTML = "LINK GRABBED";
+                    setTimeout(() => txt.innerHTML = "TAP TO<br>INITIATE IDM", 3000);
+                }
+            } catch (e) { document.getElementById('node-text').innerHTML = "RETRY"; }
         }
 
-        // --- NEW AGGRESSIVE DOWNLOADER (NO HANG) ---
-        async function forceSave(fileUrl, btn) {
-            const original = btn.innerText; btn.innerText = "LOCKING..."; btn.disabled = true;
-            const proxies = ["https://api.allorigins.win/raw?url=", "https://corsproxy.io/?", ""];
-            let saved = false;
+        // --- IDM NEURAL DOWNLOAD ENGINE ---
+        async function idmDownload(fileUrl, btn) {
+            const console = document.getElementById('idm-console');
+            const fill = document.getElementById('idm-fill');
+            const percentText = document.getElementById('idm-percent');
+            
+            console.style.display = 'block';
+            btn.disabled = true; btn.innerText = "CAPTURING...";
 
-            // Timeout Logic: Agar 10s me lock nahi hua to redirect
-            const timeout = setTimeout(() => {
-                if(!saved) { window.open(fileUrl, '_blank'); btn.innerText = "REDIRECTED"; }
-            }, 10000);
+            // Proxy nodes to prevent New Tab playback
+            const proxies = ["https://api.allorigins.win/raw?url=", "https://corsproxy.io/?"];
+            let success = false;
 
             for (let proxy of proxies) {
-                if (saved) break;
+                if (success) break;
                 try {
-                    const res = await fetch(proxy + encodeURIComponent(fileUrl));
-                    const blob = await res.blob();
-                    if(blob.size < 1000) continue; 
-                    const bUrl = URL.createObjectURL(blob);
-                    const a = document.createElement('a'); a.href = bUrl;
-                    a.download = `A2Z_VIDEO_${Date.now()}.mp4`; document.body.appendChild(a); a.click();
-                    setTimeout(() => { URL.revokeObjectURL(bUrl); document.body.removeChild(a); }, 1000);
-                    btn.innerText = "DONE!"; saved = true; clearTimeout(timeout);
-                } catch (e) { console.log("Path Blocked..."); }
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', proxy + encodeURIComponent(fileUrl), true);
+                    xhr.responseType = 'blob';
+
+                    // Progress Tracking Logic
+                    xhr.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            const p = Math.floor((e.loaded / e.total) * 100);
+                            fill.style.width = p + "%";
+                            percentText.innerText = p + "%";
+                        }
+                    };
+
+                    const task = new Promise((resolve, reject) => {
+                        xhr.onload = () => {
+                            if(xhr.status === 200) {
+                                const blobUrl = URL.createObjectURL(xhr.response);
+                                const a = document.createElement('a'); a.href = blobUrl;
+                                a.download = `A2Z_IDM_VIDEO_${Date.now()}.mp4`;
+                                document.body.appendChild(a); a.click();
+                                setTimeout(() => { URL.revokeObjectURL(blobUrl); document.body.removeChild(a); }, 1000);
+                                resolve(true);
+                            } else { reject(); }
+                        };
+                        xhr.onerror = () => reject();
+                    });
+
+                    success = await task;
+                } catch (e) { console.log("Node blocked..."); }
             }
 
-            if(!saved) { window.location.href = fileUrl; btn.innerText = "OPENED"; }
-            setTimeout(() => { btn.innerText = original; btn.disabled = false; }, 3000);
+            if(success) { btn.innerText = "FINISHED"; setTimeout(() => { console.style.display = 'none'; btn.disabled = false; btn.innerText = "IDM SAVE"; }, 3000); }
+            else { window.location.href = fileUrl; btn.innerText = "OPENED"; }
         }
 
-        function renderUI(data) {
-            document.getElementById('v-player').src = data.medias[0].url;
+        function renderIDM(data) {
+            document.getElementById('player').src = data.medias[0].url;
             const m = data.medias;
-            const filtered = [m.find(x => x.quality.includes('360') || x.quality.includes('480')), m.find(x => x.quality.includes('720') || x.quality.includes('1080')), m.find(x => x.quality.includes('4k') || x.quality.includes('2160'))].filter(Boolean);
-            document.getElementById('link-container').innerHTML = filtered.map(opt => `
-                <div class="dl-option"><p class="text-[9px] font-black tracking-widest uppercase text-white/40">${opt.quality}</p>
-                <button onclick="forceSave('${opt.url}', this)" class="save-btn">Save</button></div>
+            const filtered = [m.find(x => x.quality.includes('360') || x.quality.includes('480')), m.find(x => x.quality.includes('720') || x.quality.includes('1080')), m.find(x => x.quality.includes('4k'))].filter(Boolean);
+            document.getElementById('dl-container').innerHTML = filtered.map(opt => `
+                <div class="dl-row"><p class="text-[9px] font-black uppercase text-white/40">${opt.quality}</p>
+                <button onclick="idmDownload('${opt.url}', this)" class="idm-btn">IDM Save</button></div>
             `).join('');
-            document.getElementById('result-box').classList.remove('hidden');
+            document.getElementById('results').classList.remove('hidden');
         }
     </script>
 </body>
