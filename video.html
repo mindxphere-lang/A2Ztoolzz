@@ -3,151 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Vortex Downloader v16.0</title>
-    
+    <title>A2Z Studio - Vortex Pro v17.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
-
     <style>
         :root { --neon: #ff0055; --bg: #05000a; }
-        body { 
-            font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden;
-            background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
-        }
-
-        /* VORTEX INTERFACE */
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden; background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed; }
         .vortex-node { position: relative; width: 250px; height: 250px; margin: 40px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .bh-core {
-            position: relative; width: 150px; height: 150px; background: black; border-radius: 50%;
-            box-shadow: 0 0 50px 10px var(--neon), inset 0 0 30px var(--neon);
-            z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center;
-            transition: 0.4s;
-        }
+        .bh-core { position: relative; width: 150px; height: 150px; background: black; border-radius: 50%; box-shadow: 0 0 50px 10px var(--neon), inset 0 0 30px var(--neon); z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center; }
         .bh-core span { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--neon); text-transform: uppercase; }
         .ring { position: absolute; inset: 0; border: 1px dashed rgba(255, 0, 85, 0.15); border-radius: 50%; animation: rotate 12s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .pulse-active { animation: pulse 0.6s infinite alternate !important; }
         @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1.05); opacity: 1; } }
-
-        /* CLEAN RESULT CARDS */
         .result-box { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255, 0, 85, 0.15); border-radius: 2.5rem; overflow: hidden; }
-        .dl-row { border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 18px 25px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; }
-        .dl-row:hover { background: rgba(255, 0, 85, 0.05); }
-        .save-btn { background: linear-gradient(45deg, #80002a, #ff0055); padding: 10px 25px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; letter-spacing: 1px; }
-
-        /* MAINTENANCE SYSTEM */
+        .dl-row { border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 18px 25px; display: flex; align-items: center; justify-content: space-between; }
+        .save-btn { background: linear-gradient(45deg, #80002a, #ff0055); padding: 10px 25px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; color: white; }
         #m-mode { position: fixed; inset: 0; z-index: 9999; background: black; display: none; align-items: center; justify-content: center; text-align: center; }
     </style>
 </head>
 <body class="min-h-screen">
-
-    <div id="m-mode">
-        <div class="p-10 text-center">
-            <div class="w-16 h-16 border-2 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <h1 class="text-xl font-black text-pink-600 uppercase italic mb-2">Neural Node Paused</h1>
-            <p id="m-msg" class="text-white/30 text-[9px] tracking-widest uppercase font-bold"></p>
-        </div>
-    </div>
-
-    <nav class="p-6 flex justify-between items-center">
-        <a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> Hub</a>
-        <div class="flex items-center gap-2 opacity-30">
-            <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-            <span class="text-[7px] font-black uppercase tracking-widest text-white">Core 16.0 Linked</span>
-        </div>
-    </nav>
-
+    <div id="m-mode"><div class="p-10 text-center"><div class="w-16 h-16 border-2 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div><h1 class="text-xl font-black text-pink-600 uppercase italic mb-2">Neural Node Paused</h1><p id="m-msg" class="text-white/30 text-[9px] tracking-widest uppercase font-bold"></p></div></div>
+    <nav class="p-6 flex justify-between items-center"><a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> Hub</a></nav>
     <div class="max-w-xl mx-auto px-6 pb-20">
-        
-        <div class="vortex-node" onclick="triggerNeuralSuck()">
-            <div class="ring"></div>
-            <div class="bh-core" id="core">
-                <span id="core-text">Tap to<br>Suck Content</span>
-            </div>
-        </div>
-
-        <div id="status-label" class="text-center text-[8px] font-black uppercase tracking-[0.4em] text-pink-500/20 mb-10">Node Status: Ready</div>
-
+        <div class="vortex-node" onclick="triggerNeuralSuck()"><div class="ring"></div><div class="bh-core" id="core"><span id="core-text">Tap to<br>Suck Content</span></div></div>
+        <div id="status-label" class="text-center text-[8px] font-black uppercase tracking-[0.4em] text-pink-500/20 mb-10">Waiting for Link...</div>
         <div id="results" class="hidden space-y-8 animate-fade-in">
-            <div class="result-box">
-                <video id="player" playsinline class="w-full aspect-video bg-black" controlsList="nodownload"></video>
+            <div class="result-box"><video id="player" playsinline class="w-full aspect-video bg-black" controlsList="nodownload"></video>
                 <div id="v-title" class="p-5 text-[10px] font-bold text-white/50 truncate border-b border-white/5 uppercase italic">Video Ready</div>
-                
                 <div id="dl-links"></div>
             </div>
-            
             <p class="text-[7px] text-center text-white/10 uppercase font-black tracking-widest italic">PC: File will save directly to Downloads</p>
         </div>
     </div>
-
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
     <script>
-        // SYNC WITH MASTER CONTROL
-        const fbConfig = { 
-            apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
-            databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
-        };
-        firebase.initializeApp(fbConfig);
-        const db = firebase.database();
-        let keys = {};
-
+        firebase.initializeApp({ apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" });
+        const db = firebase.database(); let settings = {};
         db.ref('settings').on('value', (s) => {
-            keys = s.val() || {};
-            if(keys.maintenanceMode) {
-                document.getElementById('m-mode').style.display = 'flex';
-                document.getElementById('m-msg').innerText = keys.maintenanceMsg;
-            } else {
-                document.getElementById('m-mode').style.display = 'none';
-            }
+            settings = s.val() || {};
+            if(settings.maintenanceMode) { document.getElementById('m-mode').style.display = 'flex'; document.getElementById('m-msg').innerText = settings.maintenanceMsg; }
+            else { document.getElementById('m-mode').style.display = 'none'; }
         });
-
         const core = document.getElementById('core'), text = document.getElementById('core-text'), status = document.getElementById('status-label');
-
         async function triggerNeuralSuck() {
             try {
-                // Auto-Paste Clipboard
-                const link = await navigator.clipboard.readText();
-                if (!link.startsWith('http')) return alert("Link copy karo pehle!");
-
-                core.classList.add('pulse-active');
-                text.innerHTML = "Sucking...";
-                document.getElementById('results').classList.add('hidden');
-
+                const link = await navigator.clipboard.readText(); if (!link.startsWith('http')) return alert("Copy link first!");
+                core.classList.add('pulse-active'); text.innerHTML = "Sucking...";
                 const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'X-RapidAPI-Key': keys.videoKey, 
-                        'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' 
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-RapidAPI-Key': settings.videoKey, 'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' },
                     body: JSON.stringify({ url: link })
                 });
-                
                 const data = await res.json();
-                if (data.medias) {
-                    renderUI(data);
-                    core.classList.remove('pulse-active');
-                    text.innerHTML = "Success";
-                    status.innerText = "Sync Complete";
-                    setTimeout(() => { text.innerHTML = "Tap to<br>Suck Content"; }, 3000);
-                } else { throw new Error(); }
-            } catch (e) {
-                core.classList.remove('pulse-active'); text.innerHTML = "Retry";
-                status.innerText = "Node Blocked. Tap Again.";
-            }
+                if (data.medias) { renderUI(data); core.classList.remove('pulse-active'); text.innerHTML = "Success"; setTimeout(() => text.innerHTML = "Tap to<br>Suck Content", 3000); }
+            } catch (e) { core.classList.remove('pulse-active'); text.innerHTML = "Retry"; }
         }
 
-        // --- THE AGGRESSIVE FORCED DOWNLOAD ENGINE ---
+        // --- THE "FIXED" DOWNLOAD ENGINE (ANTI-CORRUPTION) ---
         async function forceSave(fileUrl, btn) {
-            const original = btn.innerText;
-            btn.innerText = "LOCKING...";
-            btn.disabled = true;
-
-            // Proxy nodes to bypass PC Play bug
-            const proxies = ["https://api.allorigins.win/raw?url=", "https://corsproxy.io/?", ""];
+            const original = btn.innerText; btn.innerText = "VALIDATING..."; btn.disabled = true;
+            const proxies = ["https://api.allorigins.win/raw?url=", "https://corsproxy.io/?", "https://thingproxy.freeboard.io/fetch/"];
             let saved = false;
 
             for (let proxy of proxies) {
@@ -155,47 +73,27 @@
                 try {
                     const res = await fetch(proxy + encodeURIComponent(fileUrl));
                     const blob = await res.blob();
-                    if(blob.size < 1000) continue; 
+                    
+                    // CORRUPTION CHECK: Agar file 100KB se choti hai toh skip karo
+                    if (blob.size < 100000) { console.log("Small file detected, skipping..."); continue; }
 
                     const bUrl = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = bUrl;
-                    a.download = `A2Z_VIDEO_${Math.floor(Date.now()/1000)}.mp4`;
-                    document.body.appendChild(a);
-                    a.click();
-                    
+                    const a = document.createElement('a'); a.href = bUrl;
+                    a.download = `A2Z_STUDIO_${Math.floor(Date.now()/1000)}.mp4`;
+                    document.body.appendChild(a); a.click();
                     setTimeout(() => { URL.revokeObjectURL(bUrl); document.body.removeChild(a); }, 1000);
-                    btn.innerText = "SAVED!";
-                    saved = true;
+                    btn.innerText = "SAVED!"; saved = true;
                 } catch (e) { console.log("Path Blocked..."); }
             }
-
-            if (!saved) {
-                window.open(fileUrl, '_blank');
-                btn.innerText = "OPENED";
-            }
+            if (!saved) { window.open(fileUrl, '_blank'); btn.innerText = "OPENED"; }
             setTimeout(() => { btn.innerText = original; btn.disabled = false; }, 3000);
         }
 
         function renderUI(data) {
-            document.getElementById('player').src = data.medias[0].url; 
-            document.getElementById('v-title').innerText = data.title || "Neural Stream Detected";
+            document.getElementById('player').src = data.medias[0].url;
             const m = data.medias;
-            
-            // Clean Quality Filter
-            const options = [
-                m.find(x => x.quality.includes('360') || x.quality.includes('480')),
-                m.find(x => x.quality.includes('720') || x.quality.includes('1080')),
-                m.find(x => x.quality.includes('4k'))
-            ].filter(Boolean);
-
-            document.getElementById('dl-links').innerHTML = options.map(opt => `
-                <div class="dl-row">
-                    <p class="text-[9px] font-black uppercase tracking-widest text-white/40">${opt.quality}</p>
-                    <button onclick="forceSave('${opt.url}', this)" class="save-btn">Save</button>
-                </div>
-            `).join('');
+            const filtered = [m.find(x => x.quality.includes('360') || x.quality.includes('480')), m.find(x => x.quality.includes('720') || x.quality.includes('1080')), m.find(x => x.quality.includes('4k'))].filter(Boolean);
+            document.getElementById('dl-links').innerHTML = filtered.map(opt => `<div class="dl-row"><p class="text-[9px] font-black uppercase text-white/40">${opt.quality}</p><button onclick="forceSave('${opt.url}', this)" class="save-btn">Save</button></div>`).join('');
             document.getElementById('results').classList.remove('hidden');
         }
     </script>
