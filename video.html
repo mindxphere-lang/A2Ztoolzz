@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>UltraSaver - Direct Download</title>
+    <title>UltraSaver - Mobile Downloader</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -13,6 +13,7 @@
             font-family: 'Segoe UI', sans-serif;
             background: #05000a;
             color: white;
+            -webkit-tap-highlight-color: transparent;
         }
         .glass-card {
             background: rgba(30, 41, 59, 0.7);
@@ -24,20 +25,27 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body class="min-h-screen p-4">
 
-    <div class="max-w-2xl mx-auto pt-12">
+    <div class="max-w-2xl mx-auto pt-8">
         <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-5xl font-black gradient-text mb-2">ULTRA SAVER</h1>
+        <div class="text-center mb-6">
+            <h1 class="text-4xl md:text-5xl font-black gradient-text mb-2">ULTRA SAVER</h1>
             <p class="text-gray-400 text-sm">YouTube • Instagram • TikTok</p>
         </div>
 
         <!-- Input Section -->
-        <div class="glass-card rounded-3xl p-6 mb-6">
-            <div class="flex gap-3 mb-4">
+        <div class="glass-card rounded-3xl p-4 md:p-6 mb-4">
+            <div class="flex flex-col md:flex-row gap-3 mb-4">
                 <input
                     type="text"
                     id="urlInput"
@@ -46,9 +54,9 @@
                 />
                 <button
                     onclick="searchVideo()"
-                    class="bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 rounded-2xl font-bold text-white hover:shadow-lg"
+                    class="bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 rounded-2xl font-bold text-white hover:shadow-lg active:scale-95 transition-all"
                 >
-                    Search
+                    <i class="fa-solid fa-search mr-2"></i>Search
                 </button>
             </div>
 
@@ -61,38 +69,96 @@
         </div>
 
         <!-- Error Message -->
-        <div id="errorBox" class="hidden bg-red-500/10 border border-red-500/50 rounded-2xl p-4 mb-6">
-            <p id="errorText" class="text-red-400 text-sm"></p>
+        <div id="errorBox" class="hidden bg-red-500/10 border border-red-500/50 rounded-2xl p-4 mb-4">
+            <p id="errorText" class="text-red-400 text-sm text-center"></p>
         </div>
 
         <!-- Loading -->
-        <div id="loadingBox" class="hidden glass-card rounded-3xl p-12 border border-white/10 text-center mb-6">
+        <div id="loadingBox" class="hidden glass-card rounded-3xl p-12 border border-white/10 text-center mb-4">
             <i class="fa-solid fa-spinner fa-spin text-4xl text-cyan-400 mb-4"></i>
             <p class="text-cyan-400 font-bold">Video dhoondh rahe hain...</p>
         </div>
 
         <!-- Results -->
-        <div id="resultsBox" class="hidden glass-card rounded-3xl p-6 border border-white/10">
-            <img id="thumbnail" class="w-full rounded-2xl mb-6 hidden" />
-            <div id="videoList"></div>
-            
-            <div class="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-                <p class="text-yellow-400 text-xs text-center">
-                    ⚠️ Browser security ki wajah se video new tab mein khulega. Wahan se right-click → "Save video as" karo
-                </p>
+        <div id="resultsBox" class="hidden glass-card rounded-3xl p-4 md:p-6 border border-white/10 mb-4">
+            <img id="thumbnail" class="w-full rounded-2xl mb-4 hidden" />
+            <div id="videoList" class="space-y-3"></div>
+        </div>
+
+        <!-- Mobile Download Instructions Modal -->
+        <div id="mobileModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+            <div class="glass-card rounded-3xl p-6 max-w-md w-full">
+                <div class="text-center mb-4">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-mobile-screen-button text-3xl text-cyan-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Mobile Download Guide</h3>
+                    <p id="deviceType" class="text-cyan-400 text-sm mb-4"></p>
+                </div>
+
+                <div id="androidSteps" class="hidden space-y-3 mb-6">
+                    <div class="bg-white/5 rounded-xl p-4">
+                        <p class="text-white font-bold mb-2">📱 Android Chrome:</p>
+                        <ol class="text-gray-300 text-sm space-y-1 ml-4">
+                            <li>1. Video player par <strong>long-press</strong> karo (2-3 sec)</li>
+                            <li>2. Menu mein <strong>"Download video"</strong> ya <strong>"Save video"</strong> dikhe to tap karo</li>
+                            <li>3. Agar nahi dikhe to video ke <strong>3-dots menu</strong> se download karo</li>
+                        </ol>
+                    </div>
+                    <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3">
+                        <p class="text-yellow-400 text-xs">⚠️ Kuch videos browser download block kar deta hai. Aise case mein share button se <strong>"Save to Files"</strong> try karo.</p>
+                    </div>
+                </div>
+
+                <div id="iosSteps" class="hidden space-y-3 mb-6">
+                    <div class="bg-white/5 rounded-xl p-4">
+                        <p class="text-white font-bold mb-2">📱 iPhone Safari:</p>
+                        <ol class="text-gray-300 text-sm space-y-1 ml-4">
+                            <li>1. Video par <strong>tap & hold</strong> karo (2-3 sec)</li>
+                            <li>2. <strong>"Download Linked File"</strong> select karo</li>
+                            <li>3. Download Files app mein save hoga</li>
+                        </ol>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-4">
+                        <p class="text-white font-bold mb-2">Alternative Method:</p>
+                        <ol class="text-gray-300 text-sm space-y-1 ml-4">
+                            <li>1. Safari ke <strong>Share button</strong> (⬆️) dabao</li>
+                            <li>2. <strong>"Save to Files"</strong> choose karo</li>
+                            <li>3. Location select karke Save karo</li>
+                        </ol>
+                    </div>
+                    <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
+                        <p class="text-red-400 text-xs">⚠️ iOS Safari bahut strict hai. Agar download nahi ho raha to <strong>Documents by Readdle</strong> app install karo aur usme paste karo yeh link.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button id="copyLinkBtn" onclick="copyVideoLink()" class="flex-1 bg-cyan-600 py-3 rounded-xl font-bold text-sm active:scale-95 transition-all">
+                        <i class="fa-solid fa-copy mr-2"></i>Copy Link
+                    </button>
+                    <button onclick="closeMobileModal()" class="flex-1 bg-white/10 py-3 rounded-xl font-bold text-sm active:scale-95 transition-all">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Instructions -->
-        <div id="instructionsBox" class="glass-card rounded-3xl p-8 border border-white/10 text-center">
-            <i class="fa-solid fa-download text-6xl text-gray-600 mb-4"></i>
-            <h3 class="text-xl font-bold text-white mb-4">Kaise Use Kare?</h3>
+        <div id="instructionsBox" class="glass-card rounded-3xl p-6 md:p-8 border border-white/10 text-center">
+            <i class="fa-solid fa-download text-5xl md:text-6xl text-gray-600 mb-4"></i>
+            <h3 class="text-lg md:text-xl font-bold text-white mb-4">Kaise Use Kare?</h3>
             <ol class="text-gray-400 text-sm space-y-2 text-left max-w-md mx-auto">
                 <li>1. YouTube/Instagram/TikTok se video link copy karo</li>
                 <li>2. Upar input box mein paste karo</li>
                 <li>3. Search button dabao</li>
                 <li>4. Quality choose karke download karo</li>
             </ol>
+            
+            <div class="mt-6 p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-xl">
+                <p class="text-cyan-400 text-xs">
+                    💡 <strong>Mobile Users:</strong> Download button dabane ke baad instructions follow karo
+                </p>
+            </div>
         </div>
     </div>
 
@@ -108,12 +174,26 @@
     firebase.initializeApp(fbConfig);
     const db = firebase.database();
     let apiKey = '';
+    let currentVideoUrl = '';
 
     // Load API Key from Firebase
     db.ref('settings/videoKey').on('value', (snapshot) => {
         apiKey = snapshot.val();
         console.log('API Key loaded:', apiKey ? 'Yes' : 'No');
     });
+
+    // Detect Device
+    function isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    function isIOS() {
+        return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
+    function isAndroid() {
+        return /Android/i.test(navigator.userAgent);
+    }
 
     // Platform Detection
     document.getElementById('urlInput').addEventListener('input', (e) => {
@@ -122,7 +202,6 @@
         const igBadge = document.getElementById('ig-badge');
         const tkBadge = document.getElementById('tk-badge');
 
-        // Reset
         ytBadge.className = igBadge.className = tkBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-white/5 text-gray-500';
 
         if (url.includes('youtube') || url.includes('youtu.be')) {
@@ -186,13 +265,11 @@
         const thumbnail = document.getElementById('thumbnail');
         const videoList = document.getElementById('videoList');
 
-        // Show thumbnail
         if (data.picture || data.thumbnail) {
             thumbnail.src = data.picture || data.thumbnail;
             thumbnail.classList.remove('hidden');
         }
 
-        // Create video list
         videoList.innerHTML = '';
         data.medias.forEach((video, index) => {
             const quality = video.quality || 'Unknown';
@@ -200,18 +277,18 @@
             const videoUrl = video.url;
 
             const card = document.createElement('div');
-            card.className = 'bg-white/5 rounded-2xl p-4 border border-white/10 mb-3';
+            card.className = 'bg-white/5 rounded-2xl p-4 border border-white/10';
             card.innerHTML = `
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-cyan-400 font-black text-sm uppercase">${quality}</span>
-                        <span class="text-gray-500 text-xs ml-2">(${extension})</span>
+                        <div class="text-cyan-400 font-black text-sm uppercase">${quality}</div>
+                        <div class="text-gray-500 text-xs mt-1">${extension.toUpperCase()}</div>
                     </div>
                     <button 
-                        onclick="downloadVideo('${videoUrl.replace(/'/g, "\\'")}', '${quality}')"
+                        onclick="downloadVideo('${videoUrl.replace(/'/g, "\\'").replace(/"/g, '&quot;')}', '${quality}')"
                         class="bg-cyan-600 hover:bg-cyan-500 px-6 py-3 rounded-xl font-bold text-sm text-white transition-all active:scale-95"
                     >
-                        <i class="fa-solid fa-download mr-2"></i>Save
+                        <i class="fa-solid fa-download mr-2"></i>Download
                     </button>
                 </div>
             `;
@@ -221,25 +298,83 @@
         resultsBox.classList.remove('hidden');
     }
 
-    // Download Video - SIMPLE & HONEST APPROACH
+    // Download Video - MOBILE OPTIMIZED
     function downloadVideo(videoUrl, quality) {
-        console.log('Downloading:', videoUrl);
+        console.log('Download started:', videoUrl);
+        currentVideoUrl = videoUrl;
 
-        // Create invisible anchor tag
-        const link = document.createElement('a');
-        link.href = videoUrl;
-        link.download = `A2Z_${quality}_${Date.now()}.mp4`;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        if (isMobile()) {
+            // Mobile: Show instructions modal
+            showMobileModal();
+            
+            // Try to trigger download anyway
+            const a = document.createElement('a');
+            a.href = videoUrl;
+            a.download = `A2Z_${quality}_${Date.now()}.mp4`;
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } else {
+            // Desktop: Direct download
+            const a = document.createElement('a');
+            a.href = videoUrl;
+            a.download = `A2Z_${quality}_${Date.now()}.mp4`;
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
 
-        // User ko batao kya karna hai
-        setTimeout(() => {
-            alert('Video new tab mein khul gaya! Wahan se:\n\n1. Right-click karo video par\n2. "Save video as..." select karo\n3. Download location choose karo\n\nYa video player ke 3-dots menu se download karo.');
-        }, 500);
+            setTimeout(() => {
+                alert('Video new tab mein khul gaya!\n\nRight-click → "Save video as" karo.');
+            }, 500);
+        }
+    }
+
+    // Show Mobile Instructions Modal
+    function showMobileModal() {
+        const modal = document.getElementById('mobileModal');
+        const deviceType = document.getElementById('deviceType');
+        const androidSteps = document.getElementById('androidSteps');
+        const iosSteps = document.getElementById('iosSteps');
+
+        if (isIOS()) {
+            deviceType.textContent = '📱 iPhone/iPad Detected';
+            iosSteps.classList.remove('hidden');
+            androidSteps.classList.add('hidden');
+        } else if (isAndroid()) {
+            deviceType.textContent = '📱 Android Device Detected';
+            androidSteps.classList.remove('hidden');
+            iosSteps.classList.add('hidden');
+        } else {
+            deviceType.textContent = '📱 Mobile Device';
+            androidSteps.classList.remove('hidden');
+            iosSteps.classList.remove('hidden');
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    function closeMobileModal() {
+        document.getElementById('mobileModal').classList.add('hidden');
+    }
+
+    function copyVideoLink() {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(currentVideoUrl).then(() => {
+                const btn = document.getElementById('copyLinkBtn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Copied!';
+                btn.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('bg-green-600');
+                }, 2000);
+            });
+        } else {
+            alert('Link: ' + currentVideoUrl + '\n\nManually copy karo!');
+        }
     }
 
     // Helper Functions
