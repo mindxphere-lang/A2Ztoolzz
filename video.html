@@ -30,7 +30,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Progress Bar Animation */
         .progress-bar-bg { width: 100%; height: 6px; background: #111; border-radius: 10px; overflow: hidden; margin-top: 5px; }
         .progress-bar-fill { width: 0%; height: 100%; background: #00d2ff; transition: 0.2s; box-shadow: 0 0 10px #00d2ff; }
         
@@ -151,65 +150,121 @@
         }
     }
 
-    // --- AGGRESSIVE DIRECT DOWNLOAD ENGINE ---
+    // IMPROVED DOWNLOAD METHOD - Multiple Fallback Strategies
     async function directDownload(fileUrl, btnId) {
         const btn = document.getElementById(btnId);
         const originalText = btn.innerText;
-        const progressFill = btn.nextElementSibling.firstElementChild;
+        const progressFill = btn.nextElementSibling.firstElementElement;
         
-        btn.innerText = "CAPTURING...";
+        btn.innerText = "PROCESSING...";
         btn.disabled = true;
 
-        // Multi-Node Proxy tunneling to bypass browser player
-        const proxies = ["https://api.allorigins.win/raw?url=", "https://corsproxy.io/?"];
-        let success = false;
-
-        for (let proxy of proxies) {
-            if (success) break;
-            try {
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', proxy + encodeURIComponent(fileUrl), true);
-                xhr.responseType = 'blob';
-
-                // Real-time progress tracking
-                xhr.onprogress = (e) => {
-                    if (e.lengthComputable) {
-                        const p = Math.floor((e.loaded / e.total) * 100);
-                        progressFill.style.width = p + "%";
-                        btn.innerText = `DOWNLOADING ${p}%`;
-                    }
-                };
-
-                const task = new Promise((resolve, reject) => {
-                    xhr.onload = () => {
-                        if (xhr.status === 200) {
-                            const blob = xhr.response;
-                            // Corruption filter (min 100KB)
-                            if(blob.size < 100000) return reject();
-
-                            const bUrl = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = bUrl;
-                            a.download = `A2Z_VIDEO_${Date.now()}.mp4`;
-                            document.body.appendChild(a);
-                            a.click();
-                            setTimeout(() => { URL.revokeObjectURL(bUrl); document.body.removeChild(a); }, 1000);
-                            resolve(true);
-                        } else { reject(); }
-                    };
-                    xhr.onerror = () => reject();
-                });
-
-                success = await task;
-            } catch (e) { console.log("Node Blocked. Switching raasta..."); }
+        // Strategy 1: Try Blob conversion with fetch
+        try {
+            progressFill.style.width = "30%";
+            const response = await fetch(fileUrl, { mode: 'cors' });
+            
+            if (!response.ok) throw new Error('Fetch failed');
+            
+            progressFill.style.width = "60%";
+            const blob = await response.blob();
+            
+            progressFill.style.width = "90%";
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `A2Z_VIDEO_${Date.now()}.mp4`;
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(a);
+            }, 100);
+            
+            progressFill.style.width = "100%";
+            btn.innerText = "✓ SAVED!";
+            btn.classList.add('bg-green-600');
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                btn.classList.remove('bg-green-600');
+                progressFill.style.width = "0%";
+            }, 2000);
+            return;
+        } catch (e) {
+            console.log("Direct fetch failed, trying proxy...");
         }
 
-        if (success) { btn.innerText = "SAVED!"; } 
-        else { window.open(fileUrl, '_blank'); btn.innerText = "OPENED (MANUAL)"; }
+        // Strategy 2: Try CORS proxies
+        const proxies = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://api.codetabs.com/v1/proxy?quest='
+        ];
+
+        for (let proxy of proxies) {
+            try {
+                progressFill.style.width = "40%";
+                const proxyUrl = proxy + encodeURIComponent(fileUrl);
+                const response = await fetch(proxyUrl);
+                
+                if (!response.ok) throw new Error('Proxy failed');
+                
+                progressFill.style.width = "70%";
+                const blob = await response.blob();
+                
+                if (blob.size < 50000) throw new Error('File too small');
+                
+                progressFill.style.width = "95%";
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = `A2Z_VIDEO_${Date.now()}.mp4`;
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    URL.revokeObjectURL(blobUrl);
+                    document.body.removeChild(a);
+                }, 100);
+                
+                progressFill.style.width = "100%";
+                btn.innerText = "✓ SAVED!";
+                btn.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('bg-green-600');
+                    progressFill.style.width = "0%";
+                }, 2000);
+                return;
+            } catch (e) {
+                console.log(`Proxy ${proxy} failed, trying next...`);
+            }
+        }
+
+        // Strategy 3: Fallback - Open in new tab with download attribute
+        progressFill.style.width = "50%";
+        const a = document.createElement('a');
+        a.href = fileUrl;
+        a.download = `A2Z_VIDEO_${Date.now()}.mp4`;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
         
-        setTimeout(() => { 
-            btn.innerText = "SAVE"; 
-            btn.disabled = false; 
+        progressFill.style.width = "100%";
+        btn.innerText = "↗ OPENED";
+        btn.classList.add('bg-yellow-600');
+        
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+            btn.classList.remove('bg-yellow-600');
             progressFill.style.width = "0%";
         }, 3000);
     }
@@ -226,7 +281,7 @@
             div.innerHTML = `
                 <div class="flex items-center justify-between bg-slate-900/50 p-4 rounded-2xl border border-slate-700">
                     <span class="text-[10px] font-black text-cyan-400 uppercase tracking-widest">${m.quality} (${m.extension})</span>
-                    <button id="${btnId}" onclick="directDownload('${m.url}', '${btnId}')" class="text-white text-[10px] font-black uppercase bg-cyan-600 px-4 py-2 rounded-xl active:scale-95 transition-all">Save</button>
+                    <button id="${btnId}" onclick="directDownload('${m.url}', '${btnId}')" class="text-white text-[10px] font-black uppercase bg-cyan-600 px-4 py-2 rounded-xl active:scale-95 transition-all">SAVE</button>
                 </div>
                 <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
             `;
