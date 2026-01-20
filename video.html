@@ -626,4 +626,201 @@
         const videoList = document.getElementById('videoList');
 
         if (data.picture || data.thumbnail) {
-            thumbnail.
+            thumbnail.src = data.picture || data.thumbnail;
+            thumbnailBox.classList.remove('hidden');
+        }
+
+        videoList.innerHTML = '';
+        
+        data.medias.forEach((video, index) => {
+            const quality = video.quality || 'Unknown';
+            const extension = video.extension || 'mp4';
+            const videoUrl = video.url;
+            
+            if (!videoUrl) {
+                console.warn('⚠️ Skipping stream without URL:', video);
+                return;
+            }
+
+            const btnId = `dl-btn-${index}`;
+            const progressId = `progress-${index}`;
+
+            const card = document.createElement('div');
+            card.className = 'hologram rounded-2xl p-5 border border-cyan-400/20 hover:border-cyan-400/60 transition-all';
+            card.innerHTML = `
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-cyan-400 font-black text-xl orbitron uppercase neon-cyan">${quality}</span>
+                            <span class="px-3 py-1 rounded-lg text-xs bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 orbitron">${extension.toUpperCase()}</span>
+                        </div>
+                        ${video.size ? `<p class="text-gray-500 text-sm orbitron">${video.size}</p>` : ''}
+                    </div>
+                    <button 
+                        id="${btnId}"
+                        data-url="${encodeURIComponent(videoUrl)}"
+                        data-quality="${quality}"
+                        onclick="startDownload('${btnId}')"
+                        class="cyber-btn px-8 py-4 font-black text-white text-sm orbitron flex items-center gap-2"
+                    >
+                        <i class="fa-solid fa-download text-lg"></i>
+                        <span>TRANSFER</span>
+                    </button>
+                </div>
+                <div id="${progressId}" class="hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-cyan-400 orbitron font-bold">QUANTUM TRANSFER</span>
+                        <span id="percent-${btnId}" class="text-sm text-cyan-400 font-black orbitron">0%</span>
+                    </div>
+                    <div class="w-full h-3 bg-black/50 rounded-full overflow-hidden border-2 border-cyan-500/30">
+                        <div id="bar-${btnId}" class="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 transition-all duration-300 magic-glow" style="width: 0%"></div>
+                    </div>
+                </div>
+            `;
+            videoList.appendChild(card);
+        });
+
+        resultsBox.classList.remove('hidden');
+    }
+
+    // Download Function
+    async function startDownload(btnId) {
+        const btn = document.getElementById(btnId);
+        const videoUrl = decodeURIComponent(btn.getAttribute('data-url'));
+        const quality = btn.getAttribute('data-quality');
+        const progressContainer = document.getElementById(`progress-${btnId.split('-')[2]}`);
+        const progressBar = document.getElementById(`bar-${btnId}`);
+        const percentText = document.getElementById(`percent-${btnId}`);
+
+        console.log('⬇️ Download initiated:', videoUrl);
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>INIT...';
+        progressContainer.classList.remove('hidden');
+
+        const proxies = [
+            '',
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+        ];
+
+        for (let i = 0; i < proxies.length; i++) {
+            const proxy = proxies[i];
+            const url = proxy ? proxy + encodeURIComponent(videoUrl) : videoUrl;
+
+            try {
+                console.log(`🔄 Method ${i + 1}:`, proxy || 'direct');
+                
+                btn.innerHTML = `<i class="fa-solid fa-atom fa-spin mr-2"></i>METHOD ${i + 1}`;
+                
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 45000);
+
+                const response = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeout);
+
+                if (!response.ok) throw new Error('Fetch failed');
+
+                const contentLength = response.headers.get('content-length');
+                const total = contentLength ? parseInt(contentLength) : 0;
+
+                const reader = response.body.getReader();
+                const chunks = [];
+                let receivedLength = 0;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    chunks.push(value);
+                    receivedLength += value.length;
+
+                    const percent = total > 0 
+                        ? Math.round((receivedLength / total) * 100)
+                        : Math.min(95, Math.round(receivedLength / 100000));
+                    
+                    progressBar.style.width = percent + '%';
+                    percentText.textContent = percent + '%';
+                }
+
+                const blob = new Blob(chunks);
+                console.log('✅ Transfer complete:', blob.size, 'bytes');
+
+                if (blob.size < 5000) throw new Error('File corrupted');
+
+                progressBar.style.width = '100%';
+                percentText.textContent = '100%';
+                
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = `A2Z_${quality}_${Date.now()}.mp4`;
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(blobUrl);
+                }, 100);
+
+                btn.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i>SUCCESS!';
+                btn.className = 'px-8 py-4 font-black text-white text-sm orbitron flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl magic-glow';
+                
+                showSuccess();
+
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-redo mr-2"></i>RETRY';
+                    btn.className = 'cyber-btn px-8 py-4 font-black text-white text-sm orbitron flex items-center gap-2';
+                    btn.disabled = false;
+                    progressContainer.classList.add('hidden');
+                    progressBar.style.width = '0%';
+                }, 4000);
+
+                return;
+
+            } catch (error) {
+                console.error(`❌ Method ${i + 1} failed:`, error);
+                
+                if (i === proxies.length - 1) {
+                    btn.innerHTML = '<i class="fa-solid fa-xmark mr-2"></i>FAILED';
+                    btn.className = 'px-8 py-4 font-black text-white text-sm orbitron flex items-center gap-2 bg-gradient-to-r from-red-500 to-rose-600 rounded-xl';
+                    
+                    setTimeout(() => {
+                        window.open(videoUrl, '_blank');
+                        showError('Quantum transfer failed. Opening in new window. Save manually.');
+                        
+                        btn.innerHTML = '<i class="fa-solid fa-redo mr-2"></i>RETRY';
+                        btn.className = 'cyber-btn px-8 py-4 font-black text-white text-sm orbitron flex items-center gap-2';
+                        btn.disabled = false;
+                        progressContainer.classList.add('hidden');
+                    }, 2000);
+                }
+            }
+        }
+    }
+
+    // Helper Functions
+    function showError(message) {
+        hideAll();
+        document.getElementById('errorBox').classList.remove('hidden');
+        document.getElementById('errorText').textContent = message;
+    }
+
+    function showSuccess() {
+        document.getElementById('successBox').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('successBox').classList.add('hidden');
+        }, 5000);
+    }
+
+    function hideAll() {
+        document.getElementById('errorBox').classList.add('hidden');
+        document.getElementById('successBox').classList.add('hidden');
+        document.getElementById('loadingBox').classList.add('hidden');
+        document.getElementById('resultsBox').classList.add('hidden');
+        document.getElementById('instructionsBox').classList.add('hidden');
+    }
+</script>
+
+</body>
+</html>
