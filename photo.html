@@ -3,145 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Enhancer - Neural Node v2.0</title>
+    <title>A2Z Enhancer - AI Node</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
     <style>
         :root { --cyan: #00d2ff; --blue: #3a7bd5; --bg: #050a15; }
         body { 
-            font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden;
+            font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0;
             background: radial-gradient(circle at 50% 0%, #0a1931, var(--bg) 85%); background-attachment: fixed;
         }
-
         .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(0, 210, 255, 0.1); border-radius: 2.5rem; }
         
-        /* Comparison Slider CSS */
-        .comparison-container { position: relative; width: 100%; aspect-ratio: 4/5; overflow: hidden; border-radius: 2rem; border: 1px solid rgba(0, 210, 255, 0.2); }
+        /* Before/After Slider */
+        .comparison-container { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; border-radius: 2rem; border: 1px solid rgba(0, 210, 255, 0.2); }
         .comp-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         .comp-overlay { position: absolute; top: 0; left: 0; width: 50%; height: 100%; overflow: hidden; border-right: 2px solid var(--cyan); z-index: 10; }
         .comp-range { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: col-resize; z-index: 20; }
         
-        .glow-btn { background: linear-gradient(45deg, var(--blue), var(--cyan)); box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); transition: 0.3s; }
-        .glow-btn:active { transform: scale(0.95); }
-
-        /* Loader */
-        .neural-loader { border: 3px solid rgba(0, 210, 255, 0.1); border-top: 3px solid var(--cyan); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .glow-btn { background: linear-gradient(45deg, var(--blue), var(--cyan)); box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); }
     </style>
 </head>
-<body class="min-h-screen pb-10">
+<body class="min-h-screen p-6">
 
-    <nav class="p-6">
-        <a href="index.html" class="text-cyan-500 font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
-            <i class="fa-solid fa-arrow-left"></i> Hub Terminal
-        </a>
-    </nav>
+    <nav class="mb-8"><a href="index.html" class="text-cyan-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> Hub</a></nav>
 
-    <div class="max-w-xl mx-auto px-6">
-        <header class="text-center mb-8">
+    <div class="max-w-xl mx-auto space-y-8">
+        <header class="text-center">
             <h1 class="text-3xl font-black italic tracking-tighter text-white">A2Z <span class="text-cyan-400">ENHANCER</span></h1>
             <p class="text-[9px] font-bold text-cyan-500/50 uppercase tracking-[0.4em]">Neural Node v2.0</p>
         </header>
 
-        <!-- Upload Zone -->
-        <div id="upload-zone" onclick="document.getElementById('file-input').click()" class="glass p-12 text-center cursor-pointer border-dashed border-2 border-cyan-500/20 hover:border-cyan-500/50 transition-all group">
-            <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processImage(event)">
-            <div class="w-20 h-20 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                <i class="fa-solid fa-cloud-arrow-up text-3xl text-cyan-500"></i>
-            </div>
-            <h3 class="text-sm font-black uppercase tracking-widest">Enhance Photo</h3>
-            <p class="text-[9px] text-gray-500 uppercase mt-2">Remini AI Engine: Tap to Upload</p>
+        <!-- Step 1: Upload Zone -->
+        <div id="upload-zone" onclick="document.getElementById('file-input').click()" class="glass p-12 text-center cursor-pointer border-dashed border-2 border-cyan-500/20 hover:border-cyan-500/50 transition-all">
+            <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processPhoto(event)">
+            <i class="fa-solid fa-wand-magic-sparkles text-4xl text-cyan-500 mb-6"></i>
+            <h3 class="text-sm font-black uppercase tracking-widest">Tap to Fix Photo</h3>
+            <p class="text-[9px] text-gray-500 uppercase mt-2">Remini Engine: AI Upscale & Faces</p>
         </div>
 
-        <!-- Processing State -->
+        <!-- Step 2: Processing Loader -->
         <div id="loading-state" class="hidden glass p-12 text-center">
-            <div class="neural-loader mx-auto mb-6"></div>
+            <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-cyan-500 mx-auto mb-4"></div>
             <h3 class="text-xs font-black uppercase tracking-widest animate-pulse">Reconstructing Pixels...</h3>
-            <p class="text-[8px] text-cyan-500/50 uppercase mt-2">Applying AI Upscale & Sharpen</p>
         </div>
 
-        <!-- Result Section -->
+        <!-- Step 3: Result Comparison -->
         <div id="result-zone" class="hidden space-y-6">
-            <div class="comparison-container" id="comp-box">
-                <img id="after-img" class="comp-img" src=""> <!-- Enhanced -->
+            <div class="comparison-container">
+                <img id="after-img" class="comp-img">
                 <div class="comp-overlay" id="comp-over">
-                    <img id="before-img" class="comp-img" src=""> <!-- Original -->
+                    <img id="before-img" class="comp-img">
                 </div>
-                <input type="range" class="comp-range" min="0" max="100" value="50" oninput="moveSlider(this.value)">
-                
-                <!-- Label Tags -->
-                <div class="absolute top-4 left-4 z-30 bg-black/50 px-3 py-1 rounded-full text-[8px] font-bold uppercase">Before</div>
-                <div class="absolute top-4 right-4 z-30 bg-cyan-500/50 px-3 py-1 rounded-full text-[8px] font-bold uppercase">AI Enhanced</div>
+                <input type="range" class="comp-range" min="0" max="100" value="50" oninput="document.getElementById('comp-over').style.width = this.value + '%'">
             </div>
-
+            
             <div class="flex gap-4">
-                <a id="dl-btn" href="#" download="A2Z_Enhanced.png" class="flex-1 glow-btn py-5 rounded-2xl text-center font-black text-xs uppercase tracking-widest text-white">
-                    <i class="fa-solid fa-download mr-2"></i> Download HD
-                </a>
-                <button onclick="location.reload()" class="bg-white/5 border border-white/10 px-6 rounded-2xl">
-                    <i class="fa-solid fa-rotate-right"></i>
-                </button>
+                <a id="dl-btn" href="#" download class="flex-1 glow-btn py-5 rounded-2xl text-center font-black text-xs uppercase tracking-widest text-white">Download Result</a>
+                <button onclick="location.reload()" class="bg-white/5 border border-white/10 px-6 rounded-2xl"><i class="fa-solid fa-rotate-right"></i></button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase & Neural Bridge -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
-        firebase.initializeApp(firebaseConfig); const db = firebase.database();
+        const CLOUD_NAME = "dgikim3w1"; // Aapka Cloud Name
+        const UPLOAD_PRESET = "a2z_preset"; // Jo aapne Step 1 mein banaya wo yahan likhein
 
-        let CLOUD_NAME = "dgikim3w1"; // Aapka Cloudinary Cloud Name
-        let UPLOAD_PRESET = "my_preset"; // Aapka Unsigned Upload Preset
-
-        function moveSlider(val) {
-            document.getElementById('comp-over').style.width = val + "%";
-        }
-
-        async function processImage(event) {
+        async function processPhoto(event) {
             const file = event.target.files[0];
             if(!file) return;
 
-            // UI Switch
             document.getElementById('upload-zone').classList.add('hidden');
             document.getElementById('loading-state').classList.remove('hidden');
 
-            // 1. Show Original Preview
+            // Show Original Preview
             document.getElementById('before-img').src = URL.createObjectURL(file);
 
-            // 2. Upload to Cloudinary for AI Enhancement
             const formData = new FormData();
             formData.append("file", file);
             formData.append("upload_preset", UPLOAD_PRESET);
 
             try {
-                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
                     method: "POST",
                     body: formData
                 });
-                const data = await response.json();
+                const data = await res.json();
 
                 if(data.secure_url) {
-                    // --- THE AI TRANSFORMATIONS ---
-                    // e_improve: Auto enhance colors
-                    // e_upscale: AI resolution increase
-                    // e_sharpen: Sharpens blurry edges
-                    const enhancedUrl = data.secure_url.replace("/upload/", "/upload/e_improve,e_upscale,e_sharpen:100,w_1500,c_limit/");
+                    // --- AI TRANSFORMATION ---
+                    // e_upscale: HD Quality
+                    // e_improve: Face & Color Fix
+                    const enhancedUrl = data.secure_url.replace("/upload/", "/upload/e_improve,e_upscale,e_sharpen:100,w_1500/");
                     
                     const afterImg = document.getElementById('after-img');
                     afterImg.src = enhancedUrl;
-                    
-                    // Wait for image to load before showing
                     afterImg.onload = () => {
                         document.getElementById('loading-state').classList.add('hidden');
                         document.getElementById('result-zone').classList.remove('hidden');
                         document.getElementById('dl-btn').href = enhancedUrl.replace("/upload/", "/upload/fl_attachment/");
                     };
                 }
-            } catch (error) {
-                alert("Neural Node Busy. Try Again!");
+            } catch (e) {
+                alert("Neural Node Blocked. Check Preset settings!");
                 location.reload();
             }
         }
