@@ -14,115 +14,89 @@
             background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
         }
 
-        /* Animated Vortex */
-        .vortex-wrapper { position: relative; width: 260px; height: 260px; margin: 40px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .vortex-wrapper { position: relative; width: 250px; height: 250px; margin: 30px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .black-hole {
-            position: relative; width: 160px; height: 160px; background: black; border-radius: 50%;
-            box-shadow: 0 0 60px 10px var(--neon-red), inset 0 0 40px var(--neon-red);
+            position: relative; width: 150px; height: 150px; background: black; border-radius: 50%;
+            box-shadow: 0 0 50px 10px var(--neon-red), inset 0 0 30px var(--neon-red);
             z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center;
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .black-hole:active { transform: scale(0.9); box-shadow: 0 0 100px 20px var(--neon-red); }
         .black-hole span { font-size: 11px; font-weight: 900; letter-spacing: 2px; color: white; text-shadow: 0 0 10px var(--neon-red); }
-        
-        .vortex-ring { 
-            position: absolute; inset: 0; border: 2px dashed rgba(255, 0, 85, 0.3); border-radius: 50%; 
-            animation: spin 8s linear infinite; 
-        }
-        .vortex-ring::before {
-            content: ''; position: absolute; inset: -15px; border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 50%; animation: spin 12s linear reverse infinite;
-        }
-
+        .vortex-ring { position: absolute; inset: 0; border: 2px dashed rgba(255, 0, 85, 0.3); border-radius: 50%; animation: spin 8s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
-        .hyper-pulse { animation: hyper 0.4s infinite alternate; }
-        @keyframes hyper { 0% { transform: scale(1); box-shadow: 0 0 50px var(--neon-red); } 100% { transform: scale(1.1); box-shadow: 0 0 80px var(--neon-red); } }
+        .hyper-pulse { animation: hyper 0.5s infinite alternate; }
+        @keyframes hyper { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
 
-        /* Video Result Card */
-        .video-box { position: relative; width: 100%; border-radius: 2rem; overflow: hidden; background: #000; border: 1px solid rgba(255, 0, 85, 0.3); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .video-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.9)); padding: 20px; font-size: 11px; font-weight: bold; z-index: 10; }
+        .video-box { position: relative; width: 100%; border-radius: 2rem; overflow: hidden; background: #000; border: 1px solid rgba(255, 0, 85, 0.3); }
+        .dl-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 1.5rem; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; margin-top: 10px;}
+        .btn-save { background: linear-gradient(45deg, #ff0055, #ff4d88); padding: 10px 25px; border-radius: 12px; font-size: 10px; font-weight: 900; color: white; }
         
-        /* Download Buttons */
-        .dl-card { 
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); 
-            border-radius: 1.5rem; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between;
-            transition: 0.3s;
-        }
-        .dl-card:hover { background: rgba(255, 0, 85, 0.05); border-color: rgba(255, 0, 85, 0.2); }
-        
-        .btn-save { 
-            background: linear-gradient(45deg, #ff0055, #ff4d88); padding: 10px 25px; border-radius: 12px; 
-            font-size: 10px; font-weight: 900; text-transform: uppercase; color: white; 
-            box-shadow: 0 5px 15px rgba(255, 0, 85, 0.3); transition: 0.3s;
-        }
-        .btn-save:disabled { background: #333; box-shadow: none; opacity: 0.7; }
-        
-        /* Progress Bar */
-        .progress-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 8px; display: none; }
-        .progress-bar { height: 100%; background: var(--neon-red); width: 0%; transition: 0.1s; box-shadow: 0 0 10px var(--neon-red); }
+        input#manual-url { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,0,85,0.2); border-radius: 15px; width: 100%; padding: 15px; color: white; font-size: 12px; margin-bottom: 20px; outline: none; }
+        input#manual-url:focus { border-color: var(--neon-red); }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <nav class="p-6">
-        <a href="index.html" class="text-pink-500 font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
-            <i class="fa-solid fa-chevron-left"></i> Hub Terminal
-        </a>
-    </nav>
+    <nav class="p-6"><a href="index.html" class="text-pink-500 font-black uppercase text-[10px]"><i class="fa-solid fa-arrow-left mr-2"></i> Back</a></nav>
 
     <div class="max-w-xl mx-auto px-6 pb-20">
+        <!-- Manual Input as Fallback -->
+        <input type="text" id="manual-url" placeholder="Paste link here if Auto-Paste fails...">
+
         <div class="vortex-wrapper" onclick="startProcess()">
             <div class="vortex-ring"></div>
-            <div class="black-hole" id="bh-core">
-                <span id="bh-text">TAP TO<br>AUTO-PASTE</span>
-            </div>
+            <div class="black-hole" id="bh-core"><span id="bh-text">TAP TO<br>PROCESS</span></div>
         </div>
 
-        <div id="status-msg" class="text-center text-[10px] font-black uppercase tracking-[0.2em] text-pink-500/40 mb-10">
-            System: Waiting for Neural Link
-        </div>
+        <div id="status-msg" class="text-center text-[10px] font-black uppercase tracking-widest text-pink-500/40 mb-10">System Ready</div>
 
-        <div id="v-results" class="hidden space-y-6 animate-fade-in">
+        <div id="v-results" class="hidden space-y-6">
             <div class="video-box">
                 <video id="v-player" controls playsinline class="w-full aspect-video bg-black"></video>
-                <div id="v-name" class="video-label truncate text-white/80 uppercase tracking-tighter">Analyzing Stream...</div>
             </div>
-            
-            <div id="v-links" class="space-y-3">
-                <!-- Quality Cards will be injected here -->
-            </div>
+            <div id="v-links" class="space-y-2"></div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        // Firebase Config
         const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig); 
         const db = firebase.database();
         let keys = {}; 
-        db.ref('settings').on('value', (s) => { keys = s.val() || {}; });
-
-        const core = document.getElementById('bh-core');
-        const text = document.getElementById('bh-text');
-        const player = document.getElementById('v-player');
-        const statusMsg = document.getElementById('status-msg');
+        db.ref('settings').on('value', (s) => { keys = s.val() || {}; console.log("Keys Loaded:", keys); });
 
         async function startProcess() {
-            try {
-                const url = await navigator.clipboard.readText();
-                if (!url.startsWith('http')) {
-                    statusMsg.innerText = "Error: Copy a valid link first!";
-                    return;
+            const manualUrl = document.getElementById('manual-url').value;
+            let url = manualUrl;
+
+            // Try Auto-Paste if manual is empty
+            if (!url) {
+                try {
+                    url = await navigator.clipboard.readText();
+                } catch (err) {
+                    console.log("Clipboard access denied");
                 }
+            }
 
-                // UI Reset
-                core.classList.add('hyper-pulse');
-                text.innerHTML = "FETCHING...";
-                statusMsg.innerText = "Connecting to Rapid Node...";
-                document.getElementById('v-results').classList.add('hidden');
+            if (!url || !url.startsWith('http')) {
+                alert("Please paste a valid link first!");
+                return;
+            }
 
+            if (!keys.videoKey) {
+                alert("API Key missing! Check Admin Panel.");
+                return;
+            }
+
+            const core = document.getElementById('bh-core'), text = document.getElementById('bh-text'), statusMsg = document.getElementById('status-msg');
+            
+            core.classList.add('hyper-pulse');
+            text.innerHTML = "FETCHING...";
+            statusMsg.innerText = "Connecting to RapidAPI...";
+
+            try {
                 const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
                     method: 'POST',
                     headers: { 
@@ -130,119 +104,65 @@
                         'X-RapidAPI-Key': keys.videoKey, 
                         'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' 
                     },
-                    body: JSON.stringify({ url })
+                    body: JSON.stringify({ url: url })
                 });
                 
                 const data = await res.json();
-                
+                console.log("API Response:", data);
+
                 if (data.medias && data.medias.length > 0) {
                     renderResults(data);
-                    core.classList.remove('hyper-pulse');
-                    text.innerHTML = "READY";
-                    statusMsg.innerText = "Video Decrypted Successfully";
+                    text.innerHTML = "SUCCESS";
+                    statusMsg.innerText = "Video Decrypted!";
                 } else {
-                    throw new Error("API Limit or Invalid URL");
+                    throw new Error(data.message || "Invalid Response");
                 }
             } catch (e) { 
-                core.classList.remove('hyper-pulse'); 
-                text.innerHTML = "RETRY"; 
-                statusMsg.innerText = "Error: Tap again to sync.";
-                console.error(e);
+                text.innerHTML = "ERROR"; 
+                statusMsg.innerText = "Fetch Failed. Check API Key or Link.";
+                alert("Error: " + e.message);
+            } finally {
+                core.classList.remove('hyper-pulse');
             }
         }
 
         function renderResults(data) {
-            player.src = data.medias[0].url; 
-            document.getElementById('v-name').innerText = data.title || "Vortex Secure Stream";
-
+            const player = document.getElementById('v-player');
             const linksBox = document.getElementById('v-links');
-            linksBox.innerHTML = ''; // Clear previous
+            player.src = data.medias[0].url; 
+            linksBox.innerHTML = '';
 
-            // Sort and filter medias
-            data.medias.forEach((media, index) => {
-                if(media.extension === "mp4") {
+            data.medias.forEach(m => {
+                if (m.extension === "mp4") {
                     const card = document.createElement('div');
                     card.className = "dl-card";
                     card.innerHTML = `
-                        <div>
-                            <p class="text-[10px] font-black tracking-widest uppercase">${media.quality}</p>
-                            <div class="progress-container" id="p-cont-${index}"><div class="progress-bar" id="p-bar-${index}"></div></div>
-                        </div>
-                        <button onclick="forceDownload('${media.url}', this, ${index})" class="btn-save">
-                            <i class="fa-solid fa-download mr-1"></i> Save
-                        </button>
+                        <p class="text-[10px] font-black uppercase">${m.quality}</p>
+                        <button onclick="downloadVideo('${m.url}')" class="btn-save">DOWNLOAD</button>
                     `;
                     linksBox.appendChild(card);
                 }
             });
-
             document.getElementById('v-results').classList.remove('hidden');
         }
 
-        // --- NEW FORCE DOWNLOAD LOGIC ---
-        async function forceDownload(videoUrl, btn, idx) {
-            const originalText = btn.innerHTML;
-            const pCont = document.getElementById(`p-cont-${idx}`);
-            const pBar = document.getElementById(`p-bar-${idx}`);
-            
-            btn.disabled = true;
-            btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i>";
-            pCont.style.display = 'block';
-
+        async function downloadVideo(videoUrl) {
+            const statusMsg = document.getElementById('status-msg');
+            statusMsg.innerText = "Starting Download...";
             try {
-                // Use CORS Proxy to bypass browser restrictions
                 const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(videoUrl);
-                
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error('Network error');
-
-                const reader = response.body.getReader();
-                const contentLength = +response.headers.get('Content-Length');
-                
-                let receivedLength = 0;
-                let chunks = []; 
-
-                while(true) {
-                    const {done, value} = await reader.read();
-                    if (done) break;
-                    chunks.push(value);
-                    receivedLength += value.length;
-                    
-                    // Update Progress Bar
-                    if(contentLength) {
-                        const step = (receivedLength / contentLength) * 100;
-                        pBar.style.width = step + "%";
-                    }
-                }
-
-                // Combine chunks into a single Blob
-                const blob = new Blob(chunks, { type: 'video/mp4' });
-                const downloadUrl = window.URL.createObjectURL(blob);
-                
+                const res = await fetch(proxyUrl);
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = downloadUrl;
+                a.href = url;
                 a.download = `A2Z_Vortex_${Date.now()}.mp4`;
                 document.body.appendChild(a);
                 a.click();
-                
-                // Cleanup
-                setTimeout(() => {
-                    window.URL.revokeObjectURL(downloadUrl);
-                    document.body.removeChild(a);
-                    btn.innerHTML = "<i class='fa-solid fa-check'></i> DONE";
-                    pCont.style.display = 'none';
-                }, 2000);
-
-            } catch (error) {
-                console.error("Download Failed:", error);
-                // Fallback: If proxy fails, try direct open (last resort)
+                window.URL.revokeObjectURL(url);
+                statusMsg.innerText = "Download Complete!";
+            } catch (err) {
                 window.open(videoUrl, '_blank');
-                btn.innerHTML = "OPENED";
-            } finally {
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }, 4000);
             }
         }
     </script>
