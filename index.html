@@ -14,58 +14,66 @@
             background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
         }
         
+        /* Compact Glass Card for Mobile & PC */
         .glass-card { 
-            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 0, 85, 0.1); border-radius: 2.5rem;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 1.5rem;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 15px 10px; min-height: 140px; text-decoration: none;
         }
-        .glass-card:hover { 
-            background: rgba(255, 0, 85, 0.05); border-color: var(--neon);
-            transform: translateY(-10px); box-shadow: 0 20px 40px rgba(255, 0, 85, 0.2);
+        
+        /* Tap Animation */
+        .glass-card:active { transform: scale(0.92); background: rgba(255, 0, 85, 0.1); border-color: var(--neon); }
+        
+        /* For Desktop Hover */
+        @media (min-width: 768px) {
+            .glass-card:hover { border-color: var(--neon); background: rgba(255, 0, 85, 0.05); transform: translateY(-5px); }
         }
 
         /* Maintenance Overlay */
         #m-overlay {
             position: fixed; inset: 0; background: var(--bg); z-index: 9999;
-            display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;
         }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- Maintenance Screen -->
+    <!-- Maintenance Screen (Admin control) -->
     <div id="m-overlay">
-        <i class="fa-solid fa-screwdriver-wrench text-6xl text-pink-500 mb-6 animate-pulse"></i>
-        <h1 class="text-3xl font-black uppercase tracking-tighter" id="m-title">SYSTEM OFFLINE</h1>
-        <p class="text-[10px] text-gray-500 uppercase tracking-[0.4em] mt-2" id="m-msg">Back in a few minutes...</p>
+        <div class="w-20 h-20 bg-pink-600/10 rounded-full flex items-center justify-center mb-6 border border-pink-600/20 animate-pulse">
+            <i class="fa-solid fa-screwdriver-wrench text-3xl text-pink-500"></i>
+        </div>
+        <h1 class="text-2xl font-black uppercase tracking-tighter">System Offline</h1>
+        <p class="text-[10px] text-gray-500 uppercase tracking-[0.3em] mt-3" id="m-msg">Updating Neural Nodes...</p>
     </div>
 
-    <div class="max-w-6xl mx-auto px-6 py-12">
-        <!-- Header -->
-        <header class="text-center mb-16">
-            <h1 class="text-5xl font-black italic tracking-tighter mb-2">A2Z <span class="text-pink-600">STUDIO</span></h1>
-            <p class="text-[10px] font-bold text-white/30 uppercase tracking-[0.5em]">Neural Interface v2.0</p>
+    <div class="max-w-4xl mx-auto px-5 py-10">
+        <!-- Compact Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-black italic tracking-tighter mb-1">A2Z <span class="text-pink-600">STUDIO</span></h1>
+            <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.4em]">Neural Hub v2.0</p>
         </header>
 
-        <!-- Dynamic App Grid -->
-        <div id="app-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Admin Panel se buttons yahan khud load honge -->
-            <div class="col-span-full text-center py-20 opacity-20">
-                <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i>
-                <p class="text-[10px] font-black uppercase tracking-widest">Syncing with Master Control...</p>
+        <!-- Grid System: Mobile (2 columns), Tablet (3), Desktop (4) -->
+        <div id="app-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <!-- Loading placeholder -->
+            <div class="col-span-full text-center py-20 opacity-30">
+                <i class="fa-solid fa-spinner fa-spin text-3xl mb-4"></i>
+                <p class="text-[10px] font-black uppercase tracking-widest">Syncing with Master...</p>
             </div>
         </div>
 
-        <!-- Footer -->
         <footer class="mt-20 text-center border-t border-white/5 pt-10">
-            <p class="text-[8px] font-black text-white/20 uppercase tracking-[0.3em]">Built for Professionals & Creators</p>
+            <p class="text-[8px] font-black text-white/10 uppercase tracking-[0.3em]">Built for High-Performance Creators</p>
         </footer>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        // Same Config as Admin & Video
+        // Firebase Configuration
         const firebaseConfig = { 
             apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
             databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
@@ -73,84 +81,50 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1. Monitor Maintenance Mode
+        // 1. Sync Maintenance Mode
         db.ref('settings').on('value', (snapshot) => {
-            const settings = snapshot.val() || {};
-            const overlay = document.getElementById('m-overlay');
-            if (settings.maintenanceMode) {
-                overlay.style.display = 'flex';
-                if(settings.maintenanceMsg) document.getElementById('m-msg').innerText = settings.maintenanceMsg;
-            } else {
-                overlay.style.display = 'none';
-            }
+            const s = snapshot.val() || {};
+            document.getElementById('m-overlay').style.display = s.maintenanceMode ? 'flex' : 'none';
+            if(s.maintenanceMsg) document.getElementById('m-msg').innerText = s.maintenanceMsg;
         });
 
-        // 2. Load Dynamic Buttons (Apps)
+        // 2. Load Dynamic App Buttons
         db.ref('apps').on('value', (snapshot) => {
             const apps = snapshot.val() || {};
             const grid = document.getElementById('app-grid');
-            grid.innerHTML = ''; // Clear loading state
+            grid.innerHTML = ''; // Clear loading screen
 
             Object.keys(apps).forEach(id => {
                 const app = apps[id];
                 
-                // Sirf wahi buttons dikhao jo Admin mein "ON" hain
+                // Sirf enabled apps dikhayega
                 if (app.enabled) {
                     const card = document.createElement('a');
                     card.href = app.path;
-                    card.className = "glass-card p-10 text-center flex flex-col items-center justify-center group";
+                    // External link detect
+                    if(app.path.startsWith('http')) card.target = "_blank";
                     
-                    // Click Hone par stats track honge
+                    card.className = "glass-card";
+                    
+                    // Track click stats in Admin
                     card.onclick = () => {
-                        db.ref('stats/' + id).transaction(current => (current || 0) + 1);
+                        db.ref('stats/' + id).transaction(c => (c || 0) + 1);
                     };
 
                     card.innerHTML = `
-                        <div class="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-6 border border-white/5 group-hover:border-pink-500/50 transition-all">
-                            <i class="fa-solid ${app.icon || 'fa-cube'} text-3xl text-pink-500"></i>
+                        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mb-3 border border-white/5">
+                            <i class="fa-solid ${app.icon || 'fa-cube'} text-xl text-pink-500"></i>
                         </div>
-                        <h3 class="text-sm font-black uppercase tracking-widest">${app.name}</h3>
-                        <p class="text-[8px] text-white/20 uppercase mt-2 font-bold group-hover:text-pink-500 transition-colors">Launch Interface <i class="fa-solid fa-arrow-right ml-1"></i></p>
+                        <h3 class="text-[10px] font-black uppercase tracking-tight text-white text-center leading-tight mb-1">${app.name}</h3>
+                        <p class="text-[8px] text-white/30 uppercase text-center line-clamp-2 px-2">${app.desc || 'Active'}</p>
                     `;
                     grid.appendChild(card);
                 }
             });
 
-            db.ref('apps').on('value', (snapshot) => {
-    const apps = snapshot.val() || {};
-    const grid = document.getElementById('app-grid');
-    grid.innerHTML = ''; 
-
-    Object.keys(apps).forEach(id => {
-        const app = apps[id];
-        if (app.enabled) {
-            const card = document.createElement('a');
-            card.href = app.path;
-            // Agar path http se start hota hai toh naye tab mein khule
-            if(app.path.startsWith('http')) card.target = "_blank";
-            
-            card.className = "glass-card p-8 text-center flex flex-col items-center group";
-            card.onclick = () => db.ref('stats/' + id).transaction(c => (c || 0) + 1);
-
-            card.innerHTML = `
-                <div class="w-16 h-16 bg-white/5 rounded-[1.5rem] flex items-center justify-center mb-5 border border-white/5 group-hover:border-pink-500/50 group-hover:bg-pink-500/5 transition-all duration-500">
-                    <i class="fa-solid ${app.icon} text-2xl text-pink-500 group-hover:scale-110 transition-transform"></i>
-                </div>
-                <h3 class="text-xs font-black uppercase tracking-widest text-white group-hover:text-pink-500 transition-colors">${app.name}</h3>
-                <p class="text-[9px] text-white/30 uppercase mt-3 leading-relaxed font-medium group-hover:text-white/60">${app.desc || 'System Module Activated'}</p>
-                
-                <div class="mt-6 px-4 py-2 bg-white/5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500">
-                    <span class="text-[7px] font-black uppercase tracking-[0.2em]">Open Interface <i class="fa-solid fa-arrow-right ml-1"></i></span>
-                </div>
-            `;
-            grid.appendChild(card);
-        }
-    });
-});
-
-            // Agar koi app enabled nahi hai
+            // Agar koi app nahi hai
             if (grid.innerHTML === '') {
-                grid.innerHTML = '<p class="col-span-full text-center text-[10px] text-white/20 font-bold uppercase">No Active Modules Found</p>';
+                grid.innerHTML = '<p class="col-span-full text-center text-[9px] text-white/20 font-bold uppercase">No Active Modules Found</p>';
             }
         });
     </script>
