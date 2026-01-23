@@ -9,123 +9,47 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
     <style>
         :root { --neon: #ff0055; --bg: #05000a; }
-        body { 
-            font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden;
-            background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
-        }
-        
-        /* Compact Glass Card for Mobile & PC */
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 1.5rem;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 15px 10px; min-height: 140px; text-decoration: none;
-        }
-        
-        /* Tap Animation */
-        .glass-card:active { transform: scale(0.92); background: rgba(255, 0, 85, 0.1); border-color: var(--neon); }
-        
-        /* For Desktop Hover */
-        @media (min-width: 768px) {
-            .glass-card:hover { border-color: var(--neon); background: rgba(255, 0, 85, 0.05); transform: translateY(-5px); }
-        }
-
-        /* Maintenance Overlay */
-        #m-overlay {
-            position: fixed; inset: 0; background: var(--bg); z-index: 9999;
-            display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;
-        }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden; background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 1.5rem; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px 10px; min-height: 140px; }
+        .glass-card:active { transform: scale(0.92); border-color: var(--neon); }
+        #m-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
     </style>
 </head>
 <body class="min-h-screen">
-
-    <!-- Maintenance Screen (Admin control) -->
-    <div id="m-overlay">
-        <div class="w-20 h-20 bg-pink-600/10 rounded-full flex items-center justify-center mb-6 border border-pink-600/20 animate-pulse">
-            <i class="fa-solid fa-screwdriver-wrench text-3xl text-pink-500"></i>
-        </div>
-        <h1 class="text-2xl font-black uppercase tracking-tighter">System Offline</h1>
-        <p class="text-[10px] text-gray-500 uppercase tracking-[0.3em] mt-3" id="m-msg">Updating Neural Nodes...</p>
-    </div>
+    <div id="m-overlay"><div class="animate-pulse"><i class="fa-solid fa-screwdriver-wrench text-3xl text-pink-500"></i></div><h1 class="text-2xl font-black uppercase mt-4">Offline</h1></div>
 
     <div class="max-w-4xl mx-auto px-5 py-10">
-        <!-- Compact Header -->
-        <header class="text-center mb-12">
-            <h1 class="text-4xl font-black italic tracking-tighter mb-1">A2Z <span class="text-pink-600">STUDIO</span></h1>
-            <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.4em]">Neural Hub v2.0</p>
-        </header>
+        <header class="text-center mb-12"><h1 class="text-4xl font-black italic tracking-tighter mb-1">A2Z <span class="text-pink-600">STUDIO</span></h1><p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.4em]">Neural Hub v2.0</p></header>
 
-        <!-- Grid System: Mobile (2 columns), Tablet (3), Desktop (4) -->
         <div id="app-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            <!-- Loading placeholder -->
-            <div class="col-span-full text-center py-20 opacity-30">
-                <i class="fa-solid fa-spinner fa-spin text-3xl mb-4"></i>
-                <p class="text-[10px] font-black uppercase tracking-widest">Syncing with Master...</p>
-            </div>
+            <div class="col-span-full text-center py-20 opacity-30"><i class="fa-solid fa-spinner fa-spin text-3xl mb-4"></i></div>
         </div>
-
-        <footer class="mt-20 text-center border-t border-white/5 pt-10">
-            <p class="text-[8px] font-black text-white/10 uppercase tracking-[0.3em]">Built for High-Performance Creators</p>
-        </footer>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        // Firebase Configuration
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", 
-            databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const config = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        firebase.initializeApp(config); const db = firebase.database();
 
-        // 1. Sync Maintenance Mode
-        db.ref('settings').on('value', (snapshot) => {
-            const s = snapshot.val() || {};
-            document.getElementById('m-overlay').style.display = s.maintenanceMode ? 'flex' : 'none';
-            if(s.maintenanceMsg) document.getElementById('m-msg').innerText = s.maintenanceMsg;
+        db.ref('settings').on('value', (s) => {
+            const d = s.val() || {}; document.getElementById('m-overlay').style.display = d.maintenanceMode ? 'flex' : 'none';
         });
 
-        // 2. Load Dynamic App Buttons
-        db.ref('apps').on('value', (snapshot) => {
-            const apps = snapshot.val() || {};
-            const grid = document.getElementById('app-grid');
-            grid.innerHTML = ''; // Clear loading screen
-
-            Object.keys(apps).forEach(id => {
-                const app = apps[id];
-                
-                // Sirf enabled apps dikhayega
+        // LOAD APPS WITH ORDER
+        db.ref('apps').orderByChild('order').on('value', (snapshot) => {
+            const grid = document.getElementById('app-grid'); grid.innerHTML = '';
+            snapshot.forEach((child) => {
+                const app = child.val(), id = child.key;
                 if (app.enabled) {
-                    const card = document.createElement('a');
-                    card.href = app.path;
-                    // External link detect
+                    const card = document.createElement('a'); card.href = app.path;
                     if(app.path.startsWith('http')) card.target = "_blank";
-                    
                     card.className = "glass-card";
-                    
-                    // Track click stats in Admin
-                    card.onclick = () => {
-                        db.ref('stats/' + id).transaction(c => (c || 0) + 1);
-                    };
-
-                    card.innerHTML = `
-                        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mb-3 border border-white/5">
-                            <i class="fa-solid ${app.icon || 'fa-cube'} text-xl text-pink-500"></i>
-                        </div>
-                        <h3 class="text-[10px] font-black uppercase tracking-tight text-white text-center leading-tight mb-1">${app.name}</h3>
-                        <p class="text-[8px] text-white/30 uppercase text-center line-clamp-2 px-2">${app.desc || 'Active'}</p>
-                    `;
+                    card.onclick = () => db.ref('stats/' + id).transaction(c => (c || 0) + 1);
+                    card.innerHTML = `<div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mb-3 border border-white/5"><i class="fa-solid ${app.icon || 'fa-cube'} text-xl text-pink-500"></i></div><h3 class="text-[10px] font-black uppercase tracking-tight text-white text-center leading-tight mb-1">${app.name}</h3><p class="text-[8px] text-white/30 uppercase text-center line-clamp-2 px-2">${app.desc || 'Active'}</p>`;
                     grid.appendChild(card);
                 }
             });
-
-            // Agar koi app nahi hai
-            if (grid.innerHTML === '') {
-                grid.innerHTML = '<p class="col-span-full text-center text-[9px] text-white/20 font-bold uppercase">No Active Modules Found</p>';
-            }
         });
     </script>
 </body>
