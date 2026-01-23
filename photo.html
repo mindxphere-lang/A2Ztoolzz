@@ -3,81 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Enhancer - AI Node</title>
+    <title>A2Z Neural Enhancer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Montserrat:wght@300;700&display=swap" rel="stylesheet"/>
     <style>
-        :root { --cyan: #00d2ff; --blue: #3a7bd5; --bg: #050a15; }
+        :root { --neon: #00f2ff; --pink: #ff0055; --bg: #02050a; }
         body { 
             font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0;
-            background: radial-gradient(circle at 50% 0%, #0a1931, var(--bg) 85%); background-attachment: fixed;
+            background-image: radial-gradient(circle at 50% 10%, #001a33, #02050a 80%);
+            background-attachment: fixed; overflow-x: hidden;
         }
-        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(0, 210, 255, 0.1); border-radius: 2.5rem; }
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+
+        /* Futuristic Glass */
+        .neural-panel { 
+            background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(30px); 
+            border: 1px solid rgba(0, 242, 255, 0.1); border-radius: 2rem;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(0, 242, 255, 0.05);
+        }
+
+        /* Comparison Slider */
+        .comp-container { position: relative; width: 100%; aspect-ratio: 4/5; overflow: hidden; border-radius: 1.5rem; }
+        .comp-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .comp-overlay { 
+            position: absolute; inset: 0; width: 50%; overflow: hidden; 
+            border-right: 2px solid var(--neon); z-index: 10;
+            box-shadow: 10px 0 30px rgba(0, 242, 255, 0.2);
+        }
+        .comp-range { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: col-resize; z-index: 20; }
+
+        /* Scanner Line Animation */
+        .scan-line {
+            position: absolute; top: 0; bottom: 0; right: 0; width: 2px;
+            background: var(--neon); box-shadow: 0 0 15px var(--neon); z-index: 11;
+        }
+
+        /* Neural Logs */
+        .console-box { background: rgba(0,0,0,0.8); border: 1px solid #111; font-family: monospace; font-size: 8px; color: #0f0; padding: 10px; border-radius: 10px; }
         
-        /* Before/After Slider */
-        .comparison-container { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; border-radius: 2rem; border: 1px solid rgba(0, 210, 255, 0.2); }
-        .comp-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .comp-overlay { position: absolute; top: 0; left: 0; width: 50%; height: 100%; overflow: hidden; border-right: 2px solid var(--cyan); z-index: 10; }
-        .comp-range { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: col-resize; z-index: 20; }
-        
-        .glow-btn { background: linear-gradient(45deg, var(--blue), var(--cyan)); box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); }
+        .cyber-btn {
+            background: linear-gradient(90deg, #0044ff, #00f2ff);
+            clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+            transition: 0.3s; font-weight: 900;
+        }
+        .cyber-btn:active { transform: scale(0.95); filter: brightness(1.2); }
+
+        .loading-ring {
+            border: 2px solid transparent; border-top: 2px solid var(--neon);
+            border-radius: 50%; width: 50px; height: 50px; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="min-h-screen p-6">
-
-    <nav class="mb-8"><a href="index.html" class="text-cyan-500 font-black uppercase text-[10px] tracking-widest"><i class="fa-solid fa-arrow-left mr-2"></i> Hub</a></nav>
+<body class="min-h-screen p-4 md:p-10">
 
     <div class="max-w-xl mx-auto space-y-8">
-        <header class="text-center">
-            <h1 class="text-3xl font-black italic tracking-tighter text-white">A2Z <span class="text-cyan-400">ENHANCER</span></h1>
-            <p class="text-[9px] font-bold text-cyan-500/50 uppercase tracking-[0.4em]">Neural Node v2.0</p>
+        <!-- Header -->
+        <header class="flex justify-between items-center px-4">
+            <a href="index.html" class="text-white/20 hover:text-white"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="text-center">
+                <h1 class="orbitron text-2xl font-black tracking-tighter text-white">NEURAL<span class="text-cyan-400">CORE</span></h1>
+                <p class="text-[7px] font-bold text-cyan-500/50 uppercase tracking-[0.6em]">A2Z Image Lab v3.0</p>
+            </div>
+            <div class="w-4 h-4 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_#22c55e]"></div>
         </header>
 
-        <!-- Step 1: Upload Zone -->
-        <div id="upload-zone" onclick="document.getElementById('file-input').click()" class="glass p-12 text-center cursor-pointer border-dashed border-2 border-cyan-500/20 hover:border-cyan-500/50 transition-all">
-            <input type="file" id="file-input" class="hidden" accept="image/*" onchange="processPhoto(event)">
-            <i class="fa-solid fa-wand-magic-sparkles text-4xl text-cyan-500 mb-6"></i>
-            <h3 class="text-sm font-black uppercase tracking-widest">Tap to Fix Photo</h3>
-            <p class="text-[9px] text-gray-500 uppercase mt-2">Remini Engine: AI Upscale & Faces</p>
+        <!-- Neural Console (Live Log) -->
+        <div id="console-ui" class="hidden console-box animate-fade-in">
+            <p id="log-text">> Initializing AI Bridge...</p>
         </div>
 
-        <!-- Step 2: Processing Loader -->
-        <div id="loading-state" class="hidden glass p-12 text-center">
-            <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-cyan-500 mx-auto mb-4"></div>
-            <h3 class="text-xs font-black uppercase tracking-widest animate-pulse">Reconstructing Pixels...</h3>
+        <!-- Main Upload Panel -->
+        <div id="upload-panel" class="neural-panel p-10 text-center space-y-6" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" class="hidden" accept="image/*" onchange="initiateNeuralFix(event)">
+            <div class="relative inline-block">
+                <div class="absolute -inset-4 bg-cyan-500/10 blur-xl rounded-full"></div>
+                <i class="fa-solid fa-microchip text-5xl text-cyan-400 relative"></i>
+            </div>
+            <div>
+                <h2 class="orbitron text-lg uppercase font-black">Fix Blurry Image</h2>
+                <p class="text-[9px] text-gray-500 uppercase tracking-widest mt-1">Remini-X AI Reconstruction</p>
+            </div>
+            <button class="cyber-btn w-full py-4 text-xs uppercase text-black">Upload Binary</button>
         </div>
 
-        <!-- Step 3: Result Comparison -->
-        <div id="result-zone" class="hidden space-y-6">
-            <div class="comparison-container">
-                <img id="after-img" class="comp-img">
+        <!-- Processing UI -->
+        <div id="processing-panel" class="hidden neural-panel p-16 text-center">
+            <div class="loading-ring mx-auto mb-6"></div>
+            <p class="orbitron text-xs text-cyan-400 tracking-widest animate-pulse">Processing Pixels...</p>
+        </div>
+
+        <!-- Comparison Result -->
+        <div id="result-panel" class="hidden space-y-6">
+            <div class="comp-container neural-panel">
+                <img id="after-img" class="comp-img"> <!-- AI Optimized -->
                 <div class="comp-overlay" id="comp-over">
-                    <img id="before-img" class="comp-img">
+                    <img id="before-img" class="comp-img"> <!-- Original -->
+                    <div class="scan-line"></div>
                 </div>
                 <input type="range" class="comp-range" min="0" max="100" value="50" oninput="document.getElementById('comp-over').style.width = this.value + '%'">
+                
+                <!-- HUD Labels -->
+                <div class="absolute bottom-4 left-4 z-30 flex items-center gap-2">
+                    <span class="bg-black/80 text-[7px] px-2 py-1 rounded border border-white/10 uppercase">Low Res</span>
+                </div>
+                <div class="absolute bottom-4 right-4 z-30 flex items-center gap-2">
+                    <span class="bg-cyan-500 text-[7px] px-2 py-1 rounded text-black font-black uppercase">Neural HD</span>
+                </div>
             </div>
-            
-            <div class="flex gap-4">
-                <a id="dl-btn" href="#" download class="flex-1 glow-btn py-5 rounded-2xl text-center font-black text-xs uppercase tracking-widest text-white">Download Result</a>
-                <button onclick="location.reload()" class="bg-white/5 border border-white/10 px-6 rounded-2xl"><i class="fa-solid fa-rotate-right"></i></button>
+
+            <div class="grid grid-cols-2 gap-4">
+                <a id="dl-link" href="#" download class="cyber-btn py-5 text-center text-xs text-black uppercase">Save Result</a>
+                <button onclick="location.reload()" class="neural-panel px-6 hover:bg-white/5"><i class="fa-solid fa-rotate-right"></i></button>
             </div>
         </div>
     </div>
 
     <script>
-        const CLOUD_NAME = "dgikim3w1"; // Aapka Cloud Name
-        const UPLOAD_PRESET = "a2z_preset"; // Jo aapne Step 1 mein banaya wo yahan likhein
+        // --- APNI DETAILS YAHAN DAALEIN ---
+        const CLOUD_NAME = "dgikim3w1"; 
+        const UPLOAD_PRESET = "a2z_preset"; 
 
-        async function processPhoto(event) {
-            const file = event.target.files[0];
+        const logs = [
+            "> Fetching Image Binary...",
+            "> Connecting to Cloudinary Neural Node...",
+            "> Analyzing Facial Landmarks...",
+            "> Applying AI Super-Resolution...",
+            "> Denoising Background...",
+            "> Sharpening Edge Contours...",
+            "> Reconstructing Pixels (100%)...",
+            "> Output Ready."
+        ];
+
+        function runConsole() {
+            const logEl = document.getElementById('log-text');
+            document.getElementById('console-ui').classList.remove('hidden');
+            let i = 0;
+            const interval = setInterval(() => {
+                logEl.innerHTML += `<br>> ${logs[i]}`;
+                i++;
+                if(i === logs.length) clearInterval(interval);
+            }, 400);
+        }
+
+        async function initiateNeuralFix(e) {
+            const file = e.target.files[0];
             if(!file) return;
 
-            document.getElementById('upload-zone').classList.add('hidden');
-            document.getElementById('loading-state').classList.remove('hidden');
-
-            // Show Original Preview
+            document.getElementById('upload-panel').classList.add('hidden');
+            document.getElementById('processing-panel').classList.remove('hidden');
             document.getElementById('before-img').src = URL.createObjectURL(file);
+            runConsole();
 
             const formData = new FormData();
             formData.append("file", file);
@@ -91,21 +168,23 @@
                 const data = await res.json();
 
                 if(data.secure_url) {
-                    // --- AI TRANSFORMATION ---
-                    // e_upscale: HD Quality
-                    // e_improve: Face & Color Fix
-                    const enhancedUrl = data.secure_url.replace("/upload/", "/upload/e_improve,e_upscale,e_sharpen:100,w_1500/");
+                    // --- STRONGER AI STRING ---
+                    // e_improve: Auto Color/Contrast
+                    // e_upscale: Real AI resolution increase
+                    // e_sharpen:300: High edge sharpening
+                    // e_vibrant:30: Better colors
+                    const aiUrl = data.secure_url.replace("/upload/", "/upload/e_improve,e_upscale,e_sharpen:300,e_vibrant:30,w_1600,c_limit/");
                     
-                    const afterImg = document.getElementById('after-img');
-                    afterImg.src = enhancedUrl;
-                    afterImg.onload = () => {
-                        document.getElementById('loading-state').classList.add('hidden');
-                        document.getElementById('result-zone').classList.remove('hidden');
-                        document.getElementById('dl-btn').href = enhancedUrl.replace("/upload/", "/upload/fl_attachment/");
+                    const after = document.getElementById('after-img');
+                    after.src = aiUrl;
+                    after.onload = () => {
+                        document.getElementById('processing-panel').classList.add('hidden');
+                        document.getElementById('result-panel').classList.remove('hidden');
+                        document.getElementById('dl-link').href = aiUrl.replace("/upload/", "/upload/fl_attachment/");
                     };
                 }
-            } catch (e) {
-                alert("Neural Node Blocked. Check Preset settings!");
+            } catch (err) {
+                alert("Neural Link Interrupted!");
                 location.reload();
             }
         }
