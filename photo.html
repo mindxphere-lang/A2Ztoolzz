@@ -11,8 +11,8 @@
         :root { --primary: #007aff; --bg: #00040a; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: white; margin: 0; background-image: radial-gradient(circle at 50% -20%, #1a2a6c, #00040a 70%); background-attachment: fixed; }
         .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 2.5rem; }
-        .mode-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 1.5rem; padding: 20px; transition: 0.3s; cursor: pointer; }
-        .mode-card:active { background: rgba(0, 122, 255, 0.1); border-color: var(--primary); }
+        .mode-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 1.5rem; padding: 18px; transition: 0.3s; cursor: pointer; }
+        .mode-card:active { background: rgba(0, 122, 255, 0.1); border-color: var(--primary); transform: scale(0.98); }
         .comparison-wrapper { position: relative; width: 100%; aspect-ratio: 4/5; overflow: hidden; border-radius: 2rem; background: #000; }
         .img-container { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
         .overlay-layer { position: absolute; inset: 0; width: 50%; overflow: hidden; border-right: 2px solid white; z-index: 10; }
@@ -23,7 +23,7 @@
 </head>
 <body class="min-h-screen p-6">
 
-    <div class="max-w-xl mx-auto space-y-8">
+    <div class="max-w-xl mx-auto space-y-8 pb-10">
         <nav class="flex justify-between items-center">
             <a href="index.html" class="w-10 h-10 glass-panel flex items-center justify-center"><i class="fa-solid fa-chevron-left text-xs"></i></a>
             <h1 class="text-xl font-extrabold tracking-tight">AI ENHANCER</h1>
@@ -34,29 +34,37 @@
         <div id="step-upload" class="glass-panel p-12 text-center space-y-6" onclick="document.getElementById('file-input').click()">
             <input type="file" id="file-input" class="hidden" accept="image/*" onchange="showModes(event)">
             <div class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-white/5">
-                <i class="fa-solid fa-camera text-2xl text-white/30"></i>
+                <i class="fa-solid fa-wand-magic-sparkles text-2xl text-blue-500"></i>
             </div>
-            <h2 class="text-lg font-extrabold uppercase tracking-tight">Select Image</h2>
-            <p class="text-[9px] text-white/30 uppercase">Upscale & Fix Blurry Photos</p>
+            <h2 class="text-lg font-extrabold uppercase">Select Image</h2>
+            <p class="text-[9px] text-white/30 uppercase">Enhance, Fix or Colorize</p>
         </div>
 
         <!-- STEP 2: MODE SELECTION -->
-        <div id="step-modes" class="hidden space-y-4">
-            <p class="text-center text-[10px] font-bold uppercase text-blue-500 mb-6">Choose AI Power</p>
+        <div id="step-modes" class="hidden space-y-3">
+            <p class="text-center text-[10px] font-bold uppercase text-blue-500 mb-6">Select AI Processing Mode</p>
+            
             <div class="mode-card flex items-center gap-5" onclick="processWithMode('face')">
                 <i class="fa-solid fa-user-check text-xl text-blue-500"></i>
-                <div><h4 class="text-xs font-bold uppercase">Face Fix</h4><p class="text-[8px] text-white/40">Sharpen Eyes & Skin</p></div>
+                <div><h4 class="text-xs font-bold uppercase">Face Restoration</h4><p class="text-[8px] text-white/40">Fix Blurry & Old Faces</p></div>
             </div>
+
             <div class="mode-card flex items-center gap-5" onclick="processWithMode('ultra')">
-                <i class="fa-solid fa-wand-magic-sparkles text-xl text-orange-500"></i>
-                <div><h4 class="text-xs font-bold uppercase">Full Enhance</h4><p class="text-[8px] text-white/40">4K Ultra Resolution</p></div>
+                <i class="fa-solid fa-expand text-xl text-purple-500"></i>
+                <div><h4 class="text-xs font-bold uppercase">4K Ultra HD</h4><p class="text-[8px] text-white/40">Super Resolution Upscale</p></div>
+            </div>
+
+            <!-- NAYA FEATURE: COLORIZE -->
+            <div class="mode-card flex items-center gap-5" onclick="processWithMode('color')">
+                <i class="fa-solid fa-palette text-xl text-pink-500"></i>
+                <div><h4 class="text-xs font-bold uppercase">Neural Colorize</h4><p class="text-[8px] text-white/40">B&W to Vibrant Color</p></div>
             </div>
         </div>
 
         <!-- STEP 3: LOADING -->
         <div id="step-loading" class="hidden glass-panel p-20 text-center space-y-6">
             <div class="loader-spin mx-auto"></div>
-            <p id="loading-txt" class="text-[10px] font-bold uppercase text-blue-400 animate-pulse">Uploading to AI Node...</p>
+            <p id="loading-txt" class="text-[10px] font-bold uppercase text-blue-400 animate-pulse">Neural Processing...</p>
         </div>
 
         <!-- STEP 4: RESULT -->
@@ -69,7 +77,7 @@
                 <input type="range" class="slider-input" min="0" max="100" value="50" oninput="document.getElementById('slider-overlay').style.width = this.value + '%'">
             </div>
             <div class="flex gap-4">
-                <a id="download-link" href="#" download class="flex-1 bg-white text-black py-5 rounded-2xl text-center text-[10px] font-black uppercase">Save Photo</a>
+                <a id="download-link" href="#" download class="flex-1 bg-white text-black py-5 rounded-2xl text-center text-[10px] font-black uppercase">Download</a>
                 <button onclick="location.reload()" class="w-16 glass-panel flex items-center justify-center"><i class="fa-solid fa-rotate-right"></i></button>
             </div>
         </div>
@@ -77,7 +85,7 @@
 
     <script>
         const CLOUD_NAME = "dgikim3w1"; 
-        const UPLOAD_PRESET = "a2z_preset"; // ISKA NAME DASHBOARD WALA HONA CHAIYE
+        const UPLOAD_PRESET = "a2z_preset"; 
         let selectedFile = null;
 
         function showModes(e) {
@@ -91,31 +99,29 @@
             const loadingTxt = document.getElementById('loading-txt');
             document.getElementById('step-modes').classList.add('hidden');
             document.getElementById('step-loading').classList.remove('hidden');
-            
             document.getElementById('img-before').src = URL.createObjectURL(selectedFile);
 
-            let aiEffect = mode === 'face' ? "e_improve,e_sharpen:150" : "e_improve,e_upscale,w_1500";
+            // --- AI TRANSFORMATION LOGIC ---
+            let aiEffect = "";
+            if(mode === 'face') aiEffect = "e_improve,e_sharpen:150";
+            else if(mode === 'ultra') aiEffect = "e_upscale,w_1800,q_auto:best";
+            else if(mode === 'color') {
+                // e_vibrant brings colors to life, e_improve restores details
+                // Cloudinary's best colorize combo for free:
+                aiEffect = "e_improve,e_vibrant:100,e_saturation:50,q_auto:best";
+            }
 
             const formData = new FormData();
             formData.append("file", selectedFile);
             formData.append("upload_preset", UPLOAD_PRESET);
 
             try {
-                loadingTxt.innerText = "Connecting to Neural Engine...";
-                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { 
-                    method: "POST", 
-                    body: formData 
-                });
-
-                if (!res.ok) {
-                    const errData = await res.json();
-                    throw new Error(errData.error.message || "Upload Failed");
-                }
-
+                loadingTxt.innerText = "Connecting to Neural Node...";
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
                 const data = await res.json();
-                loadingTxt.innerText = "AI Reconstructing Pixels...";
 
                 if(data.secure_url) {
+                    loadingTxt.innerText = "Applying AI Colors & Filters...";
                     const finalUrl = data.secure_url.replace("/upload/", `/upload/${aiEffect}/`);
                     const afterImg = document.getElementById('img-after');
                     afterImg.src = finalUrl;
@@ -127,7 +133,7 @@
                     };
                 }
             } catch (err) { 
-                alert("ERROR: " + err.message + "\n\nTip: Make sure your Preset is 'Unsigned' in Cloudinary Settings."); 
+                alert("Upload Failed! Check your Cloudinary Preset."); 
                 location.reload(); 
             }
         }
