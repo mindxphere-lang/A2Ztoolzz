@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Viral Pulse v7.6</title>
+    <title>A2Z Studio - Viral Pulse v7.7</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;800&family=JetBrains+Mono&display=swap" rel="stylesheet"/>
     <style>
         :root { --ig: #e1306c; --fb: #1877f2; --yt: #ff0000; --bg: #000; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden; }
-        .ticker-wrap { width: 100%; overflow: hidden; background: rgba(255,255,255,0.03); padding: 15px 0; border-radius: 12px; border-left: 4px solid #333; }
-        .ticker-move { display: flex; white-space: nowrap; animation: ticker 30s linear infinite; width: max-content; }
-        .ticker-item { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; padding: 0 25px; color: #00ff88; text-transform: lowercase; }
+        
+        .ticker-wrap { width: 100%; overflow: hidden; background: rgba(255,255,255,0.03); padding: 15px 0; border-radius: 12px; border-left: 4px solid #333; position: relative; }
+        .ticker-move { display: flex; white-space: nowrap; animation: ticker 40s linear infinite; width: max-content; }
+        .ticker-item { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; padding: 0 25px; color: #00ff88; }
+        
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .live-badge { background: #ff0000; padding: 2px 8px; border-radius: 4px; font-size: 8px; font-weight: 900; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .btn-copy { background: #111; border: 1px solid #222; padding: 8px 15px; border-radius: 10px; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #888; transition: 0.3s; }
+        
+        .btn-copy { background: #111; border: 1px solid #222; padding: 8px 15px; border-radius: 10px; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #888; cursor: pointer; transition: 0.3s; }
         .btn-copy:active { background: white; color: black; }
+        .live-badge { background: #ff0000; padding: 2px 8px; border-radius: 4px; font-size: 8px; font-weight: 900; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
 <body class="min-h-screen p-5 pb-20">
@@ -27,20 +30,21 @@
             <a href="index.html" class="text-white/20 hover:text-white"><i class="fa-solid fa-chevron-left"></i></a>
             <div class="text-center">
                 <h1 class="text-xl font-black uppercase tracking-tighter italic">Viral <span class="text-red-600">Pulse</span></h1>
-                <p class="text-[7px] font-bold text-white/30 uppercase tracking-[0.4em]">Build v7.6.0 Stable Node</p>
+                <p class="text-[7px] font-bold text-white/30 uppercase tracking-[0.4em]">Build v7.7.0 Stable Node</p>
             </div>
             <div class="live-badge">LIVE</div>
         </header>
 
+        <!-- Dynamic Content Hub -->
         <div id="pulse-hub" class="space-y-8">
             <!-- INSTAGRAM -->
             <div class="platform-card">
                 <div class="flex justify-between items-center mb-4">
-                    <div class="flex items-center gap-3"><i class="fa-brands fa-instagram text-2xl" style="color: var(--ig)"></i><span class="text-xs font-black uppercase tracking-widest">Instagram</span></div>
+                    <div class="flex items-center gap-3"><i class="fa-brands fa-instagram text-2xl" style="color: var(--ig)"></i><span class="text-xs font-black uppercase tracking-widest">Instagram Trends</span></div>
                     <button onclick="copyAll('ig-tags')" class="btn-copy">Copy All</button>
                 </div>
                 <div class="ticker-wrap" style="border-color: var(--ig);">
-                    <div id="ig-ticker" class="ticker-move"><span class="ticker-item italic opacity-30">Connecting to Gemini...</span></div>
+                    <div id="ig-ticker" class="ticker-move"><span class="ticker-item italic opacity-30">Neural Node Syncing...</span></div>
                 </div>
                 <p id="ig-tags" class="hidden"></p>
             </div>
@@ -52,7 +56,7 @@
                     <button onclick="copyAll('yt-tags')" class="btn-copy">Copy All</button>
                 </div>
                 <div class="ticker-wrap" style="border-color: var(--yt);">
-                    <div id="yt-ticker" class="ticker-move"><span class="ticker-item italic opacity-30">Analyzing Global Trends...</span></div>
+                    <div id="yt-ticker" class="ticker-move"><span class="ticker-item italic opacity-30">Analyzing Social Metadata...</span></div>
                 </div>
                 <p id="yt-tags" class="hidden"></p>
             </div>
@@ -64,15 +68,19 @@
                     <button onclick="copyAll('fb-tags')" class="btn-copy">Copy All</button>
                 </div>
                 <div class="ticker-wrap" style="border-color: var(--fb);">
-                    <div id="fb-ticker" class="ticker-move"><span class="ticker-item italic opacity-30">Fetching Social Graph...</span></div>
+                    <div id="fb-ticker" class="ticker-move"><span class="ticker-item italic opacity-30">Establishing Pulse...</span></div>
                 </div>
                 <p id="fb-tags" class="hidden"></p>
             </div>
         </div>
 
-        <footer class="text-center opacity-30">
-            <p class="text-[8px] font-black uppercase tracking-widest" id="sync-status">Neural Node Standby</p>
-        </footer>
+        <!-- System Controls -->
+        <div class="flex flex-col items-center gap-4 pt-10">
+            <button onclick="fetchPulse()" class="px-6 py-3 bg-white/5 border border-white/10 rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition">
+                <i class="fa-solid fa-sync-alt mr-2"></i> Force Neural Sync
+            </button>
+            <p id="sync-status" class="text-[8px] font-black uppercase text-white/20 tracking-widest">Initializing Connection...</p>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -82,17 +90,26 @@
         firebase.initializeApp(firebaseConfig); const db = firebase.database();
         
         let GEMINI_KEY = "";
+        
+        // Ensure Key is loaded before fetching
         db.ref('keys/GEMINI_PRO_KEY').on('value', s => { 
             GEMINI_KEY = s.val();
             if(GEMINI_KEY) {
-                document.getElementById('sync-status').innerText = "Neural Node Online";
-                fetchPulse();
+                document.getElementById('sync-status').innerText = "Neural Node Connected";
+                fetchPulse(); 
+            } else {
+                document.getElementById('sync-status').innerText = "Key Missing in Admin Panel!";
             }
         });
 
         async function fetchPulse() {
-            const prompt = "Provide 20 viral trending hashtags for Instagram, YouTube, and Facebook for today. Return ONLY the tags in this format: IG: #tag1 #tag2... YT: #tag1 #tag2... FB: #tag1 #tag2...";
+            if(!GEMINI_KEY) return;
             
+            document.getElementById('sync-status').innerText = "Fetching Global Trends...";
+            
+            // Fixed Strict Prompt
+            const prompt = "List 20 worldwide trending hashtags for Instagram, then for YouTube, then for Facebook. Format must be IG: [tags] YT: [tags] FB: [tags]. No other text.";
+
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
                     method: 'POST',
@@ -101,32 +118,46 @@
                 });
 
                 const data = await res.json();
-                const text = data.candidates[0].content.parts[0].text;
                 
-                // Optimized Robust Parsing
-                const ig = text.split(/YT:|YouTube:/i)[0].replace(/IG:|Instagram:/i, '').trim();
-                const yt = text.split(/YT:|YouTube:/i)[1].split(/FB:|Facebook:/i)[0].trim();
-                const fb = text.split(/FB:|Facebook:/i)[1].trim();
+                if(!data.candidates) {
+                    throw new Error("AI Refused or API Limit Reached");
+                }
 
-                updateUI('ig', ig);
-                updateUI('yt', yt);
-                updateUI('fb', fb);
+                const rawText = data.candidates[0].content.parts[0].text;
                 
-                document.getElementById('sync-status').innerText = "Pulse Last Sync: " + new Date().toLocaleTimeString();
-            } catch (e) {
-                console.log("Parsing error, retrying...");
-                setTimeout(fetchPulse, 5000);
+                // --- ROBUST HACKY PARSING ---
+                const extractTags = (text, startMarker, endMarker) => {
+                    let part = text.split(startMarker)[1];
+                    if (endMarker) part = part.split(endMarker)[0];
+                    return part.trim().replace(/\n/g, ' ');
+                };
+
+                const ig = extractTags(rawText, /IG:/i, /YT:/i);
+                const yt = extractTags(rawText, /YT:/i, /FB:/i);
+                const fb = extractTags(rawText, /FB:/i, null);
+
+                updateTicker('ig', ig);
+                updateTicker('yt', yt);
+                updateTicker('fb', fb);
+
+                document.getElementById('sync-status').innerText = "Neural Pulse Synced: " + new Date().toLocaleTimeString();
+
+            } catch (err) {
+                document.getElementById('sync-status').innerText = "Node Sync Error: " + err.message;
+                console.error(err);
             }
         }
 
-        function updateUI(id, tagsStr) {
-            const tagsArr = tagsStr.split(/\s+/);
+        function updateTicker(id, tagsStr) {
+            // Store for Copying
             document.getElementById(`${id}-tags`).innerText = tagsStr;
+            
             const ticker = document.getElementById(`${id}-ticker`);
             ticker.innerHTML = "";
+            const tags = tagsStr.split(' ').filter(t => t.startsWith('#'));
             
-            // Loop for infinite effect
-            const list = [...tagsArr, ...tagsArr];
+            // Loop for seamless animation
+            const list = [...tags, ...tags, ...tags]; 
             list.forEach(tag => {
                 const span = document.createElement('span');
                 span.className = "ticker-item";
@@ -137,12 +168,12 @@
 
         function copyAll(id) {
             const text = document.getElementById(id).innerText;
-            if(!text) return;
+            if(!text || text.length < 5) return alert("Nothing to copy yet!");
             navigator.clipboard.writeText(text);
             alert("Viral Tags Copied!");
         }
 
-        // Auto Refresh every 15 minutes
+        // Refresh trends every 15 minutes
         setInterval(fetchPulse, 900000);
     </script>
 </body>
