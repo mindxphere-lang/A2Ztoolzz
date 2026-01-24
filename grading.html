@@ -3,190 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Neural Studio - Pro Edition</title>
+    <title>A2Z Neural Studio - Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet"/>
     <style>
-        :root { --accent: #007aff; --bg: #000; --panel: #0a0a0a; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: white; margin: 0; overflow: hidden; height: 100vh; }
+        :root { --accent: #007aff; --panel: #0d0d0d; }
+        body { font-family: 'Inter', sans-serif; background: #000; color: white; margin: 0; overflow: hidden; height: 100vh; }
         
-        /* Studio Layout */
-        .editor-wrapper { display: flex; flex-direction: column; height: 100vh; }
-        .viewport { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #111 0%, #000 100%); padding: 10px; }
+        .main-layout { display: flex; flex-direction: column; height: 100vh; }
         
-        #canvas-wrapper { position: relative; max-width: 100%; max-height: 100%; display: flex; align-items: center; justify-content: center; }
-        #main-img { max-width: 100%; max-height: 60vh; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); object-fit: contain; pointer-events: none; }
-        #mask-canvas { position: absolute; top: 0; left: 0; cursor: crosshair; touch-action: none; z-index: 10; opacity: 0.6; }
+        /* Viewport Area */
+        .viewport { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; background: #050505; overflow: hidden; }
+        #canvas-wrap { position: relative; display: flex; align-items: center; justify-content: center; max-width: 95%; max-height: 95%; }
+        #main-img { max-width: 100%; max-height: 55vh; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); object-fit: contain; }
+        #mask-canvas { position: absolute; top: 0; left: 0; z-index: 10; cursor: crosshair; touch-action: none; opacity: 0.7; }
 
-        /* Bottom Control Panel */
-        .controls-panel { height: 40vh; background: var(--panel); border-top: 1px solid #1a1a1a; display: flex; flex-direction: column; }
+        /* Control Panel Area */
+        .controls { height: 42vh; background: var(--panel); border-top: 1px solid #1a1a1a; display: flex; flex-direction: column; }
         
-        /* Tabs Navigation */
-        .tabs-nav { display: flex; overflow-x: auto; gap: 20px; border-bottom: 1px solid #111; padding: 10px 20px; scrollbar-width: none; }
-        .tabs-nav::-webkit-scrollbar { display: none; }
-        .tab-item { font-size: 9px; font-weight: 800; color: #444; text-transform: uppercase; cursor: pointer; white-space: nowrap; padding: 10px 15px; transition: 0.3s; }
-        .tab-item.active { color: white; border-bottom: 2px solid var(--accent); }
+        .nav-tabs { display: flex; overflow-x: auto; gap: 25px; padding: 12px 20px; border-bottom: 1px solid #151515; scrollbar-width: none; }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+        .tab-btn { font-size: 10px; font-weight: 800; color: #444; text-transform: uppercase; cursor: pointer; white-space: nowrap; padding-bottom: 8px; }
+        .tab-btn.active { color: white; border-bottom: 2px solid var(--accent); }
 
-        .tools-area { flex: 1; overflow-y: auto; padding: 20px 30px; }
-        .tool-content { max-width: 500px; margin: 0 auto; display: none; }
-        .tool-content.active { display: block; animation: fadeIn 0.3s ease; }
+        .tool-body { flex: 1; overflow-y: auto; padding: 20px 25px; }
+        .tool-sec { display: none; max-width: 500px; margin: 0 auto; }
+        .tool-sec.active { display: block; animation: fadeInUp 0.3s ease; }
 
-        /* Sliders Styling */
-        .slider-row { margin-bottom: 22px; }
-        .slider-label { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: #666; text-transform: uppercase; margin-bottom: 10px; }
-        .slider-label span { color: var(--accent); }
-        
-        input[type=range] { -webkit-appearance: none; width: 100%; background: #222; height: 3px; outline: none; border-radius: 10px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: white; border-radius: 50%; cursor: pointer; border: 4px solid var(--panel); }
+        /* Sliders */
+        .slider-wrap { margin-bottom: 20px; }
+        .slider-lbl { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: #666; text-transform: uppercase; margin-bottom: 8px; }
+        .slider-lbl span { color: var(--accent); }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: #222; height: 2px; outline: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: white; border-radius: 50%; border: 4px solid var(--panel); }
 
-        /* Custom Action Buttons */
-        .btn-neural { background: var(--accent); color: white; font-weight: 900; text-transform: uppercase; font-size: 10px; padding: 15px; border-radius: 12px; width: 100%; transition: 0.3s; margin-top: 10px; }
-        .btn-sub { background: #111; border: 1px solid #222; padding: 12px; border-radius: 10px; font-size: 9px; font-weight: 800; text-transform: uppercase; text-align: center; }
-        .btn-sub.active { background: rgba(0, 122, 255, 0.1); border-color: var(--accent); color: var(--accent); }
+        /* UI Elements */
+        .btn-neural { background: var(--accent); color: white; width: 100%; padding: 15px; border-radius: 12px; font-weight: 900; font-size: 11px; text-transform: uppercase; margin-top: 10px; transition: 0.2s; }
+        .btn-neural:active { transform: scale(0.96); }
+        .grid-tool { display: grid; grid-cols-2; gap: 10px; margin-bottom: 20px; }
+        .tool-card { background: #151515; border: 1px solid #222; padding: 15px; border-radius: 15px; text-align: center; }
 
-        /* Toggle Switch */
-        .toggle-wrap { display: flex; justify-content: space-between; items: center; background: #111; padding: 12px 15px; border-radius: 12px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
-        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider-switch { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
-        .slider-switch:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider-switch { background-color: var(--accent); }
-        input:checked + .slider-switch:before { transform: translateX(18px); }
-
-        .loader { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; flex-direction: column; items: center; justify-content: center; text-align: center; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .loader { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; flex-direction: column; items: center; justify-content: center; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="editor-wrapper">
-        <!-- Header -->
+    <div class="main-layout">
+        <!-- Top Navigation -->
         <header class="p-4 flex justify-between items-center border-b border-white/5 bg-black">
             <a href="index.html" class="text-white/30"><i class="fa-solid fa-chevron-left"></i></a>
-            <h1 class="text-[9px] font-black tracking-[0.5em] uppercase text-white/40">A2Z Neural Pro</h1>
-            <button onclick="downloadImage()" class="text-blue-500 font-bold text-[10px] uppercase">Export</button>
+            <h1 class="text-[10px] font-black tracking-[0.4em] uppercase text-white/40">Neural Studio Pro</h1>
+            <button onclick="downloadImg()" class="text-blue-500 font-black text-[11px] uppercase">Export</button>
         </header>
 
         <!-- Viewport -->
-        <main class="viewport">
-            <input type="file" id="file-input" class="hidden" onchange="initNeuralEngine(event)">
-            <div id="import-ui" onclick="document.getElementById('file-input').click()" class="text-center cursor-pointer">
-                <i class="fa-solid fa-plus text-3xl text-white/10 mb-4"></i>
-                <p class="text-[9px] font-black uppercase tracking-widest text-white/30">Import Master File</p>
+        <div class="viewport">
+            <input type="file" id="file-in" class="hidden" onchange="bootEngine(event)">
+            <div id="init-ui" onclick="document.getElementById('file-in').click()" class="text-center cursor-pointer">
+                <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto border border-white/10 mb-4 hover:border-blue-500 transition">
+                    <i class="fa-solid fa-plus text-white/30"></i>
+                </div>
+                <p class="text-[9px] font-black uppercase text-white/20 tracking-widest">Select Image Binary</p>
             </div>
 
-            <div id="canvas-wrapper" class="hidden">
+            <div id="canvas-wrap" class="hidden">
                 <img id="main-img" src="">
                 <canvas id="mask-canvas"></canvas>
             </div>
 
             <div id="loader" class="loader">
-                <div class="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
-                <p id="loader-msg" class="text-[9px] font-black uppercase tracking-[0.4em] text-blue-500 animate-pulse">Syncing with Gemini AI...</p>
+                <div class="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <p id="l-msg" class="text-[9px] font-black uppercase tracking-[0.4em] text-blue-500 mt-6">Processing AI...</p>
             </div>
-        </main>
+        </div>
 
-        <!-- Control Center -->
-        <div id="controls-ui" class="controls-panel hidden">
-            <nav class="tabs-nav">
-                <div class="tab-item active" onclick="switchTab('aifix', this)">AI Fix</div>
-                <div class="tab-item" onclick="switchTab('blur', this)">Blur</div>
-                <div class="tab-item" onclick="switchTab('lab', this)">Photo Lab</div>
-                <div class="tab-item" onclick="switchTab('color', this)">Color</div>
-                <div class="tab-item" onclick="switchTab('light', this)">Light</div>
-            </nav>
+        <!-- Controls -->
+        <div id="ui-panel" class="controls hidden">
+            <div class="nav-tabs">
+                <div class="tab-btn active" onclick="setTab('aifix', this)">AI Fix</div>
+                <div class="tab-btn" onclick="setTab('blur', this)">Blur</div>
+                <div class="tab-btn" onclick="setTab('lab', this)">Photo Lab</div>
+                <div class="tab-btn" onclick="setTab('color', this)">Color</div>
+                <div class="tab-btn" onclick="setTab('light', this)">Light</div>
+            </div>
 
-            <div class="tools-area">
-                <!-- AI FIX TAB -->
-                <div id="sec-aifix" class="tool-content active">
-                    <div class="toggle-wrap">
+            <div class="tool-body">
+                <!-- AI FIX -->
+                <div id="sec-aifix" class="tool-sec active">
+                    <div class="flex justify-between items-center bg-[#111] p-4 rounded-xl mb-4 border border-white/5">
                         <span class="text-[10px] font-black uppercase">Generative AI Mode</span>
-                        <label class="switch"><input type="checkbox" id="gen-toggle"><span class="slider-switch"></span></label>
+                        <input type="checkbox" id="gen-mode" class="w-5 h-5 accent-blue-500">
                     </div>
-                    <div class="flex justify-between items-center mb-4">
-                        <p class="text-[9px] font-bold text-gray-500 uppercase">Brush over object to remove/fill</p>
-                        <button onclick="clearMask()" class="text-[8px] text-blue-500 font-bold uppercase">Reset</button>
-                    </div>
-                    <div class="slider-row">
-                        <div class="slider-label">Brush Size <span id="v-brush">30</span></div>
+                    <div class="slider-wrap">
+                        <div class="slider-lbl">Brush Size <span id="v-brush">30</span></div>
                         <input type="range" id="brush-size" min="10" max="150" value="30" oninput="brushSize=this.value; document.getElementById('v-brush').innerText=this.value">
                     </div>
-                    <button onclick="applyAIFix()" class="btn-neural">Process Brushing</button>
+                    <button onclick="applyNeuralFix()" class="btn-neural">Process Brushing</button>
+                    <button onclick="clearMask()" class="w-full text-[8px] font-bold text-gray-500 uppercase mt-4">Reset Mask</button>
                 </div>
 
-                <!-- BLUR TAB -->
-                <div id="sec-blur" class="tool-content">
-                    <div class="slider-row">
-                        <div class="slider-label">Background Blur <span id="v-blur">0</span></div>
-                        <input type="range" id="blur-slider" min="0" max="100" value="0">
+                <!-- BLUR -->
+                <div id="sec-blur" class="tool-sec">
+                    <div class="slider-wrap">
+                        <div class="slider-lbl">Background Blur Amount <span id="v-blur">0</span></div>
+                        <input type="range" id="blur-val" min="0" max="100" value="0" oninput="document.getElementById('v-blur').innerText=this.value">
                     </div>
-                    <button onclick="applyBlur()" class="btn-neural">Auto Detect & Blur</button>
+                    <button onclick="applyNeuralBlur()" class="btn-neural">Auto Detect & Blur</button>
                 </div>
 
-                <!-- PHOTO LAB TAB -->
-                <div id="sec-lab" class="tool-content">
+                <!-- PHOTO LAB -->
+                <div id="sec-lab" class="tool-sec">
                     <div class="grid grid-cols-2 gap-3 mb-6">
-                        <div class="btn-sub" onclick="applyUpscale()">Upscale 4K</div>
-                        <div class="btn-sub" onclick="applyOldRestore()">Old Photo Restore</div>
+                        <button onclick="applyUpscale()" class="tool-card"><i class="fa-solid fa-expand text-purple-500 mb-2 block"></i><span class="text-[9px] font-bold uppercase">Upscale HD</span></button>
+                        <button onclick="applyRestore()" class="tool-card"><i class="fa-solid fa-palette text-pink-500 mb-2 block"></i><span class="text-[9px] font-bold uppercase">Colorize Old</span></button>
                     </div>
-                    <div class="slider-row">
-                        <div class="slider-label">Face Smooth <span id="v-smooth">0</span></div>
-                        <input type="range" id="smooth-slider" min="0" max="100" value="0">
+                    <div class="slider-wrap">
+                        <div class="slider-lbl">Skin Smoothing <span id="v-smooth">0</span></div>
+                        <input type="range" id="smooth-val" min="0" max="100" value="0" oninput="document.getElementById('v-smooth').innerText=this.value">
                     </div>
-                    <button onclick="applySmooth()" class="btn-neural">Smooth Face AI</button>
+                    <button onclick="applyNeuralSmooth()" class="btn-neural">Smooth Face AI</button>
                 </div>
 
-                <!-- COLOR TAB (HSL) -->
-                <div id="sec-color" class="tool-content">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="slider-row"><div class="slider-label">Green <span></span></div><input type="range" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
-                        <div class="slider-row"><div class="slider-label">Yellow <span></span></div><input type="range" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
-                        <div class="slider-row"><div class="slider-label">Orange <span></span></div><input type="range" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
-                        <div class="slider-row"><div class="slider-label">Red <span></span></div><input type="range" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
+                <!-- COLOR -->
+                <div id="sec-color" class="tool-sec">
+                    <div class="grid grid-cols-2 gap-x-6">
+                        <div class="slider-wrap"><div class="slider-lbl">Red</div><input type="range" id="c-red" min="-100" max="100" value="0" oninput="liveHSL()"></div>
+                        <div class="slider-wrap"><div class="slider-lbl">Orange</div><input type="range" id="c-orange" min="-100" max="100" value="0" oninput="liveHSL()"></div>
+                        <div class="slider-wrap"><div class="slider-lbl">Yellow</div><input type="range" id="c-yellow" min="-100" max="100" value="0" oninput="liveHSL()"></div>
+                        <div class="slider-wrap"><div class="slider-lbl">Green</div><input type="range" id="c-green" min="-100" max="100" value="0" oninput="liveHSL()"></div>
                     </div>
                 </div>
 
-                <!-- LIGHT TAB -->
-                <div id="sec-light" class="tool-content">
-                    <div class="slider-row"><div class="slider-label">Exposure <span id="v-exp">0</span></div><input type="range" id="exp" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
-                    <div class="slider-row"><div class="slider-label">Highlights <span id="v-hi">0</span></div><input type="range" id="hi" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
-                    <div class="slider-row"><div class="slider-label">Shadows <span id="v-sh">0</span></div><input type="range" id="sh" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
+                <!-- LIGHT -->
+                <div id="sec-light" class="tool-sec">
+                    <div class="slider-wrap"><div class="slider-lbl">Exposure <span id="val-exp">0</span></div><input type="range" id="exp" min="-100" max="100" value="0" oninput="liveHSL()"></div>
+                    <div class="slider-wrap"><div class="slider-lbl">Highlights <span id="val-hi">0</span></div><input type="range" id="hi" min="-100" max="100" value="0" oninput="liveHSL()"></div>
+                    <div class="slider-wrap"><div class="slider-lbl">Shadows <span id="val-sh">0</span></div><input type="range" id="sh" min="-100" max="100" value="0" oninput="liveHSL()"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
         const CLOUD_NAME = "dgikim3w1", UPLOAD_PRESET = "a2z_preset";
-        let publicId = "", brushSize = 30, painting = false;
+        let pubId = "", brushSize = 30, painting = false;
         let canvas = document.getElementById('mask-canvas'), ctx = canvas.getContext('2d');
-        
-        // 1. Init Engine
-        async function initNeuralEngine(e) {
+
+        async function bootEngine(e) {
             const file = e.target.files[0]; if(!file) return;
-            showLoader(true, "Uploading Source...");
+            setLoading(true, "Uploading Source...");
             const fd = new FormData(); fd.append("file", file); fd.append("upload_preset", UPLOAD_PRESET);
 
             const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: fd });
-            const data = await res.json();
-            publicId = data.public_id;
+            const d = await res.json(); pubId = d.public_id;
 
             const img = document.getElementById('main-img');
-            img.src = data.secure_url;
+            img.src = d.secure_url;
             img.onload = () => {
                 canvas.width = img.clientWidth; canvas.height = img.clientHeight;
-                document.getElementById('import-ui').classList.add('hidden');
-                document.getElementById('canvas-wrapper').classList.remove('hidden');
-                document.getElementById('controls-ui').classList.remove('hidden');
-                setupBrushing(); showLoader(false);
+                document.getElementById('init-ui').classList.add('hidden');
+                document.getElementById('canvas-wrap').classList.remove('hidden');
+                document.getElementById('ui-panel').classList.remove('hidden');
+                initBrush(); setLoading(false);
             };
         }
 
-        // 2. Red Brushing Logic
-        function setupBrushing() {
+        function initBrush() {
             ctx.strokeStyle = "rgba(255, 0, 0, 0.8)"; ctx.lineCap = "round";
             const start = (e) => { painting = true; draw(e); }
             const move = (e) => { if(painting) draw(e); }
@@ -202,70 +186,58 @@
             ctx.stroke(); ctx.beginPath(); ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
         }
 
-        // 3. Tab Navigation
-        function switchTab(id, btn) {
-            document.querySelectorAll('.tool-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        function setTab(id, btn) {
+            document.querySelectorAll('.tool-sec').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
             document.getElementById('sec-' + id).classList.add('active');
             btn.classList.add('active');
-            // Enable brushing only in AI FIX
             canvas.style.pointerEvents = (id === 'aifix') ? 'auto' : 'none';
         }
 
-        // --- AI LOGIC FUNCTIONS ---
-
-        async function applyAIFix() {
-            showLoader(true, "AI Reconstructing Area...");
-            const isGen = document.getElementById('gen-toggle').checked;
-            // No Prompt Box - Internal Prompt based on toggle
-            let tr = isGen ? "e_gen_fill:prompt_background" : "e_gen_remove:prompt_object";
-            updateImg(tr);
+        async function applyNeuralFix() {
+            setLoading(true, "AI Reconstructing...");
+            const isGen = document.getElementById('gen-mode').checked;
+            updateCore(isGen ? "e_gen_fill:prompt_background" : "e_gen_remove:prompt_object");
         }
 
-        async function applyBlur() {
-            const val = document.getElementById('blur-slider').value;
-            showLoader(true, `Blurring Background (${val}%)`);
-            // Cloudinary background blur (10 to 2000 mapping)
-            updateImg(`e_background_blur:${val * 20}`);
+        async function applyNeuralBlur() {
+            const v = document.getElementById('blur-val').value;
+            setLoading(true, "AI Background Detection...");
+            updateCore(`e_background_blur:${v * 20}`);
         }
 
         async function applyUpscale() {
-            showLoader(true, "Upscaling to 4K Ultra...");
-            // HDR, Sharp, Color Enhance combo
-            updateImg(`e_improve,e_upscale,e_sharpen:100,w_2000`);
+            setLoading(true, "Neural HDR Upscaling...");
+            updateCore(`e_improve,e_upscale,e_sharpen:100,w_2000`);
         }
 
-        async function applyOldRestore() {
-            showLoader(true, "AI Colorizing Old Photo...");
-            updateImg(`e_improve,e_vibrant:100,e_saturation:50`);
+        async function applyRestore() {
+            setLoading(true, "Color Restoration...");
+            updateCore(`e_improve,e_vibrant:100,e_saturation:50`);
         }
 
-        async function applySmooth() {
-            const val = document.getElementById('smooth-slider').value;
-            showLoader(true, "Skin Smoothing AI...");
-            // e_adv_redeye is a common hack for skin smooth in basic cloudinary or use improve
-            updateImg(`e_improve:skin_toning:${val}`);
+        async function applyNeuralSmooth() {
+            const v = document.getElementById('smooth-val').value;
+            setLoading(true, "Skin Smoothing...");
+            updateCore(`e_improve:skin_toning:${v}`);
         }
 
-        function liveUpdate() {
+        function liveHSL() {
             const exp = document.getElementById('exp').value;
-            document.getElementById('v-exp').innerText = exp;
+            document.getElementById('val-exp').innerText = exp;
+            // Instant CSS Filters for no lag
             document.getElementById('main-img').style.filter = `brightness(${100 + parseInt(exp)}%)`;
         }
 
-        function updateImg(tr) {
+        function updateCore(tr) {
             const img = document.getElementById('main-img');
-            const finalUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${tr}/${publicId}?t=${Date.now()}`;
-            img.src = finalUrl;
-            img.onload = () => { clearMask(); showLoader(false); };
+            img.src = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${tr}/${pubId}?t=${Date.now()}`;
+            img.onload = () => { clearMask(); setLoading(false); };
         }
 
         function clearMask() { ctx.clearRect(0,0,canvas.width,canvas.height); }
-        function showLoader(s, msg) { 
-            document.getElementById('loader').style.display = s ? 'flex' : 'none'; 
-            document.getElementById('loader-msg').innerText = msg || "Processing...";
-        }
-        function downloadImage() { window.open(document.getElementById('main-img').src, '_blank'); }
+        function setLoading(s, m) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; document.getElementById('l-msg').innerText = m; }
+        function downloadImg() { window.open(document.getElementById('main-img').src, '_blank'); }
     </script>
 </body>
 </html>
