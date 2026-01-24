@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Neural Studio - Pro</title>
+    <title>A2Z Studio - Pro Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet"/>
@@ -11,19 +11,17 @@
         :root { --accent: #007aff; --panel: #0d0d0d; }
         body { font-family: 'Inter', sans-serif; background: #000; color: white; margin: 0; overflow: hidden; height: 100vh; width: 100vw; }
         
-        /* Layout Structure */
         .app-shell { display: flex; flex-direction: column; height: 100vh; }
-        
-        header { height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid #1a1a1a; background: #000; }
+        header { height: 55px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid #1a1a1a; background: #000; flex-shrink: 0; }
 
-        /* Viewport Area */
-        .viewport { flex: 1; position: relative; background: #050505; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        /* Centered Viewport */
+        .viewport { flex-grow: 1; position: relative; background: #050505; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         #canvas-wrap { position: relative; display: flex; align-items: center; justify-content: center; max-width: 95%; max-height: 95%; }
         #main-img { max-width: 100%; max-height: 50vh; border-radius: 4px; display: block; object-fit: contain; }
         #mask-canvas { position: absolute; top: 0; left: 0; z-index: 20; touch-action: none; cursor: crosshair; }
 
         /* Controls Panel */
-        .controls { height: 45vh; background: var(--panel); border-top: 1px solid #1a1a1a; display: flex; flex-direction: column; }
+        .controls { height: 40vh; background: var(--panel); border-top: 1px solid #1a1a1a; display: flex; flex-direction: column; flex-shrink: 0; }
         
         .tabs-nav { display: flex; overflow-x: auto; gap: 20px; padding: 12px 20px; border-bottom: 1px solid #151515; scrollbar-width: none; }
         .tabs-nav::-webkit-scrollbar { display: none; }
@@ -35,43 +33,36 @@
         .tool-sec.active { display: block; }
 
         /* Sliders */
-        .slider-wrap { margin-bottom: 22px; }
+        .slider-wrap { margin-bottom: 20px; }
         .lbl { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: #666; text-transform: uppercase; margin-bottom: 8px; }
         .lbl span { color: var(--accent); }
         input[type=range] { -webkit-appearance: none; width: 100%; background: #222; height: 2px; outline: none; border-radius: 10px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: white; border-radius: 50%; border: 4px solid var(--panel); }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: white; border-radius: 50%; border: 4px solid var(--panel); }
 
         /* Action UI */
-        .btn-neural { background: var(--accent); color: white; width: 100%; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 11px; text-transform: uppercase; margin-top: 10px; transition: 0.2s; }
-        .btn-neural:active { transform: scale(0.96); }
-        
+        .btn-neural { background: var(--accent); color: white; width: 100%; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 11px; text-transform: uppercase; margin-top: 10px; }
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .tool-card { background: #111; border: 1px solid #1a1a1a; padding: 15px; border-radius: 12px; text-align: center; }
+        .card-tool { background: #111; border: 1px solid #1a1a1a; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; }
 
-        /* Loader */
-        .loader { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; flex-direction: column; items: center; justify-content: center; }
-        .shimmer { width: 120px; height: 2px; background: #222; border-radius: 10px; overflow: hidden; margin-top: 15px; }
-        .shimmer-bar { width: 40%; height: 100%; background: var(--accent); animation: move 1.5s infinite; }
-        @keyframes move { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+        .loader { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <div class="app-shell">
         <header>
-            <a href="index.html" class="text-white/30"><i class="fa-solid fa-chevron-left text-sm"></i></a>
-            <h1 class="text-[9px] font-black uppercase tracking-[0.4em] text-white/50">Neural Vision Pro</h1>
+            <a href="index.html" class="text-white/30"><i class="fa-solid fa-chevron-left"></i></a>
+            <h1 class="text-[9px] font-black uppercase tracking-[0.4em] text-white/50">Neural Studio Pro</h1>
             <button onclick="downloadImg()" class="text-blue-500 font-black text-[10px] uppercase">Export</button>
         </header>
 
         <div class="viewport">
-            <input type="file" id="file-in" class="hidden" onchange="bootEditor(event)">
-            
+            <input type="file" id="file-in" class="hidden" onchange="initStudio(event)">
             <div id="init-ui" onclick="document.getElementById('file-in').click()" class="text-center cursor-pointer">
                 <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10 hover:border-blue-500 transition">
                     <i class="fa-solid fa-plus text-white/40"></i>
                 </div>
-                <p class="text-[9px] font-bold text-white/20 uppercase tracking-widest">Select Image</p>
+                <p class="text-[9px] font-bold text-white/20 uppercase tracking-widest">Import Master Image</p>
             </div>
 
             <div id="canvas-wrap" class="hidden">
@@ -81,8 +72,7 @@
 
             <div id="loader" class="loader">
                 <div class="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                <div class="shimmer"><div class="shimmer-bar"></div></div>
-                <p id="l-msg" class="text-[9px] font-black uppercase tracking-[0.4em] text-blue-500 mt-4">AI Reconstructing...</p>
+                <p id="l-msg" class="text-[10px] font-black uppercase tracking-widest text-blue-500 mt-6">AI Processing...</p>
             </div>
         </div>
 
@@ -96,7 +86,7 @@
             </div>
 
             <div class="tool-body">
-                <!-- AI FIX -->
+                <!-- AI FIX: Brushing -->
                 <div id="sec-aifix" class="tool-sec active">
                     <div class="flex justify-between items-center bg-[#111] p-4 rounded-xl mb-4 border border-white/5">
                         <span class="text-[10px] font-black uppercase">Generative AI Mode</span>
@@ -106,7 +96,7 @@
                         <div class="lbl">Brush Size <span id="v-brush">35</span></div>
                         <input type="range" id="b-size" min="10" max="150" value="35" oninput="brushSize=this.value; document.getElementById('v-brush').innerText=this.value">
                     </div>
-                    <button onclick="runAIAction('fix')" class="btn-neural">Execute Brushing</button>
+                    <button onclick="runAI('fix')" class="btn-neural">Process Brushing</button>
                     <button onclick="clearMask()" class="w-full text-[8px] font-bold text-gray-600 uppercase mt-4">Reset Mask</button>
                 </div>
 
@@ -116,33 +106,37 @@
                         <div class="lbl">Blur Intensity <span id="v-blur">0</span></div>
                         <input type="range" id="blur-val" min="0" max="100" value="0" oninput="document.getElementById('v-blur').innerText=this.value">
                     </div>
-                    <button onclick="runAIAction('blur')" class="btn-neural">Blur Background</button>
+                    <button onclick="runAI('blur')" class="btn-neural">Auto Blur Background</button>
                 </div>
 
                 <!-- PHOTO LAB -->
                 <div id="sec-lab" class="tool-sec">
                     <div class="card-grid">
-                        <div class="tool-card" onclick="runAIAction('upscale')"><i class="fa-solid fa-expand text-purple-500 mb-2 block"></i><span class="text-[9px] font-bold uppercase">Upscale 4K</span></div>
-                        <div class="tool-card" onclick="runAIAction('restore')"><i class="fa-solid fa-wand-magic-sparkles text-pink-500 mb-2 block"></i><span class="text-[9px] font-bold uppercase">Colorize Old</span></div>
+                        <div class="card-tool" onclick="runAI('upscale')"><i class="fa-solid fa-expand text-purple-500 mb-2 block"></i><span class="text-[9px] font-bold uppercase">Upscale 4K</span></div>
+                        <div class="card-tool" onclick="runAI('restore')"><i class="fa-solid fa-wand-magic-sparkles text-pink-500 mb-2 block"></i><span class="text-[9px] font-bold uppercase">Colorize Old</span></div>
                     </div>
                     <div class="slider-wrap">
-                        <div class="lbl">Skin Smooth <span id="v-smooth">0</span></div>
+                        <div class="lbl">Face Smooth <span id="v-smooth">0</span></div>
                         <input type="range" id="smooth-val" min="0" max="100" value="0" oninput="document.getElementById('v-smooth').innerText=this.value">
                     </div>
-                    <button onclick="runAIAction('smooth')" class="btn-neural">Apply Face AI</button>
+                    <button onclick="runAI('smooth')" class="btn-neural">Smooth Face AI</button>
                 </div>
 
-                <!-- COLOR -->
+                <!-- COLOR (INSTANT) -->
                 <div id="sec-color" class="tool-sec">
                     <div class="grid grid-cols-2 gap-x-6">
-                        <div class="slider-wrap"><div class="lbl">Saturation</div><input type="range" id="sat" min="0" max="200" value="100" oninput="liveHSL()"></div>
-                        <div class="slider-wrap"><div class="lbl">Contrast</div><input type="range" id="con" min="-100" max="100" value="0" oninput="liveHSL()"></div>
+                        <div class="slider-wrap"><div class="lbl">Red</div><input type="range" id="sat" min="0" max="200" value="100" oninput="liveEdit()"></div>
+                        <div class="slider-wrap"><div class="lbl">Orange</div><input type="range" id="con" min="-100" max="100" value="0" oninput="liveEdit()"></div>
+                        <div class="slider-wrap"><div class="lbl">Yellow</div><input type="range" min="-100" max="100" value="0" oninput="liveEdit()"></div>
+                        <div class="slider-wrap"><div class="lbl">Green</div><input type="range" min="-100" max="100" value="0" oninput="liveEdit()"></div>
                     </div>
                 </div>
 
-                <!-- LIGHT -->
+                <!-- LIGHT (INSTANT) -->
                 <div id="sec-light" class="tool-sec">
-                    <div class="slider-wrap"><div class="lbl">Exposure <span id="val-exp">0</span></div><input type="range" id="exp" min="-100" max="100" value="0" oninput="liveHSL()"></div>
+                    <div class="slider-wrap"><div class="lbl">Exposure <span id="val-exp">0</span></div><input type="range" id="exp" min="-100" max="100" value="0" oninput="liveEdit()"></div>
+                    <div class="slider-wrap"><div class="lbl">Highlights</div><input type="range" min="-100" max="100" value="0" oninput="liveEdit()"></div>
+                    <div class="slider-wrap"><div class="lbl">Shadows</div><input type="range" min="-100" max="100" value="0" oninput="liveEdit()"></div>
                 </div>
             </div>
         </div>
@@ -153,12 +147,14 @@
         let pubId = "", brushSize = 35, painting = false;
         let canvas = document.getElementById('mask-canvas'), ctx = canvas.getContext('2d');
 
-        async function bootEditor(e) {
+        async function initStudio(e) {
             const file = e.target.files[0]; if(!file) return;
             setLoading(true, "Uploading Source...");
             const fd = new FormData(); fd.append("file", file); fd.append("upload_preset", UPLOAD_PRESET);
+            
             const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: fd });
             const d = await res.json(); pubId = d.public_id;
+
             const img = document.getElementById('main-img');
             img.src = d.secure_url;
             img.onload = () => {
@@ -181,7 +177,8 @@
 
         function draw(e) {
             const rect = canvas.getBoundingClientRect();
-            ctx.lineWidth = brushSize; ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.lineWidth = brushSize;
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
             ctx.stroke(); ctx.beginPath(); ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
         }
 
@@ -192,24 +189,26 @@
             canvas.style.pointerEvents = (id === 'aifix') ? 'auto' : 'none';
         }
 
-        async function runAIAction(type) {
-            setLoading(true, "Neural Processing...");
+        async function runAI(type) {
+            setLoading(true, "Neural AI Processing...");
             let tr = "";
             if(type==='fix') tr = document.getElementById('gen-toggle').checked ? "e_gen_fill" : "e_gen_remove";
             if(type==='blur') tr = `e_background_blur:${document.getElementById('blur-val').value * 20}`;
-            if(type==='upscale') tr = "e_improve,e_upscale,w_1800";
+            if(type==='upscale') tr = "e_improve,e_upscale,w_1800,q_auto:best";
             if(type==='restore') tr = "e_improve,e_vibrant:100";
             if(type==='smooth') tr = `e_improve:skin_toning:${document.getElementById('smooth-val').value}`;
 
             const img = document.getElementById('main-img');
-            img.src = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${tr}/${pubId}?t=${Date.now()}`;
+            const newUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${tr}/${pubId}?t=${Date.now()}`;
+            img.src = newUrl;
             img.onload = () => { clearMask(); setLoading(false); };
         }
 
-        function liveHSL() {
+        function liveEdit() {
             const exp = document.getElementById('exp').value;
             const sat = document.getElementById('sat').value;
             const con = document.getElementById('con').value;
+            document.getElementById('val-exp').innerText = exp;
             document.getElementById('main-img').style.filter = `brightness(${100+parseInt(exp)}%) saturate(${sat}%) contrast(${100+parseInt(con)}%)`;
         }
 
