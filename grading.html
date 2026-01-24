@@ -3,192 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Neural Vision</title>
+    <title>A2Z Studio - Neural Vision Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&display=swap" rel="stylesheet"/>
     <style>
-        :root { --primary: #ffffff; --accent: #007aff; --bg: #000000; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; margin: 0; overflow: hidden; height: 100vh; }
+        :root { --accent: #007aff; --bg: #000; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: white; margin: 0; overflow: hidden; height: 100vh; }
         
-        /* Layout */
-        .editor-container { display: flex; flex-direction: column; height: 100vh; }
-        .viewport { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; background: #050505; padding: 20px; }
-        .controls-panel { background: #000; padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid #111; }
-        
-        /* Instant Preview Canvas */
-        #main-canvas { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,1); transition: filter 0.1s linear; }
+        .viewport { height: 55vh; position: relative; display: flex; align-items: center; justify-content: center; background: #050505; }
+        #canvas-wrapper { position: relative; max-width: 90%; max-height: 90%; }
+        #main-img { display: block; max-width: 100%; max-height: 100%; border-radius: 8px; }
+        #mask-canvas { position: absolute; top: 0; left: 0; z-index: 10; cursor: crosshair; touch-action: none; border-radius: 8px; }
 
-        /* Professional Sliders */
-        .slider-box { padding: 25px 30px; }
-        .slider-info { display: flex; justify-content: space-between; font-size: 10px; font-weight: 600; color: #444; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
-        .slider-info span { color: var(--accent); font-weight: 900; }
+        .controls-panel { height: 45vh; background: #000; border-top: 1px solid #111; display: flex; flex-direction: column; }
         
-        input[type=range] { -webkit-appearance: none; width: 100%; background: #1a1a1a; height: 2px; outline: none; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: white; border-radius: 50%; box-shadow: 0 0 15px rgba(0,0,0,0.5); cursor: pointer; }
+        /* Tabs */
+        .tab-bar { display: flex; justify-content: space-around; padding: 10px; border-bottom: 1px solid #111; }
+        .tab-item { font-size: 10px; font-weight: 800; color: #444; text-transform: uppercase; cursor: pointer; padding: 10px; }
+        .tab-item.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
 
-        /* Toolbar */
-        .toolbar { display: flex; overflow-x: auto; padding: 15px 10px; gap: 15px; border-top: 1px solid #111; scrollbar-width: none; }
-        .toolbar::-webkit-scrollbar { display: none; }
-        .tool-item { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; width: 65px; opacity: 0.4; transition: 0.3s; cursor: pointer; }
-        .tool-item.active { opacity: 1; color: var(--accent); }
-        .tool-item i { font-size: 18px; }
-        .tool-item span { font-size: 8px; font-weight: 700; text-transform: uppercase; }
+        /* Sliders Area */
+        .tools-content { flex: 1; overflow-y: auto; padding: 20px 30px; padding-bottom: 80px; }
+        .slider-group { margin-bottom: 20px; }
+        .slider-label { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: #666; text-transform: uppercase; margin-bottom: 8px; }
+        .slider-label span { color: var(--accent); }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: #222; height: 2px; outline: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: white; border-radius: 50%; }
 
-        /* Header UI */
-        header { padding: 15px 25px; display: flex; justify-content: space-between; items: center; border-b: 1px solid #111; }
-        .btn-done { background: white; color: black; padding: 6px 15px; border-radius: 50px; font-size: 10px; font-weight: 900; text-transform: uppercase; }
-        
-        /* Floating AI Badge */
-        .ai-badge { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 5px 12px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); font-size: 7px; font-weight: 900; color: var(--accent); display: none; }
+        /* AI Prompt Box */
+        #remove-settings { display: none; background: #111; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+        #remove-prompt { background: #000; border: 1px solid #222; color: white; padding: 8px; width: 100%; border-radius: 8px; font-size: 12px; margin-top: 10px; }
+
+        .btn-apply { background: var(--accent); color: white; width: 100%; py: 4; border-radius: 12px; font-weight: 900; font-size: 11px; text-transform: uppercase; margin-top: 10px; padding: 12px; }
+
+        .loader { position: absolute; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div class="editor-container">
-        <header>
-            <a href="index.html" class="text-white/30 text-xs"><i class="fa-solid fa-chevron-left"></i></a>
-            <div class="text-[10px] font-black tracking-[0.4em] text-white/50 uppercase">Neural Vision Engine</div>
-            <button onclick="downloadResult()" class="btn-done">Export</button>
+    <div class="flex flex-col h-screen">
+        <header class="p-4 flex justify-between items-center border-b border-white/5">
+            <a href="index.html" class="text-white/30"><i class="fa-solid fa-chevron-left"></i></a>
+            <p class="text-[9px] font-black uppercase tracking-widest">Neural Pro Editor</p>
+            <button onclick="downloadOutput()" class="text-blue-500 font-black text-[10px] uppercase">Export</button>
         </header>
 
-        <main class="viewport" id="viewport">
-            <!-- Hidden File Input -->
-            <input type="file" id="file-input" class="hidden" accept="image/*" onchange="loadImage(event)">
-            
-            <!-- Welcome View -->
-            <div id="welcome-ui" class="text-center cursor-pointer" onclick="document.getElementById('file-input').click()">
-                <div class="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center mx-auto mb-6 border border-white/5 transition-transform active:scale-95">
-                    <i class="fa-solid fa-plus text-2xl text-white/20"></i>
-                </div>
-                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Import Cinematic Master</p>
+        <div class="viewport">
+            <input type="file" id="file-input" class="hidden" onchange="initEditor(event)">
+            <div id="welcome-ui" onclick="document.getElementById('file-input').click()" class="text-center cursor-pointer">
+                <i class="fa-solid fa-plus text-3xl text-white/10 mb-2"></i>
+                <p class="text-[9px] text-white/20 font-black uppercase">Import Image</p>
             </div>
 
-            <!-- Instant Canvas -->
-            <canvas id="main-canvas" class="hidden"></canvas>
-            <div class="ai-badge" id="ai-status">AI OPTIMIZED</div>
-        </main>
+            <div id="canvas-wrapper" class="hidden">
+                <img id="main-img" src="">
+                <canvas id="mask-canvas"></canvas>
+            </div>
+
+            <div id="loader" class="loader">
+                <div class="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mb-4"></div>
+                <p class="text-[9px] font-black uppercase tracking-widest animate-pulse">Processing AI...</p>
+            </div>
+        </div>
 
         <div class="controls-panel hidden" id="controls">
-            <!-- Dynamic Slider Box -->
-            <div class="slider-box">
-                <div id="slider-container">
-                    <div class="slider-info"><span id="tool-name">Exposure</span> <span id="tool-val">0</span></div>
-                    <input type="range" id="main-slider" min="-100" max="100" value="0" oninput="updateFilter()">
-                </div>
+            <div class="tab-bar">
+                <div class="tab-item active" onclick="switchTab('light', this)">Light</div>
+                <div class="tab-item" onclick="switchTab('color', this)">Color</div>
+                <div class="tab-item" onclick="switchTab('ai', this)">AI Tools</div>
             </div>
 
-            <!-- Lightroom Style Toolbar -->
-            <div class="toolbar">
-                <div class="tool-item active" onclick="setTool('brightness', 'Exposure', -100, 100, 0, 'fa-sun', this)">
-                    <i class="fa-solid fa-sun"></i><span>Light</span>
+            <div class="tools-content">
+                <!-- LIGHT TAB -->
+                <div id="tab-light" class="tab-content">
+                    <div class="slider-group">
+                        <div class="slider-label">Exposure <span id="v-br">0</span></div>
+                        <input type="range" id="br" min="-99" max="100" value="0" oninput="applyInstantFilters()">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">Contrast <span id="v-co">0</span></div>
+                        <input type="range" id="co" min="-100" max="100" value="0" oninput="applyInstantFilters()">
+                    </div>
                 </div>
-                <div class="tool-item" onclick="setTool('contrast', 'Contrast', -100, 100, 0, 'fa-circle-half-stroke', this)">
-                    <i class="fa-solid fa-circle-half-stroke"></i><span>Contrast</span>
+
+                <!-- COLOR TAB -->
+                <div id="tab-color" class="tab-content hidden">
+                    <div class="slider-group">
+                        <div class="slider-label">Saturation <span id="v-sa">0</span></div>
+                        <input type="range" id="sa" min="0" max="200" value="100" oninput="applyInstantFilters()">
+                    </div>
                 </div>
-                <div class="tool-item" onclick="setTool('saturate', 'Saturation', 0, 200, 100, 'fa-droplet', this)">
-                    <i class="fa-solid fa-droplet"></i><span>Color</span>
-                </div>
-                <div class="tool-item" onclick="setTool('grayscale', 'B&W', 0, 100, 0, 'fa-palette', this)">
-                    <i class="fa-solid fa-palette"></i><span>B&W</span>
-                </div>
-                <div class="tool-item" onclick="setTool('blur', 'Neural Blur', 0, 20, 0, 'fa-circle-dot', this)">
-                    <i class="fa-solid fa-circle-dot"></i><span>Depth</span>
-                </div>
-                <div class="tool-item" onclick="applyAIEnhance(this)">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Fix</span>
+
+                <!-- AI TOOLS TAB -->
+                <div id="tab-ai" class="tab-content hidden">
+                    <div id="remove-settings">
+                        <p class="text-[8px] font-black text-white/30 uppercase">Mark object & describe it:</p>
+                        <input type="text" id="remove-prompt" placeholder="e.g. unwanted person, wire, bird">
+                        <p class="text-[7px] text-blue-400 mt-2 uppercase">Brush size: <input type="range" min="10" max="100" value="30" oninput="brushSize=this.value"></p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="aiAction('enhance')" class="p-4 bg-white/5 rounded-xl text-[8px] font-bold uppercase"><i class="fa-solid fa-wand-magic-sparkles mb-1 block"></i>Fix</button>
+                        <button onclick="aiAction('blur')" class="p-4 bg-white/5 rounded-xl text-[8px] font-bold uppercase"><i class="fa-solid fa-person-rays mb-1 block"></i>Blur</button>
+                        <button onclick="showRemoveUI()" class="p-4 bg-white/5 rounded-xl text-[8px] font-bold uppercase"><i class="fa-solid fa-paintbrush mb-1 block"></i>Remove</button>
+                    </div>
+                    <button onclick="commitAI()" class="btn-apply">Process AI Action</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let canvas = document.getElementById('main-canvas');
-        let ctx = canvas.getContext('2d');
-        let img = new Image();
-        let currentTool = 'brightness';
-        let filters = { brightness: 0, contrast: 0, saturate: 100, grayscale: 0, blur: 0 };
+        const CLOUD_NAME = "dgikim3w1";
+        const UPLOAD_PRESET = "a2z_preset";
+        let publicId = "", currentAI = "enhance", painting = false, brushSize = 30;
+        let canvas = document.getElementById('mask-canvas'), ctx = canvas.getContext('2d');
 
-        function loadImage(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                img.onload = () => {
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
-                    canvas.classList.remove('hidden');
-                    document.getElementById('welcome-ui').classList.add('hidden');
-                    document.getElementById('controls').classList.remove('hidden');
-                };
-                img.src = event.target.result;
+        async function initEditor(e) {
+            const file = e.target.files[0]; if(!file) return;
+            showLoader(true);
+            const formData = new FormData();
+            formData.append("file", file); formData.append("upload_preset", UPLOAD_PRESET);
+
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
+            const data = await res.json();
+            publicId = data.public_id;
+
+            const img = document.getElementById('main-img');
+            img.src = data.secure_url;
+            img.onload = () => {
+                canvas.width = img.clientWidth; canvas.height = img.clientHeight;
+                document.getElementById('welcome-ui').classList.add('hidden');
+                document.getElementById('canvas-wrapper').classList.remove('hidden');
+                document.getElementById('controls').classList.remove('hidden');
+                showLoader(false);
             };
-            reader.readAsDataURL(file);
         }
 
-        function setTool(id, name, min, max, val, icon, btn) {
-            currentTool = id;
-            const slider = document.getElementById('main-slider');
-            slider.min = min;
-            slider.max = max;
-            slider.value = filters[id];
-            
-            document.getElementById('tool-name').innerText = name;
-            document.getElementById('tool-val').innerText = Math.round(filters[id]);
-            
-            document.querySelectorAll('.tool-item').forEach(i => i.classList.remove('active'));
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.remove('hidden');
             btn.classList.add('active');
         }
 
-        // --- INSTANT PERFORMANCE LOGIC ---
-        function updateFilter() {
-            const val = document.getElementById('main-slider').value;
-            filters[currentTool] = val;
-            document.getElementById('tool-val').innerText = Math.round(val);
+        function applyInstantFilters() {
+            const br = document.getElementById('br').value;
+            const co = document.getElementById('co').value;
+            const sa = document.getElementById('sa').value;
+            document.getElementById('v-br').innerText = br;
+            document.getElementById('v-co').innerText = co;
+            document.getElementById('v-sa').innerText = sa;
             
-            // WebGL-like Instant Filter applying via CSS for max performance
-            const filterStr = `
-                brightness(${100 + parseInt(filters.brightness)}%)
-                contrast(${100 + parseInt(filters.contrast)}%)
-                saturate(${filters.saturate}%)
-                grayscale(${filters.grayscale}%)
-                blur(${filters.blur}px)
-            `;
-            canvas.style.filter = filterStr;
+            document.getElementById('main-img').style.filter = `brightness(${100 + parseInt(br)}%) contrast(${100 + parseInt(co)}%) saturate(${sa}%)`;
         }
 
-        // --- REAL AI INTEGRATION (Stability AI / ClipDrop Pattern) ---
-        async function applyAIEnhance(btn) {
-            btn.classList.add('animate-pulse');
-            document.getElementById('ai-status').style.display = 'block';
-            document.getElementById('ai-status').innerText = 'AI RECONSTRUCTING...';
-            
-            // Note: Since this is a static frontend, real AI needs an API Key from Admin.
-            // Hum yahan WebGL Sharpening apply kar rahe hain for instant high performance feel.
-            setTimeout(() => {
-                filters.contrast = 20;
-                filters.saturate = 120;
-                updateFilter();
-                document.getElementById('ai-status').innerText = 'AI OPTIMIZED';
-                btn.classList.remove('animate-pulse');
-            }, 1500);
+        function showRemoveUI() {
+            currentAI = "remove";
+            document.getElementById('remove-settings').style.display = 'block';
+            ctx.strokeStyle = "rgba(255, 0, 0, 0.5)"; ctx.lineWidth = brushSize; ctx.lineCap = "round";
         }
 
-        function downloadResult() {
-            // Draw filters to a new canvas to save actual pixels
-            const offscreen = document.createElement('canvas');
-            offscreen.width = canvas.width;
-            offscreen.height = canvas.height;
-            const oCtx = offscreen.getContext('2d');
-            oCtx.filter = canvas.style.filter;
-            oCtx.drawImage(img, 0, 0);
-            
-            const link = document.createElement('a');
-            link.download = 'A2Z_Neural_Vision.png';
-            link.href = offscreen.toDataURL();
-            link.click();
+        function aiAction(type) {
+            currentAI = type;
+            document.getElementById('remove-settings').style.display = 'none';
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
+
+        // Painting logic
+        canvas.onmousedown = (e) => { if(currentAI==='remove') { painting = true; draw(e); } }
+        canvas.onmousemove = (e) => { if(painting) draw(e); }
+        canvas.onmouseup = () => { painting = false; ctx.beginPath(); }
+        // Mobile Touch
+        canvas.ontouchstart = (e) => { if(currentAI==='remove') { painting = true; draw(e.touches[0]); } }
+        canvas.ontouchmove = (e) => { if(painting) { e.preventDefault(); draw(e.touches[0]); } }
+        canvas.ontouchend = () => { painting = false; ctx.beginPath(); }
+
+        function draw(e) {
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke(); ctx.beginPath(); ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        async function commitAI() {
+            showLoader(true);
+            let tr = "";
+            if(currentAI === 'enhance') tr = "e_improve,e_upscale,e_sharpen:100";
+            if(currentAI === 'blur') tr = "e_background_blur:2000"; // AI Background Blur
+            if(currentAI === 'remove') {
+                const prompt = document.getElementById('remove-prompt').value || "object";
+                tr = `e_gen_remove:prompt_${prompt}`;
+            }
+
+            const finalUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${tr}/${publicId}`;
+            const img = document.getElementById('main-img');
+            img.src = finalUrl;
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                showLoader(false);
+            };
+        }
+
+        function showLoader(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
+        function downloadOutput() { window.open(document.getElementById('main-img').src.replace("/upload/", "/upload/fl_attachment/"), '_blank'); }
     </script>
 </body>
 </html>
