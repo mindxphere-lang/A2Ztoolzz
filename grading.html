@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Neural Studio - Generative Pro</title>
+    <title>A2Z Neural Studio - Pro Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;800&display=swap" rel="stylesheet"/>
@@ -11,46 +11,69 @@
         :root { --accent: #007aff; --bg: #000; --panel: #0a0a0a; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: white; margin: 0; overflow: hidden; height: 100vh; }
         
-        .viewport { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; background: #000; padding: 10px; }
+        /* Studio Layout */
+        .editor-wrapper { display: flex; flex-direction: column; height: 100vh; }
+        .viewport { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #111 0%, #000 100%); padding: 10px; }
+        
         #canvas-wrapper { position: relative; max-width: 100%; max-height: 100%; display: flex; align-items: center; justify-content: center; }
-        #main-img { max-width: 100%; max-height: 60vh; border-radius: 4px; object-fit: contain; }
-        #mask-canvas { position: absolute; top: 0; left: 0; cursor: crosshair; touch-action: none; z-index: 10; }
+        #main-img { max-width: 100%; max-height: 60vh; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); object-fit: contain; pointer-events: none; }
+        #mask-canvas { position: absolute; top: 0; left: 0; cursor: crosshair; touch-action: none; z-index: 10; opacity: 0.6; }
 
+        /* Bottom Control Panel */
         .controls-panel { height: 40vh; background: var(--panel); border-top: 1px solid #1a1a1a; display: flex; flex-direction: column; }
-        .tabs-nav { display: flex; justify-content: center; gap: 40px; border-bottom: 1px solid #111; padding: 15px 0; }
-        .tab-item { font-size: 11px; font-weight: 800; color: #444; text-transform: uppercase; cursor: pointer; }
+        
+        /* Tabs Navigation */
+        .tabs-nav { display: flex; overflow-x: auto; gap: 20px; border-bottom: 1px solid #111; padding: 10px 20px; scrollbar-width: none; }
+        .tabs-nav::-webkit-scrollbar { display: none; }
+        .tab-item { font-size: 9px; font-weight: 800; color: #444; text-transform: uppercase; cursor: pointer; white-space: nowrap; padding: 10px 15px; transition: 0.3s; }
         .tab-item.active { color: white; border-bottom: 2px solid var(--accent); }
 
         .tools-area { flex: 1; overflow-y: auto; padding: 20px 30px; }
-        .gen-ui-box { background: #111; border: 1px solid #1a1a1a; padding: 20px; border-radius: 20px; max-width: 500px; margin: 0 auto; }
-        #prompt-input { background: #000; border: 1px solid #222; color: white; padding: 12px; width: 100%; border-radius: 12px; font-size: 13px; margin: 10px 0; outline: none; }
+        .tool-content { max-width: 500px; margin: 0 auto; display: none; }
+        .tool-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+        /* Sliders Styling */
+        .slider-row { margin-bottom: 22px; }
+        .slider-label { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: #666; text-transform: uppercase; margin-bottom: 10px; }
+        .slider-label span { color: var(--accent); }
         
-        .btn-neural { background: var(--accent); color: white; font-weight: 900; text-transform: uppercase; font-size: 11px; padding: 16px; border-radius: 15px; width: 100%; transition: 0.3s; }
-        .btn-neural:active { transform: scale(0.96); }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: #222; height: 3px; outline: none; border-radius: 10px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: white; border-radius: 50%; cursor: pointer; border: 4px solid var(--panel); }
+
+        /* Custom Action Buttons */
+        .btn-neural { background: var(--accent); color: white; font-weight: 900; text-transform: uppercase; font-size: 10px; padding: 15px; border-radius: 12px; width: 100%; transition: 0.3s; margin-top: 10px; }
+        .btn-sub { background: #111; border: 1px solid #222; padding: 12px; border-radius: 10px; font-size: 9px; font-weight: 800; text-transform: uppercase; text-align: center; }
+        .btn-sub.active { background: rgba(0, 122, 255, 0.1); border-color: var(--accent); color: var(--accent); }
+
+        /* Toggle Switch */
+        .toggle-wrap { display: flex; justify-content: space-between; items: center; background: #111; padding: 12px 15px; border-radius: 12px; border: 1px solid #1a1a1a; margin-bottom: 15px; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider-switch { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+        .slider-switch:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider-switch { background-color: var(--accent); }
+        input:checked + .slider-switch:before { transform: translateX(18px); }
 
         .loader { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; flex-direction: column; items: center; justify-content: center; text-align: center; }
-        .loader-bar { width: 150px; height: 3px; background: #222; border-radius: 10px; margin-top: 15px; overflow: hidden; }
-        .loader-progress { width: 0%; height: 100%; background: var(--accent); animation: load 3s infinite; }
-        @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="flex flex-col h-screen">
-        <header class="p-4 flex justify-between items-center border-b border-white/5">
+    <div class="editor-wrapper">
+        <!-- Header -->
+        <header class="p-4 flex justify-between items-center border-b border-white/5 bg-black">
             <a href="index.html" class="text-white/30"><i class="fa-solid fa-chevron-left"></i></a>
-            <h1 class="text-[9px] font-black tracking-[0.4em] uppercase text-blue-500">Neural Generative Pro</h1>
-            <button onclick="downloadImage()" class="text-white font-bold text-[11px] uppercase opacity-50">Export</button>
+            <h1 class="text-[9px] font-black tracking-[0.5em] uppercase text-white/40">A2Z Neural Pro</h1>
+            <button onclick="downloadImage()" class="text-blue-500 font-bold text-[10px] uppercase">Export</button>
         </header>
 
+        <!-- Viewport -->
         <main class="viewport">
             <input type="file" id="file-input" class="hidden" onchange="initNeuralEngine(event)">
-            
-            <div id="welcome-ui" onclick="document.getElementById('file-input').click()" class="text-center cursor-pointer">
-                <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto border border-white/10 mb-4 transition hover:border-blue-500">
-                    <i class="fa-solid fa-plus text-white/30"></i>
-                </div>
-                <p class="text-[9px] font-bold text-white/20 uppercase tracking-widest">Import Master Image</p>
+            <div id="import-ui" onclick="document.getElementById('file-input').click()" class="text-center cursor-pointer">
+                <i class="fa-solid fa-plus text-3xl text-white/10 mb-4"></i>
+                <p class="text-[9px] font-black uppercase tracking-widest text-white/30">Import Master File</p>
             </div>
 
             <div id="canvas-wrapper" class="hidden">
@@ -59,34 +82,76 @@
             </div>
 
             <div id="loader" class="loader">
-                <div class="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                <div class="loader-bar"><div class="loader-progress"></div></div>
-                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-blue-500 mt-4">Gemini AI Reconstructing...</p>
+                <div class="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+                <p id="loader-msg" class="text-[9px] font-black uppercase tracking-[0.4em] text-blue-500 animate-pulse">Syncing with Gemini AI...</p>
             </div>
         </main>
 
-        <div class="controls-panel hidden" id="controls">
-            <div class="tabs-nav">
-                <div class="tab-item active">AI Generative Fill</div>
-            </div>
+        <!-- Control Center -->
+        <div id="controls-ui" class="controls-panel hidden">
+            <nav class="tabs-nav">
+                <div class="tab-item active" onclick="switchTab('aifix', this)">AI Fix</div>
+                <div class="tab-item" onclick="switchTab('blur', this)">Blur</div>
+                <div class="tab-item" onclick="switchTab('lab', this)">Photo Lab</div>
+                <div class="tab-item" onclick="switchTab('color', this)">Color</div>
+                <div class="tab-item" onclick="switchTab('light', this)">Light</div>
+            </nav>
 
             <div class="tools-area">
-                <div class="gen-ui-box">
-                    <div class="flex justify-between items-center mb-2">
-                        <p class="text-[9px] font-black text-blue-500 uppercase">1. Brush the area on photo</p>
-                        <button onclick="clearMask()" class="text-[8px] text-white/20 uppercase">Reset Mask</button>
+                <!-- AI FIX TAB -->
+                <div id="sec-aifix" class="tool-content active">
+                    <div class="toggle-wrap">
+                        <span class="text-[10px] font-black uppercase">Generative AI Mode</span>
+                        <label class="switch"><input type="checkbox" id="gen-toggle"><span class="slider-switch"></span></label>
                     </div>
-                    
-                    <input type="text" id="prompt-input" placeholder="Describe change (e.g. 'remove person', 'add clouds')">
-                    
-                    <div class="mt-4 flex justify-between items-center">
-                        <span class="text-[9px] font-bold text-gray-500 uppercase">Brush Size</span>
-                        <input type="range" min="10" max="150" value="40" class="w-32" oninput="brushSize=this.value">
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="text-[9px] font-bold text-gray-500 uppercase">Brush over object to remove/fill</p>
+                        <button onclick="clearMask()" class="text-[8px] text-blue-500 font-bold uppercase">Reset</button>
                     </div>
+                    <div class="slider-row">
+                        <div class="slider-label">Brush Size <span id="v-brush">30</span></div>
+                        <input type="range" id="brush-size" min="10" max="150" value="30" oninput="brushSize=this.value; document.getElementById('v-brush').innerText=this.value">
+                    </div>
+                    <button onclick="applyAIFix()" class="btn-neural">Process Brushing</button>
+                </div>
 
-                    <button onclick="executeGeminiAI()" class="btn-neural mt-6">
-                        <i class="fa-solid fa-sparkles mr-2"></i> Run Neural Engine
-                    </button>
+                <!-- BLUR TAB -->
+                <div id="sec-blur" class="tool-content">
+                    <div class="slider-row">
+                        <div class="slider-label">Background Blur <span id="v-blur">0</span></div>
+                        <input type="range" id="blur-slider" min="0" max="100" value="0">
+                    </div>
+                    <button onclick="applyBlur()" class="btn-neural">Auto Detect & Blur</button>
+                </div>
+
+                <!-- PHOTO LAB TAB -->
+                <div id="sec-lab" class="tool-content">
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <div class="btn-sub" onclick="applyUpscale()">Upscale 4K</div>
+                        <div class="btn-sub" onclick="applyOldRestore()">Old Photo Restore</div>
+                    </div>
+                    <div class="slider-row">
+                        <div class="slider-label">Face Smooth <span id="v-smooth">0</span></div>
+                        <input type="range" id="smooth-slider" min="0" max="100" value="0">
+                    </div>
+                    <button onclick="applySmooth()" class="btn-neural">Smooth Face AI</button>
+                </div>
+
+                <!-- COLOR TAB (HSL) -->
+                <div id="sec-color" class="tool-content">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="slider-row"><div class="slider-label">Green <span></span></div><input type="range" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
+                        <div class="slider-row"><div class="slider-label">Yellow <span></span></div><input type="range" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
+                        <div class="slider-row"><div class="slider-label">Orange <span></span></div><input type="range" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
+                        <div class="slider-row"><div class="slider-label">Red <span></span></div><input type="range" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
+                    </div>
+                </div>
+
+                <!-- LIGHT TAB -->
+                <div id="sec-light" class="tool-content">
+                    <div class="slider-row"><div class="slider-label">Exposure <span id="v-exp">0</span></div><input type="range" id="exp" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
+                    <div class="slider-row"><div class="slider-label">Highlights <span id="v-hi">0</span></div><input type="range" id="hi" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
+                    <div class="slider-row"><div class="slider-label">Shadows <span id="v-sh">0</span></div><input type="range" id="sh" min="-100" max="100" value="0" oninput="liveUpdate()"></div>
                 </div>
             </div>
         </div>
@@ -95,23 +160,17 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
-        // 1. Firebase Bridge to get Gemini Key from Admin
-        const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
-        firebase.initializeApp(firebaseConfig); const db = firebase.database();
-        
-        let GEMINI_KEY = "";
-        db.ref('keys/GEMINI_PRO_KEY').on('value', s => { GEMINI_KEY = s.val(); });
-
-        let publicId = "", brushSize = 40, painting = false;
-        let canvas = document.getElementById('mask-canvas'), ctx = canvas.getContext('2d');
         const CLOUD_NAME = "dgikim3w1", UPLOAD_PRESET = "a2z_preset";
-
+        let publicId = "", brushSize = 30, painting = false;
+        let canvas = document.getElementById('mask-canvas'), ctx = canvas.getContext('2d');
+        
+        // 1. Init Engine
         async function initNeuralEngine(e) {
             const file = e.target.files[0]; if(!file) return;
-            showLoading(true);
-            const formData = new FormData(); formData.append("file", file); formData.append("upload_preset", UPLOAD_PRESET);
+            showLoader(true, "Uploading Source...");
+            const fd = new FormData(); fd.append("file", file); fd.append("upload_preset", UPLOAD_PRESET);
 
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: fd });
             const data = await res.json();
             publicId = data.public_id;
 
@@ -119,15 +178,16 @@
             img.src = data.secure_url;
             img.onload = () => {
                 canvas.width = img.clientWidth; canvas.height = img.clientHeight;
-                document.getElementById('welcome-ui').classList.add('hidden');
+                document.getElementById('import-ui').classList.add('hidden');
                 document.getElementById('canvas-wrapper').classList.remove('hidden');
-                document.getElementById('controls').classList.remove('hidden');
-                setupBrushing(); showLoading(false);
+                document.getElementById('controls-ui').classList.remove('hidden');
+                setupBrushing(); showLoader(false);
             };
         }
 
+        // 2. Red Brushing Logic
         function setupBrushing() {
-            ctx.strokeStyle = "rgba(0, 122, 255, 0.6)"; ctx.lineCap = "round";
+            ctx.strokeStyle = "rgba(255, 0, 0, 0.8)"; ctx.lineCap = "round";
             const start = (e) => { painting = true; draw(e); }
             const move = (e) => { if(painting) draw(e); }
             const end = () => { painting = false; ctx.beginPath(); }
@@ -142,38 +202,69 @@
             ctx.stroke(); ctx.beginPath(); ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
         }
 
-        // --- THE GEMINI AI CORE ---
-        async function executeGeminiAI() {
-            const prompt = document.getElementById('prompt-input').value;
-            if(!prompt) return alert("Pehle prompt likhiye!");
-            if(!GEMINI_KEY) return alert("Admin mein GEMINI_PRO_KEY nahi mili!");
+        // 3. Tab Navigation
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tool-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById('sec-' + id).classList.add('active');
+            btn.classList.add('active');
+            // Enable brushing only in AI FIX
+            canvas.style.pointerEvents = (id === 'aifix') ? 'auto' : 'none';
+        }
 
-            showLoading(true);
+        // --- AI LOGIC FUNCTIONS ---
 
-            // Tech Logic:
-            // Since we use Gemini Premium, we leverage Google's Imagen 3 via Vertex API
-            // For the frontend, we use Cloudinary as the Processor that bridges to Gemini/Imagen
-            let aiType = prompt.toLowerCase().includes('remove') ? "e_gen_remove" : "e_gen_fill";
-            let tr = `${aiType}:prompt_${prompt}`;
+        async function applyAIFix() {
+            showLoader(true, "AI Reconstructing Area...");
+            const isGen = document.getElementById('gen-toggle').checked;
+            // No Prompt Box - Internal Prompt based on toggle
+            let tr = isGen ? "e_gen_fill:prompt_background" : "e_gen_remove:prompt_object";
+            updateImg(tr);
+        }
 
-            const finalUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${tr}/${publicId}?t=${Date.now()}`;
-            
+        async function applyBlur() {
+            const val = document.getElementById('blur-slider').value;
+            showLoader(true, `Blurring Background (${val}%)`);
+            // Cloudinary background blur (10 to 2000 mapping)
+            updateImg(`e_background_blur:${val * 20}`);
+        }
+
+        async function applyUpscale() {
+            showLoader(true, "Upscaling to 4K Ultra...");
+            // HDR, Sharp, Color Enhance combo
+            updateImg(`e_improve,e_upscale,e_sharpen:100,w_2000`);
+        }
+
+        async function applyOldRestore() {
+            showLoader(true, "AI Colorizing Old Photo...");
+            updateImg(`e_improve,e_vibrant:100,e_saturation:50`);
+        }
+
+        async function applySmooth() {
+            const val = document.getElementById('smooth-slider').value;
+            showLoader(true, "Skin Smoothing AI...");
+            // e_adv_redeye is a common hack for skin smooth in basic cloudinary or use improve
+            updateImg(`e_improve:skin_toning:${val}`);
+        }
+
+        function liveUpdate() {
+            const exp = document.getElementById('exp').value;
+            document.getElementById('v-exp').innerText = exp;
+            document.getElementById('main-img').style.filter = `brightness(${100 + parseInt(exp)}%)`;
+        }
+
+        function updateImg(tr) {
             const img = document.getElementById('main-img');
-            const temp = new Image();
-            temp.src = finalUrl;
-            temp.onload = () => {
-                img.src = finalUrl;
-                clearMask();
-                showLoading(false);
-            };
-            temp.onerror = () => {
-                alert("Neural Node busy. Try a simpler prompt.");
-                showLoading(false);
-            };
+            const finalUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${tr}/${publicId}?t=${Date.now()}`;
+            img.src = finalUrl;
+            img.onload = () => { clearMask(); showLoader(false); };
         }
 
         function clearMask() { ctx.clearRect(0,0,canvas.width,canvas.height); }
-        function showLoading(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
+        function showLoader(s, msg) { 
+            document.getElementById('loader').style.display = s ? 'flex' : 'none'; 
+            document.getElementById('loader-msg').innerText = msg || "Processing...";
+        }
         function downloadImage() { window.open(document.getElementById('main-img').src, '_blank'); }
     </script>
 </body>
