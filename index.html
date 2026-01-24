@@ -3,82 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Neural Hub</title>
+    <title>A2Z STUDIO - Neural Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
     <style>
         :root { --neon: #ff0055; --bg: #05000a; }
-        body { 
-            font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden;
-            background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
-        }
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 1.5rem;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 15px 10px; min-height: 140px; text-decoration: none;
-        }
-        .glass-card:active { transform: scale(0.92); border-color: var(--neon); background: rgba(255, 0, 85, 0.1); }
-        #m-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-        @media (min-width: 768px) { .glass-card:hover { border-color: var(--neon); transform: translateY(-5px); } }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; overflow-x: hidden; background: radial-gradient(circle at 20% 0%, #2a0015, var(--bg) 80%); background-attachment: fixed; }
+        .glass-card { background: rgba(255, 0, 85, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 0, 85, 0.15); transition: 0.3s; }
+        .neon-text { text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon); }
+        #m-screen { position: fixed; inset: 0; z-index: 2000; background: black; display: none; align-items: center; justify-content: center; text-align: center; }
+        #timer-bar { transition: stroke-dashoffset 1s linear; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <div id="m-overlay">
-        <div class="animate-pulse mb-6"><i class="fa-solid fa-screwdriver-wrench text-4xl text-pink-500"></i></div>
-        <h1 class="text-2xl font-black uppercase tracking-tighter">System Offline</h1>
-        <p class="text-[10px] text-gray-500 uppercase tracking-[0.3em] mt-3" id="m-msg">Neural Nodes Updating...</p>
+    <!-- Maintenance Screen -->
+    <div id="m-screen">
+        <div class="p-10">
+            <div class="w-20 h-20 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-8"></div>
+            <h1 class="text-3xl font-black neon-text text-yellow-500 uppercase italic mb-4">Maintenance</h1>
+            <p id="m-msg-display" class="text-white/50 text-xs tracking-widest uppercase font-bold"></p>
+        </div>
     </div>
 
-    <div class="max-w-4xl mx-auto px-5 py-10">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl font-black italic tracking-tighter mb-1">A2Z <span class="text-pink-600">STUDIO</span></h1>
-            <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.4em]">Neural Hub v2.0</p>
+    <!-- Ad Modal -->
+    <div id="ad-modal" class="fixed inset-0 z-[1500] bg-black/95 backdrop-blur-3xl hidden items-center justify-center p-6">
+        <div class="glass-card max-w-sm w-full p-10 rounded-[3rem] text-center">
+            <h2 class="text-xl font-black uppercase italic mb-4">Unlocking Studio</h2>
+            <div class="relative w-24 h-24 mx-auto mb-10">
+                <svg class="w-full h-full transform -rotate-90">
+                    <circle cx="48" cy="48" r="40" stroke="rgba(255,0,85,0.1)" stroke-width="8" fill="transparent" />
+                    <circle id="timer-bar" cx="48" cy="48" r="40" stroke="#ff0055" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="0" />
+                </svg>
+                <span id="timer-text" class="absolute inset-0 flex items-center justify-center font-black text-2xl">10</span>
+            </div>
+            <button id="ad-btn" disabled class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/20">Wait...</button>
+        </div>
+    </div>
+
+    <nav class="p-5 border-b border-white/5 flex justify-between items-center glass-card sticky top-0 z-[100]">
+        <h1 class="text-lg font-black italic uppercase tracking-tighter"><span class="text-pink-600">A2Z</span> STUDIO</h1>
+        <div id="status-dot" class="w-2 h-2 rounded-full bg-green-500"></div>
+    </nav>
+
+    <div class="max-w-5xl mx-auto w-full px-5 py-10">
+        <header class="text-center mb-16">
+            <h2 class="text-6xl md:text-9xl font-black neon-text italic uppercase tracking-tighter">NEURAL HUB</h2>
         </header>
 
-        <div id="app-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            <div class="col-span-full text-center py-20 opacity-30">
-                <i class="fa-solid fa-spinner fa-spin text-3xl mb-4"></i>
-                <p class="text-[10px] font-black uppercase">Syncing...</p>
-            </div>
+        <!-- Dynamic Grid -->
+        <div id="app-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+            <!-- Apps will load here from Firebase -->
         </div>
-
-        <footer class="mt-20 text-center border-t border-white/5 pt-10">
-            <p class="text-[8px] font-black text-white/10 uppercase tracking-[0.3em]">Built for Creators</p>
-        </footer>
     </div>
+
+    <div id="header-script-box"></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script>
         const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
-        firebase.initializeApp(firebaseConfig); const db = firebase.database();
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
+        // Load Settings & Maintenance
         db.ref('settings').on('value', (s) => {
-            const d = s.val() || {}; document.getElementById('m-overlay').style.display = d.maintenanceMode ? 'flex' : 'none';
-            if(d.maintenanceMsg) document.getElementById('m-msg').innerText = d.maintenanceMsg;
+            const keys = s.val() || {};
+            if(keys.maintenanceMode) {
+                document.getElementById('m-screen').style.display = 'flex';
+                document.getElementById('m-msg-display').innerText = keys.maintenanceMsg || "Updating Nodes...";
+            } else {
+                document.getElementById('m-screen').style.display = 'none';
+                if (!sessionStorage.getItem('adDone')) startAdTimer();
+            }
+            if(keys.headerScript) document.getElementById('header-script-box').innerHTML = keys.headerScript;
         });
 
-        db.ref('apps').orderByChild('order').on('value', (snapshot) => {
-            const grid = document.getElementById('app-grid'); grid.innerHTML = '';
-            snapshot.forEach((child) => {
-                const app = child.val(), id = child.key;
-                if (app.enabled) {
-                    const isImg = app.icon && (app.icon.startsWith('http') || app.icon.includes('/'));
-                    const iconHTML = isImg ? `<img src="${app.icon}" class="w-full h-full object-cover rounded-xl">` : `<i class="fa-solid ${app.icon || 'fa-cube'} text-xl text-pink-500"></i>`;
-                    
-                    const card = document.createElement('a');
-                    card.href = app.path; if(app.path.startsWith('http')) card.target = "_blank";
-                    card.className = "glass-card";
-                    card.onclick = () => db.ref('stats/' + id).transaction(c => (c || 0) + 1);
-                    card.innerHTML = `<div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mb-3 border border-white/5 overflow-hidden">${iconHTML}</div><h3 class="text-[10px] font-black uppercase tracking-tight text-white text-center leading-tight mb-1">${app.name}</h3><p class="text-[8px] text-white/30 uppercase text-center line-clamp-2 px-2">${app.desc || 'Active'}</p>`;
-                    grid.appendChild(card);
-                }
+        // Load Apps Dynamically
+        db.ref('apps').orderByChild('order').on('value', (s) => {
+            const grid = document.getElementById('app-grid');
+            grid.innerHTML = '';
+            s.forEach((child) => {
+                const app = child.val();
+                if(!app.enabled) return;
+                
+                const isImg = app.icon.startsWith('http');
+                const iconHtml = isImg ? `<img src="${app.icon}" class="w-10 h-10 object-cover mx-auto mb-4 rounded-lg">` : `<i class="fa-solid ${app.icon} text-3xl mb-4 text-pink-500"></i>`;
+                
+                grid.innerHTML += `
+                    <a href="${app.path}" class="glass-card p-8 rounded-[2rem] text-center active:scale-95 transition block">
+                        ${iconHtml}
+                        <h3 class="text-[9px] font-black uppercase tracking-widest">${app.name}</h3>
+                    </a>
+                `;
             });
         });
+
+        function startAdTimer() {
+            const modal = document.getElementById('ad-modal');
+            const btn = document.getElementById('ad-btn');
+            const bar = document.getElementById('timer-bar');
+            const text = document.getElementById('timer-text');
+            let count = 10; modal.classList.replace('hidden', 'flex');
+            const int = setInterval(() => {
+                count--; text.innerText = count;
+                bar.style.strokeDashoffset = 251.2 - (251.2 * count / 10);
+                if(count <= 0) {
+                    clearInterval(int);
+                    btn.disabled = false; btn.innerText = "CONTINUE TO HUB";
+                    btn.className = "w-full py-4 rounded-2xl bg-pink-600 text-[10px] font-black uppercase text-white shadow-[0_0_20px_#ff0055]";
+                    btn.onclick = () => { sessionStorage.setItem('adDone', 'true'); modal.classList.replace('flex', 'hidden'); };
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>
