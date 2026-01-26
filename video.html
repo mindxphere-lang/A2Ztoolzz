@@ -2,168 +2,350 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>A2Z Studio - Vortex Downloader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>UltraSaver - Neural Video Engine</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+
     <style>
-        :root { --neon-red: #ff0055; --bg: #05000a; }
-        body { 
-            font-family: 'Montserrat', sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden;
-            background: radial-gradient(circle at 50% 0%, #2a0015, var(--bg) 85%); background-attachment: fixed;
+        :root {
+            --primary: #00d2ff;
+            --secondary: #928DAB;
+            --dark: #05000a;
+            --neon: #00d2ff;
         }
 
-        .vortex-wrapper { position: relative; width: 250px; height: 250px; margin: 30px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .black-hole {
-            position: relative; width: 150px; height: 150px; background: black; border-radius: 50%;
-            box-shadow: 0 0 50px 10px var(--neon-red), inset 0 0 30px var(--neon-red);
-            z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center;
+        body {
+            background-color: var(--dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 0, 85, 0.05) 0%, transparent 40%);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
         }
-        .black-hole span { font-size: 11px; font-weight: 900; letter-spacing: 2px; color: white; text-shadow: 0 0 10px var(--neon-red); }
-        .vortex-ring { position: absolute; inset: 0; border: 2px dashed rgba(255, 0, 85, 0.3); border-radius: 50%; animation: spin 8s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        .hyper-pulse { animation: hyper 0.5s infinite alternate; }
-        @keyframes hyper { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
 
-        .video-box { position: relative; width: 100%; border-radius: 2rem; overflow: hidden; background: #000; border: 1px solid rgba(255, 0, 85, 0.3); }
-        .dl-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 1.5rem; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; margin-top: 10px;}
-        .btn-save { background: linear-gradient(45deg, #ff0055, #ff4d88); padding: 10px 25px; border-radius: 12px; font-size: 10px; font-weight: 900; color: white; }
-        
-        input#manual-url { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,0,85,0.2); border-radius: 15px; width: 100%; padding: 15px; color: white; font-size: 12px; margin-bottom: 20px; outline: none; }
-        input#manual-url:focus { border-color: var(--neon-red); }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .neon-border {
+            position: relative;
+            z-index: 1;
+        }
+
+        .neon-border::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, var(--primary), #ff0055, var(--primary));
+            background-size: 400%;
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.3;
+            border-radius: 2.6rem;
+            animation: moveGradient 10s linear infinite;
+        }
+
+        @keyframes moveGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .input-glow:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
+        }
+
+        .btn-premium {
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-premium:active {
+            transform: scale(0.95);
+        }
+
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            position: relative;
+        }
+
+        .loader-ring::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-bottom-color: #ff0055;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .dl-progress-container {
+            background: rgba(255,255,255,0.05);
+            height: 6px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .dl-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            width: 0%;
+            transition: 0.3s;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .platform-chip {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            transition: 0.3s;
+        }
+
+        .chip-active {
+            background: rgba(0, 210, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.1);
+        }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="p-6 overflow-x-hidden">
 
-    <nav class="p-6"><a href="index.html" class="text-pink-500 font-black uppercase text-[10px]"><i class="fa-solid fa-arrow-left mr-2"></i> Back</a></nav>
-
-    <div class="max-w-xl mx-auto px-6 pb-20">
-        <!-- Manual Input as Fallback -->
-        <input type="text" id="manual-url" placeholder="Paste link here if Auto-Paste fails...">
-
-        <div class="vortex-wrapper" onclick="startProcess()">
-            <div class="vortex-ring"></div>
-            <div class="black-hole" id="bh-core"><span id="bh-text">TAP TO<br>PROCESS</span></div>
+    <!-- Navigation -->
+    <nav class="max-w-2xl mx-auto flex justify-between items-center mb-12">
+        <a href="index.html" class="group flex items-center gap-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/10 hover:border-cyan-500/50 transition-all">
+            <i class="fa-solid fa-arrow-left text-cyan-400 group-hover:-translate-x-1 transition-transform"></i>
+            <span class="text-[10px] font-black uppercase tracking-widest">Studio Hub</span>
+        </a>
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span class="text-[9px] font-bold text-white/30 uppercase tracking-tighter">Engine v22.0 Online</span>
         </div>
+    </nav>
 
-        <div id="status-msg" class="text-center text-[10px] font-black uppercase tracking-widest text-pink-500/40 mb-10">System Ready</div>
+    <main class="max-w-xl mx-auto space-y-12">
+        
+        <!-- Branding -->
+        <header class="text-center space-y-2">
+            <h1 class="text-6xl font-black italic tracking-tighter uppercase">
+                Ultra<span class="text-transparent" style="-webkit-text-stroke: 1px var(--primary);">Saver</span>
+            </h1>
+            <p class="text-[10px] text-white/20 font-bold uppercase tracking-[0.5em]">Neural Video Extraction Node</p>
+        </header>
 
-        <div id="v-results" class="hidden space-y-6">
-            <div class="video-box">
-                <video id="v-player" controls playsinline class="w-full aspect-video bg-black"></video>
+        <!-- Search Section -->
+        <div class="neon-border">
+            <div class="glass-card p-2 flex items-center input-glow transition-all">
+                <div class="pl-5 text-white/20">
+                    <i class="fa-solid fa-link"></i>
+                </div>
+                <input type="text" id="v-url" oninput="detectPlatform()"
+                    class="bg-transparent flex-1 px-4 py-5 outline-none text-sm font-semibold placeholder:text-white/10" 
+                    placeholder="Paste link here...">
+                <button onclick="fetchVideoData()" class="btn-premium px-8 py-5 rounded-[1.8rem] text-[10px] text-white shadow-xl">
+                    Extract
+                </button>
             </div>
-            <div id="v-links" class="space-y-2"></div>
         </div>
-    </div>
 
+        <!-- Platform Indicators -->
+        <div class="flex flex-wrap justify-center gap-3">
+            <div id="chip-yt" class="platform-chip"><i class="fa-brands fa-youtube mr-2"></i>YouTube</div>
+            <div id="chip-ins" class="platform-chip"><i class="fa-brands fa-instagram mr-2"></i>Instagram</div>
+            <div id="chip-snap" class="platform-chip"><i class="fa-brands fa-snapchat mr-2"></i>Snapchat</div>
+            <div id="chip-tik" class="platform-chip"><i class="fa-brands fa-tiktok mr-2"></i>TikTok</div>
+        </div>
+
+        <!-- Loader State -->
+        <div id="v-loader" class="hidden flex flex-col items-center py-12 space-y-6">
+            <div class="loader-ring"></div>
+            <div class="text-center">
+                <p class="text-xs font-black uppercase tracking-widest text-cyan-400 animate-pulse">Capturing Neural Data</p>
+                <p class="text-[9px] text-white/20 uppercase mt-1">Bypassing restrictions...</p>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="v-res" class="hidden space-y-6 animate-fade-in">
+            <div class="glass-card overflow-hidden border border-white/5 shadow-2xl">
+                <div class="relative group">
+                    <img id="v-thumb" class="w-full aspect-video object-cover brightness-75 group-hover:brightness-100 transition-all duration-500" src="">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                    <div class="absolute bottom-6 left-6 right-6">
+                        <h3 id="v-title" class="text-lg font-black uppercase truncate leading-tight drop-shadow-lg">Video Title</h3>
+                    </div>
+                </div>
+                
+                <div class="p-8 space-y-6">
+                    <div id="v-links" class="space-y-4">
+                        <!-- Quality Items Will Inject Here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scripts remain same as previous perfect version -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
-        firebase.initializeApp(firebaseConfig); 
-        const db = firebase.database();
-        let keys = {}; 
-        db.ref('settings').on('value', (s) => { keys = s.val() || {}; console.log("Keys Loaded:", keys); });
+        // Configuration
+        const config = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
+        firebase.initializeApp(config); const db = firebase.database();
+        
+        let apiBase = ""; 
+        db.ref('settings/myDownloaderUrl').on('value', s => { apiBase = s.val(); });
 
-        async function startProcess() {
-            const manualUrl = document.getElementById('manual-url').value;
-            let url = manualUrl;
+        async function fetchVideoData() {
+            const url = document.getElementById('v-url').value;
+            if(!url) return;
 
-            // Try Auto-Paste if manual is empty
-            if (!url) {
-                try {
-                    url = await navigator.clipboard.readText();
-                } catch (err) {
-                    console.log("Clipboard access denied");
-                }
-            }
-
-            if (!url || !url.startsWith('http')) {
-                alert("Please paste a valid link first!");
-                return;
-            }
-
-            if (!keys.videoKey) {
-                alert("API Key missing! Check Admin Panel.");
-                return;
-            }
-
-            const core = document.getElementById('bh-core'), text = document.getElementById('bh-text'), statusMsg = document.getElementById('status-msg');
-            
-            core.classList.add('hyper-pulse');
-            text.innerHTML = "FETCHING...";
-            statusMsg.innerText = "Connecting to RapidAPI...";
+            const loader = document.getElementById('v-loader');
+            const resBox = document.getElementById('v-res');
+            loader.classList.remove('hidden');
+            resBox.classList.add('hidden');
 
             try {
-                const res = await fetch(`https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'X-RapidAPI-Key': keys.videoKey, 
-                        'X-RapidAPI-Host': 'social-download-all-in-one.p.rapidapi.com' 
-                    },
-                    body: JSON.stringify({ url: url })
-                });
-                
-                const data = await res.json();
-                console.log("API Response:", data);
+                const response = await fetch(`${apiBase}/extract?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
 
-                if (data.medias && data.medias.length > 0) {
-                    renderResults(data);
-                    text.innerHTML = "SUCCESS";
-                    statusMsg.innerText = "Video Decrypted!";
-                } else {
-                    throw new Error(data.message || "Invalid Response");
-                }
-            } catch (e) { 
-                text.innerHTML = "ERROR"; 
-                statusMsg.innerText = "Fetch Failed. Check API Key or Link.";
-                alert("Error: " + e.message);
+                if(data.medias && data.medias.length > 0) {
+                    displayResults(data);
+                    resBox.classList.remove('hidden');
+                } else { throw new Error(); }
+            } catch (e) {
+                alert("Server busy! Try again.");
             } finally {
-                core.classList.remove('hyper-pulse');
+                loader.classList.add('hidden');
             }
         }
 
-        function renderResults(data) {
-            const player = document.getElementById('v-player');
-            const linksBox = document.getElementById('v-links');
-            player.src = data.medias[0].url; 
-            linksBox.innerHTML = '';
+        function displayResults(data) {
+            document.getElementById('v-thumb').src = data.thumbnail;
+            document.getElementById('v-title').innerText = data.title;
+            const list = document.getElementById('v-links');
+            list.innerHTML = '';
 
-            data.medias.forEach(m => {
-                if (m.extension === "mp4") {
-                    const card = document.createElement('div');
-                    card.className = "dl-card";
-                    card.innerHTML = `
-                        <p class="text-[10px] font-black uppercase">${m.quality}</p>
-                        <button onclick="downloadVideo('${m.url}')" class="btn-save">DOWNLOAD</button>
-                    `;
-                    linksBox.appendChild(card);
-                }
+            data.medias.forEach((m, index) => {
+                const btnId = `dl-${index}`;
+                list.innerHTML += `
+                    <div class="space-y-3 bg-white/5 p-5 rounded-[1.8rem] border border-white/5 hover:border-cyan-500/30 transition-all">
+                        <div class="flex justify-between items-center">
+                            <div class="space-y-1">
+                                <p class="text-[10px] font-black uppercase text-cyan-400 tracking-wider">${m.quality}</p>
+                                <p class="text-[9px] font-bold text-white/20 uppercase">Format: ${m.quality.includes('mp4') ? 'VIDEO' : 'MEDIA'}</p>
+                            </div>
+                            <button id="${btnId}" onclick="forceDownload('${m.url}', 'A2Z_${Date.now()}.mp4', '${btnId}')" 
+                                class="btn-premium px-6 py-3 rounded-2xl text-[9px] text-white">
+                                Save Link
+                            </button>
+                        </div>
+                        <div id="prog-parent-${btnId}" class="hidden space-y-2">
+                            <div class="dl-progress-container">
+                                <div id="bar-${btnId}" class="dl-progress-bar"></div>
+                            </div>
+                            <div class="flex justify-between text-[8px] font-black text-white/20 uppercase">
+                                <span>Status: Downloading</span>
+                                <span id="pct-${btnId}">0%</span>
+                            </div>
+                        </div>
+                    </div>`;
             });
-            document.getElementById('v-results').classList.remove('hidden');
         }
 
-        async function downloadVideo(videoUrl) {
-            const statusMsg = document.getElementById('status-msg');
-            statusMsg.innerText = "Starting Download...";
+        async function forceDownload(url, filename, btnId) {
+            const btn = document.getElementById(btnId);
+            const bar = document.getElementById(`bar-${btnId}`);
+            const pctText = document.getElementById(`pct-${btnId}`);
+            const progParent = document.getElementById(`prog-parent-${btnId}`);
+            
+            btn.innerText = "CAPTURING";
+            btn.disabled = true;
+            progParent.classList.remove('hidden');
+
             try {
-                const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(videoUrl);
-                const res = await fetch(proxyUrl);
-                const blob = await res.blob();
-                const url = window.URL.createObjectURL(blob);
+                const response = await fetch(url);
+                const reader = response.body.getReader();
+                const contentLength = +response.headers.get('Content-Length');
+                let receivedLength = 0;
+                let chunks = [];
+
+                while(true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    chunks.push(value);
+                    receivedLength += value.length;
+                    
+                    if (contentLength) {
+                        const pct = Math.floor((receivedLength / contentLength) * 100);
+                        bar.style.width = pct + "%";
+                        pctText.innerText = pct + "%";
+                    }
+                }
+
+                const blob = new Blob(chunks);
+                const blobUrl = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = url;
-                a.download = `A2Z_Vortex_${Date.now()}.mp4`;
+                a.href = blobUrl;
+                a.download = filename;
                 document.body.appendChild(a);
                 a.click();
-                window.URL.revokeObjectURL(url);
-                statusMsg.innerText = "Download Complete!";
-            } catch (err) {
-                window.open(videoUrl, '_blank');
+                
+                setTimeout(() => { URL.revokeObjectURL(blobUrl); document.body.removeChild(a); }, 100);
+                btn.innerText = "SAVED";
+            } catch (e) {
+                window.open(url, '_blank');
+                btn.innerText = "OPENED";
             }
+
+            setTimeout(() => {
+                btn.innerText = "SAVE LINK";
+                btn.disabled = false;
+                progParent.classList.add('hidden');
+            }, 3000);
+        }
+
+        function detectPlatform() {
+            const url = document.getElementById('v-url').value.toLowerCase();
+            const chips = {
+                'chip-yt': 'youtube',
+                'chip-ins': 'instagram',
+                'chip-snap': 'snapchat',
+                'chip-tik': 'tiktok'
+            };
+            
+            Object.keys(chips).forEach(id => {
+                const el = document.getElementById(id);
+                if (url.includes(chips[id])) el.classList.add('chip-active');
+                else el.classList.remove('chip-active');
+            });
         }
     </script>
 </body>
