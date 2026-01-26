@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>CINEMA — Neural Media Streamer</title>
+    <title>CINEMA — Pure Neural Streaming</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -13,7 +13,7 @@
         :root { --primary: #e11d48; --bg: #050505; }
         body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
 
-        /* Movie UI Grid */
+        /* Movie Grid UI */
         .movie-card { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
         .movie-card:hover { transform: scale(1.05); }
         .movie-card img { border-radius: 2rem; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
@@ -46,7 +46,7 @@
 </head>
 <body class="pb-24">
 
-    <!-- Sticky Header -->
+    <!-- Navbar -->
     <nav class="sticky top-0 z-50 p-6 glass-nav flex justify-between items-center">
         <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 active:scale-90 transition">
             <i class="fa-solid fa-chevron-left text-sm"></i>
@@ -58,7 +58,7 @@
     <div class="max-w-7xl mx-auto p-6 space-y-12">
         <header>
             <h2 class="text-4xl font-black uppercase tracking-tight">Stream Hub</h2>
-            <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.5em] mt-1">Direct Cloud API Streaming</p>
+            <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.5em] mt-1">Direct Cloud Node Streaming</p>
         </header>
 
         <!-- Movie Grid -->
@@ -74,34 +74,34 @@
             
             <header class="mb-10 text-center">
                 <h3 id="sel-title" class="text-2xl font-black uppercase italic tracking-tight mb-2">Movie Title</h3>
-                <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">Connecting to G-Drive API Node...</p>
+                <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">Resolving Media Stream...</p>
             </header>
 
             <div class="space-y-4">
-                <!-- Native Browser / iPhone Quick Play -->
+                <!-- 1. Native Web Player -->
                 <button onclick="launchInternal()" class="player-opt">
                     <div class="w-14 h-14 bg-rose-600/20 rounded-2xl flex items-center justify-center text-rose-500 text-xl"><i class="fa-solid fa-play"></i></div>
-                    <div><p class="text-base font-bold uppercase tracking-tight">Native Player</p><p class="text-[10px] opacity-30 uppercase font-medium">Auto Fullscreen • Bypass Virus Warning</p></div>
+                    <div><p class="text-base font-bold uppercase tracking-tight">Web Browser</p><p class="text-[10px] opacity-30 uppercase font-medium">Standard Playback • iPhone Optimized</p></div>
                 </button>
 
-                <!-- VLC Player -->
+                <!-- 2. VLC Media Player -->
                 <button onclick="launchVLC()" class="player-opt">
                     <div class="w-14 h-14 bg-orange-500/20 rounded-2xl flex items-center justify-center text-orange-500 text-xl"><i class="fa-solid fa-cone-striped"></i></div>
-                    <div><p class="text-base font-bold uppercase tracking-tight">VLC Media Player</p><p class="text-[10px] opacity-30 uppercase font-medium">Universal Support • Multi-Audio Tracks</p></div>
+                    <div><p class="text-base font-bold uppercase tracking-tight">VLC Media Player</p><p class="text-[10px] opacity-30 uppercase font-medium">Native App • Dual-Audio Support</p></div>
                 </button>
 
-                <!-- MX Player -->
+                <!-- 3. MX Player -->
                 <button onclick="launchMX()" class="player-opt">
                     <div class="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-500 text-xl"><i class="fa-solid fa-bolt"></i></div>
-                    <div><p class="text-base font-bold uppercase tracking-tight">MX Player Pro</p><p class="text-[10px] opacity-30 uppercase font-medium">Hardware+ Acceleration • Android</p></div>
+                    <div><p class="text-base font-bold uppercase tracking-tight">MX Player Pro</p><p class="text-[10px] opacity-30 uppercase font-medium">HW+ Acceleration • Android Only</p></div>
                 </button>
             </div>
 
-            <!-- Professional Instruction -->
+            <!-- Professional Disclaimer -->
             <div class="mt-10 p-6 bg-white/[0.03] rounded-3xl border border-white/5">
                 <p class="text-[10px] leading-relaxed font-bold text-white/40 text-center uppercase tracking-widest leading-loose">
                     <i class="fa-solid fa-circle-info mr-2 text-rose-500"></i>
-                    For an enhanced cinematic experience with <b>Dual Audio (Hindi/English)</b> and subtitles, we highly recommend using <b>VLC</b> or <b>MX Player</b>. The native player is optimized for fast web streaming.
+                    To access <b>Dual-Audio (Hindi/English)</b> tracks and customized subtitles, please utilize <b>VLC</b> or <b>MX Player</b>. The native player is designed for instant browser-based playback.
                 </p>
             </div>
         </div>
@@ -118,6 +118,7 @@
         </div>
     </div>
 
+    <!-- SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
@@ -127,19 +128,19 @@
         
         let selectedId = "", selectedTitle = "", workerUrl = "";
 
-        // 1. Fetch Proxy Worker URL from Settings (Aapka gdrive-proxy link yahan save karein)
+        // 1. Fetch Cloudflare URL from Firebase
         db.ref('settings/workerUrl').on('value', s => {
             workerUrl = s.val() || "https://gdrive-proxy.mindxphere.workers.dev/";
         });
 
-        // 2. Load Movies
+        // 2. Load Movies Grid
         db.ref('movies').on('value', s => {
             const grid = document.getElementById('movie-grid'); grid.innerHTML = '';
             s.forEach(child => {
                 const m = child.val();
                 grid.innerHTML += `
                     <div class="movie-card" onclick="openSelector('${m.driveId}', '${m.title}')">
-                        <div class="aspect-[2/3] overflow-hidden"><img src="${m.poster}" class="w-full h-full object-cover"></div>
+                        <div class="aspect-[2/3] overflow-hidden"><img src="${m.poster}" class="w-full h-full object-cover shadow-2xl"></div>
                         <div class="mt-4"><h4 class="text-[11px] font-black uppercase truncate tracking-wide">${m.title}</h4></div>
                     </div>`;
             });
@@ -153,13 +154,13 @@
 
         function closeSelector() { document.getElementById('selector-sheet').style.display = 'none'; }
 
-        // --- THE ENGINE: API PROXY CONSTRUCTOR ---
+        // --- THE MAGIC ENGINE: REDIRECT STREAM CONSTRUCTOR ---
         function getStreamURL() {
-            // Hitting your worker which returns a pure video stream
-            return `${workerUrl}?id=${selectedId}`;
+            // Adding a fake extension to help VLC/Mobile recognize it as a video stream
+            return `${workerUrl}?id=${selectedId}&type=video.mkv`;
         }
 
-        // 1. Native Player (iPhone/Web Optimized)
+        // 1. NATIVE PLAYER (iPhone/Web)
         function launchInternal() {
             closeSelector();
             const view = document.getElementById('player-view');
@@ -172,21 +173,29 @@
             video.play();
         }
 
-        // 2. VLC Media Player (Universal)
+        // 2. VLC PLAYER (AGGRESSIVE MOBILE FIX)
         function launchVLC() {
-            const url = getStreamURL();
-            // VLC x-callback to ensure it treats it as a stream, not a file
-            window.location.href = `vlc-x-callback://x-callback-url/stream?url=${encodeURIComponent(url)}`;
-            
-            // Android Fallback
-            setTimeout(() => { window.location.href = `vlc://${url}`; }, 1000);
+            const stream = getStreamURL();
+            const encodedUrl = encodeURIComponent(stream);
+
+            // iOS FIX: iPhone VLC needs x-callback to force stream mode
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                window.location.href = `vlc-x-callback://x-callback-url/stream?url=${encodedUrl}`;
+            } 
+            // ANDROID FIX: Direct vlc:// protocol
+            else {
+                window.location.href = `vlc://${stream}`;
+            }
+
+            // Global Fallback
+            setTimeout(() => { window.location.href = `vlc://${stream}`; }, 1500);
             closeSelector();
         }
 
-        // 3. MX Player (Android Intent)
+        // 3. MX PLAYER (Android Intent)
         function launchMX() {
-            const url = getStreamURL();
-            const intent = `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;S.title=${selectedTitle};end`;
+            const stream = getStreamURL();
+            const intent = `intent:${stream}#Intent;package=com.mxtech.videoplayer.ad;S.title=${selectedTitle};end`;
             window.location.href = intent;
             closeSelector();
         }
