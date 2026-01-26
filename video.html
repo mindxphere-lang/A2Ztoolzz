@@ -3,160 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>EXAR | Neural Extraction Terminal</title>
+    <title>EXAR — Pure Extraction</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Inter:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
 
     <style>
-        :root { --accent: #ffffff; --bg: #000000; }
-        body { 
-            background: var(--bg); 
-            color: white; 
-            font-family: 'JetBrains Mono', monospace; 
-            overflow-x: hidden; 
-            transition: background 1s ease;
-        }
-        
-        /* Cyber-Grid Background */
-        .grid-overlay {
-            position: fixed; inset: 0;
-            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
-            pointer-events: none; z-index: 1;
+        :root {
+            --primary: #6366f1;
+            --accent: #f43f5e;
+            --bg: #030308;
         }
 
-        .tech-card {
-            background: rgba(10, 10, 10, 0.8);
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 0.5rem; /* Industrial look */
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        /* Glowing Status */
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 8px; }
-        .glow-red { background: #ff4444; box-shadow: 0 0 10px #ff4444; }
-
-        /* Terminal Style Logs */
-        #console {
-            font-size: 9px;
-            color: #555;
-            height: 60px;
-            overflow: hidden;
-            line-height: 1.5;
+        /* 1. MOVING AURORA BACKGROUND */
+        .aurora {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; filter: blur(100px); opacity: 0.6;
+        }
+        .blob {
+            position: absolute; width: 500px; height: 500px; border-radius: 50%;
+            animation: move 20s infinite alternate;
+        }
+        @keyframes move {
+            0% { transform: translate(-20%, -20%) scale(1); }
+            100% { transform: translate(50%, 40%) scale(1.5); }
         }
 
-        .input-box {
-            background: #0a0a0a;
-            border: 1px solid #222;
+        /* 2. BREATHING LOGO */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(99,102,241,0.2)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(99,102,241,0.5)); }
+        }
+        .exar-logo { animation: breathe 4s ease-in-out infinite; }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 2.5rem;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .input-pill {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: 0.4s;
         }
-        .input-box:focus-within { border-color: #fff; box-shadow: 0 0 30px rgba(255,255,255,0.05); }
-
-        /* Loading Scan Line */
-        .scanline {
-            position: absolute; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent);
-            top: -100%; animation: scan 3s linear infinite;
+        .input-pill:focus-within {
+            transform: scale(1.05) translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        @keyframes scan { 0% { top: -100%; } 100% { top: 100%; } }
 
-        .btn-capture {
-            background: #fff; color: #000;
-            font-weight: 800; font-size: 10px;
-            letter-spacing: 2px; transition: 0.3s;
+        .btn-magic {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 100px;
+            font-weight: 800;
+            transition: 0.3s;
+            position: relative; overflow: hidden;
         }
-        .btn-capture:hover { transform: scale(1.05); }
+        .btn-magic::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg); animation: shine 3s infinite;
+        }
+        @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
 
-        .platform-active { opacity: 1 !important; filter: drop-shadow(0 0 8px currentColor); }
-        
-        .animate-glitch { animation: glitch 0.3s ease; }
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
+        /* 3. STAGGERED REVEAL ANIMATION */
+        .reveal-item { opacity: 0; transform: translateY(30px); animation: fadeInUp 0.8s forwards; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* 4. SKELETON LOADER */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-move 1.5s infinite linear;
         }
+        @keyframes skeleton-move { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .dl-icon-anim { animation: dl-bob 1s infinite; }
+        @keyframes dl-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+
+        .progress-bar { height: 4px; background: linear-gradient(90deg, #6366f1, #f43f5e); border-radius: 10px; width: 0%; transition: 0.3s; }
     </style>
 </head>
-<body class="p-4 md:p-10">
-    <div class="grid-overlay"></div>
+<body class="p-6">
+    <!-- Aurora background elements -->
+    <div class="aurora">
+        <div class="blob" style="background: #6366f1; left: -10%; top: -10%;"></div>
+        <div class="blob" style="background: #f43f5e; right: -10%; bottom: -10%; animation-delay: -5s;"></div>
+    </div>
 
-    <div class="relative z-10 max-w-2xl mx-auto">
-        
-        <!-- Top Metadata Bar -->
-        <div class="flex justify-between items-center mb-12 text-[8px] font-bold opacity-40 uppercase tracking-[0.3em]">
-            <div><span class="status-dot glow-red"></span> Neural Bridge: Online</div>
-            <div id="clock">00:00:00</div>
-            <div>EXAR v4.0.2</div>
+    <nav class="max-w-4xl mx-auto flex justify-between items-center mb-16 relative z-10">
+        <a href="index.html" class="w-12 h-12 flex items-center justify-center rounded-full glass hover:bg-white/10 transition active:scale-90">
+            <i class="fa-solid fa-arrow-left text-sm"></i>
+        </a>
+        <div class="glass px-5 py-2 rounded-full border-white/5 flex items-center gap-2">
+            <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping"></div>
+            <span class="text-[9px] font-black uppercase tracking-[0.2em] opacity-40">Motion Engine Active</span>
         </div>
+    </nav>
 
-        <!-- Hero Section -->
-        <header class="text-center mb-16">
-            <h1 class="text-6xl md:text-8xl font-black tracking-tighter italic mb-2">EXAR</h1>
-            <p class="text-[9px] opacity-30 uppercase tracking-[1em]">Universal Extraction Unit</p>
+    <main class="max-w-xl mx-auto space-y-12 relative z-10">
+        
+        <header class="text-center space-y-4 exar-logo">
+            <h1 class="text-7xl font-black tracking-tighter italic leading-none">EX<span class="text-indigo-500">A</span>R</h1>
+            <p class="text-xs font-medium opacity-30 uppercase tracking-[0.5em]">FREE DOWNLOADS</p>
         </header>
 
-        <!-- Input Area -->
-        <div class="tech-card p-2 mb-4">
-            <div class="input-box flex items-center p-1 rounded-sm">
-                <input type="text" id="v-url" oninput="techDetect()"
-                    class="bg-transparent flex-1 px-4 py-4 outline-none text-xs text-white placeholder:text-zinc-800"
-                    placeholder="ENTER SOURCE LINK_">
-                <button onclick="techFetch()" class="btn-capture px-8 py-4 uppercase">Capture</button>
+        <div class="reveal-item" style="animation-delay: 0.2s;">
+            <div class="input-pill p-2 flex items-center shadow-2xl">
+                <button onclick="autoPaste()" class="w-12 h-12 flex items-center justify-center text-indigo-400 hover:rotate-12 transition">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </button>
+                <input type="text" id="v-url" class="bg-transparent flex-1 px-3 py-4 outline-none text-base font-medium placeholder:opacity-20" placeholder="Drop magic link...">
+                <button onclick="startMotionExtraction()" class="btn-magic px-8 py-4 text-xs text-white uppercase tracking-widest shadow-lg">Go</button>
             </div>
         </div>
 
-        <!-- Live Terminal Console -->
-        <div class="px-2 mb-10">
-            <div id="console">
-                <div>> SYSTEM READY...</div>
-                <div>> WAITING FOR INPUT_</div>
+        <!-- Animated Spinner -->
+        <div id="v-loader" class="hidden flex flex-col items-center py-10 space-y-6">
+            <div class="relative w-16 h-16">
+                <div class="absolute inset-0 border-4 border-indigo-500/10 border-t-indigo-500 rounded-full animate-spin"></div>
+                <div class="absolute inset-2 border-4 border-rose-500/10 border-b-rose-500 rounded-full animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
             </div>
+            <p class="text-[10px] font-black uppercase tracking-widest opacity-30 animate-pulse">Scanning Neural Paths...</p>
         </div>
 
-        <!-- Platform Matrix -->
-        <div class="flex justify-center gap-10 mb-20 opacity-10 transition-all duration-700" id="matrix">
-            <i id="m-yt" class="fa-brands fa-youtube text-2xl"></i>
-            <i id="m-ins" class="fa-brands fa-instagram text-2xl"></i>
-            <i id="m-snap" class="fa-brands fa-snapchat text-2xl"></i>
-            <i id="m-tik" class="fa-brands fa-tiktok text-2xl"></i>
-        </div>
-
-        <!-- Loader -->
-        <div id="v-loader" class="hidden py-10 text-center space-y-4">
-            <div class="inline-block w-8 h-8 border-2 border-white/10 border-t-white animate-spin"></div>
-            <p class="text-[8px] font-black uppercase tracking-[0.5em] animate-pulse">Handshaking Server</p>
-        </div>
-
-        <!-- Results Display -->
-        <div id="v-res" class="hidden space-y-4 animate-glitch pb-20">
-            <div class="tech-card overflow-hidden relative">
-                <div class="scanline"></div>
-                <img id="v-thumb" class="w-full h-48 object-cover grayscale hover:grayscale-0 transition-all duration-500" src="">
+        <!-- Result Box -->
+        <div id="v-res" class="hidden pb-24">
+            <div class="glass overflow-hidden reveal-item">
+                <div class="p-3">
+                    <div id="thumb-wrap" class="w-full h-72 rounded-[2rem] skeleton overflow-hidden relative">
+                        <img id="v-thumb" class="w-full h-full object-cover opacity-0 transition-opacity duration-1000" 
+                             referrerpolicy="no-referrer"
+                             onload="this.classList.remove('opacity-0'); document.getElementById('thumb-wrap').classList.remove('skeleton')">
+                    </div>
+                </div>
                 
-                <div class="p-6 border-t border-white/5">
-                    <div class="flex justify-between items-end mb-8">
-                        <div class="max-w-[80%]">
-                            <h3 id="v-title" class="text-xs font-bold uppercase tracking-wider truncate">Metadata Title</h3>
-                            <div class="flex gap-4 mt-2 opacity-30 text-[8px] font-bold">
-                                <span id="v-src">SRC: UNKNOWN</span>
-                                <span id="v-dur">DUR: 00:00</span>
-                            </div>
+                <div class="p-8 space-y-8">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <h3 id="v-title" class="text-xl font-bold leading-tight truncate">Data Decrypted</h3>
+                            <p class="text-[9px] uppercase font-black opacity-20 mt-1 tracking-widest">Atmospheric Node v6.0</p>
                         </div>
                     </div>
 
-                    <div id="v-links" class="grid grid-cols-1 gap-2">
-                        <!-- Technical Item Rows -->
-                    </div>
+                    <div id="v-links" class="space-y-4"></div>
                 </div>
             </div>
         </div>
-
-    </div>
+    </main>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -168,114 +175,105 @@
         let apiBase = ""; 
         db.ref('settings/myDownloaderUrl').on('value', s => { apiBase = s.val(); });
 
-        // LIVE LOG ENGINE
-        function log(msg) {
-            const con = document.getElementById('console');
-            const div = document.createElement('div');
-            div.innerText = `> ${msg.toUpperCase()}...`;
-            con.prepend(div);
+        async function autoPaste() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('v-url').value = text;
+            } catch (err) { alert("Paste manually!"); }
         }
 
-        async function techFetch() {
+        async function startMotionExtraction() {
             const url = document.getElementById('v-url').value;
             if(!url) return;
-
-            log("initializing extraction");
-            log("resolving peer nodes");
+            const loader = document.getElementById('v-loader');
+            const resBox = document.getElementById('v-res');
             
-            document.getElementById('v-loader').classList.remove('hidden');
-            document.getElementById('v-res').classList.add('hidden');
+            loader.classList.remove('hidden');
+            resBox.classList.add('hidden');
 
             try {
                 const response = await fetch(`${apiBase}/extract?url=${encodeURIComponent(url)}`);
                 const data = await response.json();
                 if(data.medias) {
-                    log("data packets received");
-                    log("decrypting formats");
-                    renderTechResult(data);
-                    document.getElementById('v-res').classList.remove('hidden');
+                    renderAnimatedUI(data);
+                    resBox.classList.remove('hidden');
                 }
-            } catch (e) { log("critical error: node timeout"); }
-            finally { document.getElementById('v-loader').classList.add('hidden'); }
+            } catch (e) { alert("API Error!"); }
+            finally { loader.classList.add('hidden'); }
         }
 
-        function renderTechResult(data) {
+        function renderAnimatedUI(data) {
             document.getElementById('v-thumb').src = data.thumbnail;
             document.getElementById('v-title').innerText = data.title;
-            document.getElementById('v-src').innerText = `SRC: ${data.source || 'CLOUD'}`;
             const list = document.getElementById('v-links');
             list.innerHTML = '';
 
             data.medias.forEach((m, idx) => {
+                const id = `link-${idx}`;
+                const delay = (idx * 0.1) + "s"; // Stagger effect
                 list.innerHTML += `
-                    <div class="flex justify-between items-center p-4 bg-white/5 border border-white/[0.03] group hover:bg-white/10 transition cursor-pointer" 
-                         onclick="forceDL('${m.url}', 'EXAR_${idx}.mp4', this)">
-                        <div>
-                            <p class="text-[10px] font-bold tracking-tighter">${m.quality}</p>
-                            <p class="text-[7px] font-black opacity-20 mt-0.5">TYPE: VIDEO/MP4 | SIZE: ${m.size || 'AUTO'}</p>
+                    <div class="reveal-item" style="animation-delay: ${delay}">
+                        <div class="flex justify-between items-center bg-white/[0.03] p-5 rounded-[1.8rem] border border-white/5 group hover:bg-white/[0.08] hover:border-indigo-500/50 transition-all duration-500">
+                            <div>
+                                <p class="text-sm font-bold text-white/90">${m.quality}</p>
+                                <p class="text-[8px] font-black opacity-20 uppercase mt-1">Ready for Storage</p>
+                            </div>
+                            <button id="${id}" onclick="motionDownload('${m.url}', 'EXAR_${idx}.mp4', '${id}')"
+                                class="w-12 h-12 flex items-center justify-center rounded-full bg-white text-black hover:bg-indigo-500 hover:text-white hover:scale-110 transition-all duration-300">
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </button>
                         </div>
-                        <div class="text-[10px]"><i class="fa-solid fa-download opacity-20 group-hover:opacity-100 transition"></i></div>
-                    </div>
-                    <div class="hidden h-0.5 bg-white/10 w-full mb-2"><div class="h-full bg-white w-0 transition-all duration-300"></div></div>`;
+                        <div id="prog-wrap-${id}" class="hidden mt-3 px-2 space-y-2">
+                            <div class="bg-white/5 h-1 rounded-full overflow-hidden">
+                                <div id="bar-${id}" class="progress-bar"></div>
+                            </div>
+                            <div class="flex justify-between text-[7px] font-black opacity-30 uppercase tracking-tighter">
+                                <span>Capturing Bitstream</span>
+                                <span id="pct-${id}">0%</span>
+                            </div>
+                        </div>
+                    </div>`;
             });
         }
 
-        async function forceDL(url, filename, el) {
-            log(`capturing stream: ${filename}`);
-            const progBar = el.nextElementSibling.firstElementChild;
-            el.nextElementSibling.classList.remove('hidden');
-            
+        async function motionDownload(url, filename, id) {
+            const btn = document.getElementById(id);
+            const bar = document.getElementById(`bar-${id}`);
+            const pct = document.getElementById(`pct-${id}`);
+            const wrap = document.getElementById(`prog-wrap-${id}`);
+
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i>`;
+            btn.disabled = true;
+            wrap.classList.remove('hidden');
+            btn.querySelector('i').classList.add('dl-icon-anim');
+
             try {
-                const res = await fetch(url);
-                const reader = res.body.getReader();
-                const total = +res.headers.get('Content-Length');
-                let received = 0; let chunks = [];
+                const response = await fetch(url);
+                const reader = response.body.getReader();
+                const total = +response.headers.get('Content-Length');
+                let loaded = 0; let chunks = [];
 
                 while(true) {
                     const {done, value} = await reader.read();
                     if (done) break;
-                    chunks.push(value); received += value.length;
-                    if(total) progBar.style.width = (received/total*100) + "%";
+                    chunks.push(value); loaded += value.length;
+                    if (total) {
+                        const p = Math.floor((loaded / total) * 100);
+                        bar.style.width = p + "%"; pct.innerText = p + "%";
+                        if(p > 99) btn.innerHTML = `<i class="fa-solid fa-check"></i>`;
+                    }
                 }
                 const blob = new Blob(chunks);
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = filename;
-                a.click();
-                log("extraction complete");
-            } catch(e) { window.open(url, '_blank'); log("cors bypass: opening direct link"); }
-        }
-
-        function techDetect() {
-            const url = document.getElementById('v-url').value.toLowerCase();
-            const matrix = document.getElementById('matrix');
-            const chips = {'m-yt':['youtube','red'], 'm-ins':['instagram','#f09'], 'm-snap':['snapchat','#ff0'], 'm-tik':['tiktok','#0ff']};
-            
-            let found = false;
-            Object.keys(chips).forEach(id => {
-                const el = document.getElementById(id);
-                if(url.includes(chips[id][0])) {
-                    el.classList.add('platform-active');
-                    el.style.color = chips[id][1];
-                    document.body.style.background = `radial-gradient(circle at 50% 50%, ${chips[id][1]}11 0%, #000 100%)`;
-                    matrix.style.opacity = "1";
-                    found = true;
-                } else {
-                    el.classList.remove('platform-active');
-                    el.style.color = "white";
-                }
-            });
-            if(!found) {
-                document.body.style.background = "#000";
-                matrix.style.opacity = "0.1";
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+                a.download = filename; a.click();
+            } catch (e) {
+                window.open(url, '_blank'); btn.innerHTML = `<i class="fa-solid fa-arrow-up-right-from-square"></i>`;
             }
+            setTimeout(() => { 
+                btn.innerHTML = `<i class="fa-solid fa-arrow-down"></i>`; 
+                btn.disabled = false; wrap.classList.add('hidden');
+            }, 5000);
         }
-
-        // Technical Clock
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toTimeString().split(' ')[0];
-        }, 1000);
     </script>
 </body>
 </html>
