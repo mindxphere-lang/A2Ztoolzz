@@ -1,97 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>EXAR CINEMA — Direct Stream</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>CINEMA — Neural Streaming Node</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+
     <style>
-        :root { --primary: #e11d48; --bg: #000; }
-        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; }
-        .movie-card { transition: 0.4s ease; cursor: pointer; }
-        .movie-card:active { transform: scale(0.95); }
-        .bottom-sheet { position: fixed; inset: 0; z-index: 5000; display: none; align-items: flex-end; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); }
-        .sheet-content { width: 100%; background: #0a0a0a; border-radius: 2.5rem 2.5rem 0 0; padding: 35px; border-top: 1px solid rgba(255,255,255,0.1); animation: slideUp 0.5s ease; }
+        :root { --primary: #e11d48; --bg: #050505; }
+        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+
+        /* Movie UI */
+        .movie-card { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .movie-card:hover { transform: scale(1.05); }
+        .movie-card img { border-radius: 2rem; border: 1px solid rgba(255,255,255,0.05); }
+
+        /* iOS Style Bottom Sheet */
+        .bottom-sheet {
+            position: fixed; inset: 0; z-index: 5000; display: none; align-items: flex-end;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
+        }
+        .sheet-content {
+            width: 100%; background: #0a0a0a; border-radius: 2.5rem 2.5rem 0 0;
+            padding: 35px; border-top: 1px solid rgba(255,255,255,0.1);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .player-opt { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 1.5rem; display: flex; align-items: center; gap: 15px; width: 100%; margin-bottom: 12px; }
+
+        .player-opt {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            padding: 22px; border-radius: 1.8rem; display: flex; align-items: center; gap: 18px;
+            transition: 0.3s; width: 100%; text-align: left; margin-bottom: 12px;
+        }
+        .player-opt:active { background: var(--primary); transform: scale(0.96); }
+
+        /* Fullscreen Player View */
+        #player-view { position: fixed; inset: 0; z-index: 6000; background: black; display: none; flex-direction: column; }
+        video { width: 100%; height: 100%; background: black; }
+
+        .glass-nav { background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body class="pb-24">
 
-    <nav class="p-6 flex justify-between items-center border-b border-white/5">
-        <a href="index.html" class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-full"><i class="fa-solid fa-arrow-left"></i></a>
-        <h1 class="text-xl font-black uppercase italic">CINE<span class="text-rose-600">MA</span></h1>
+    <!-- Header -->
+    <nav class="sticky top-0 z-50 p-6 glass-nav flex justify-between items-center">
+        <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 active:scale-90 transition">
+            <i class="fa-solid fa-chevron-left text-sm"></i>
+        </a>
+        <h1 class="text-2xl font-black italic uppercase tracking-tighter">CINE<span class="text-rose-600">MA</span></h1>
         <div class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></div>
     </nav>
 
-    <div class="max-w-6xl mx-auto p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6" id="movie-grid"></div>
+    <div class="max-w-7xl mx-auto p-6 space-y-12">
+        <header>
+            <h2 class="text-4xl font-black uppercase tracking-tight">Prime Media</h2>
+            <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.5em] mt-1">Multi-Channel Direct Stream Node</p>
+        </header>
 
-    <!-- SELECTOR SHEET -->
+        <!-- Movie Grid -->
+        <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
+            <!-- Loading from Firebase -->
+        </div>
+    </div>
+
+    <!-- PLAYER SELECTOR (Bottom Sheet) -->
     <div id="selector-sheet" class="bottom-sheet" onclick="if(event.target == this) closeSelector()">
         <div class="sheet-content">
-            <div class="w-12 h-1 bg-white/10 rounded-full mx-auto mb-8"></div>
-            <h3 id="sel-title" class="text-xl font-black uppercase italic mb-8">Play Media</h3>
+            <div class="w-12 h-1 bg-white/10 rounded-full mx-auto mb-10"></div>
             
-            <button onclick="playInternal()" class="player-opt">
-                <div class="w-12 h-12 bg-rose-600/20 rounded-xl flex items-center justify-center text-rose-500"><i class="fa-solid fa-play"></i></div>
-                <div><p class="text-sm font-bold uppercase">Native Player</p><p class="text-[9px] opacity-40 uppercase">iPhone & Browser Fullscreen Fix</p></div>
-            </button>
+            <header class="mb-10 text-center">
+                <h3 id="sel-title" class="text-xl font-black uppercase italic tracking-tight mb-2">Movie Title</h3>
+                <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">Bypassing Virus Warning Node...</p>
+            </header>
 
-            <button onclick="playVLC()" class="player-opt">
-                <div class="w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center text-orange-500"><i class="fa-solid fa-cone-striped"></i></div>
-                <div><p class="text-sm font-bold uppercase">VLC Player</p><p class="text-[9px] opacity-40 uppercase">Enable Dual-Audio Tracks</p></div>
-            </button>
+            <div class="space-y-4">
+                <!-- Internal Native Player -->
+                <button onclick="launchInternal()" class="player-opt">
+                    <div class="w-14 h-14 bg-rose-600/20 rounded-2xl flex items-center justify-center text-rose-500 text-xl"><i class="fa-solid fa-play"></i></div>
+                    <div><p class="text-base font-bold uppercase">Native Browser</p><p class="text-[10px] opacity-30 uppercase">iPhone Fullscreen Optimized</p></div>
+                </button>
 
-            <button onclick="playMX()" class="player-opt">
-                <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500"><i class="fa-solid fa-bolt"></i></div>
-                <div><p class="text-sm font-bold uppercase">MX Player</p><p class="text-[9px] opacity-40 uppercase">Best for Android HW+ Decoding</p></div>
-            </button>
+                <!-- VLC Player -->
+                <button onclick="launchVLC()" class="player-opt">
+                    <div class="w-14 h-14 bg-orange-500/20 rounded-2xl flex items-center justify-center text-orange-500 text-xl"><i class="fa-solid fa-cone-striped"></i></div>
+                    <div><p class="text-base font-bold uppercase">VLC Media Player</p><p class="text-[10px] opacity-30 uppercase">Best for Dual-Audio Tracks</p></div>
+                </button>
 
-            <p class="mt-6 text-[10px] text-center text-white/30 uppercase font-bold tracking-widest leading-relaxed">
-                Professional Note: For <b>Dual-Audio (Hindi/English)</b> and subtitles, please utilize VLC or MX Player apps.
-            </p>
+                <!-- MX Player -->
+                <button onclick="launchMX()" class="player-opt">
+                    <div class="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-500 text-xl"><i class="fa-solid fa-bolt"></i></div>
+                    <div><p class="text-base font-bold uppercase">MX Player Pro</p><p class="text-[10px] opacity-30 uppercase">Hardware+ Support (Android)</p></div>
+                </button>
+            </div>
+
+            <!-- Professional Instruction -->
+            <div class="mt-8 p-6 bg-white/[0.03] rounded-3xl border border-white/5">
+                <p class="text-[10px] leading-relaxed font-bold text-white/40 text-center uppercase tracking-widest">
+                    <i class="fa-solid fa-circle-info mr-2 text-rose-500"></i>
+                    To access <b>Dual-Audio (Hindi/English)</b> and customized subtitles, we strongly suggest utilizing <b>VLC</b> or <b>MX Player</b>. The native player is designed for instant playback.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- INTERNAL FULLSCREEN VIEW -->
+    <div id="player-view">
+        <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-white/5">
+            <button onclick="closePlayer()" class="text-[10px] font-black uppercase tracking-widest text-rose-500 active:scale-90 transition"><i class="fa-solid fa-xmark mr-2"></i> Exit Cinema</button>
+            <h4 id="now-playing" class="text-[9px] font-bold uppercase opacity-30 truncate max-w-[50%] tracking-widest">A2Z Node Stream</h4>
+        </div>
+        <div class="flex-1 flex items-center justify-center bg-black">
+            <video id="main-video" controls playsinline controlsList="nodownload"></video>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
     <script>
         const config = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const db = firebase.database();
-        let mId = "", mTitle = "", workerUrl = "";
+        
+        let selectedId = "", selectedTitle = "", hfBaseUrl = "";
 
-        db.ref('settings/workerUrl').on('value', s => workerUrl = s.val());
+        // Fetch Hugging Face URL from Firebase Global Nodes
+        db.ref('settings/hfDownloaderUrl').on('value', s => {
+            hfBaseUrl = s.val() || "https://mindxphere-a2z-downloader.hf.space";
+        });
+
+        // Load Movies
         db.ref('movies').on('value', s => {
             const grid = document.getElementById('movie-grid'); grid.innerHTML = '';
-            s.forEach(c => {
-                const m = c.val();
-                grid.innerHTML += `<div class="movie-card" onclick="openSelector('${m.driveId}', '${m.title}')">
-                    <img src="${m.poster}" class="aspect-[2/3] object-cover mb-4">
-                    <h4 class="text-[10px] font-bold uppercase truncate">${m.title}</h4>
-                </div>`;
+            s.forEach(child => {
+                const m = child.val();
+                grid.innerHTML += `
+                    <div class="movie-card" onclick="openSelector('${m.driveId}', '${m.title}')">
+                        <div class="aspect-[2/3] overflow-hidden"><img src="${m.poster}" class="w-full h-full object-cover"></div>
+                        <div class="mt-4"><h4 class="text-[11px] font-black uppercase truncate tracking-wide">${m.title}</h4></div>
+                    </div>`;
             });
         });
 
-        function openSelector(id, title) { mId = id; mTitle = title; document.getElementById('sel-title').innerText = title; document.getElementById('selector-sheet').style.display = 'flex'; }
+        function openSelector(id, title) {
+            selectedId = id; selectedTitle = title;
+            document.getElementById('sel-title').innerText = title;
+            document.getElementById('selector-sheet').style.display = 'flex';
+        }
+
         function closeSelector() { document.getElementById('selector-sheet').style.display = 'none'; }
 
-        // THE MAGIC: Isse link seedha video me badal jayega
-        function getStreamLink() { return `${workerUrl}?id=${mId}`; }
-
-        function playInternal() {
-            // Seedha direct link open karenge browser me, iPhone khud native player khol dega
-            window.location.href = getStreamLink();
+        // --- THE ENGINE: PROXY STREAM CONSTRUCTOR ---
+        function getStreamURL() {
+            // Pumping the stream through Hugging Face to bypass warnings
+            return `${hfBaseUrl}/stream?id=${selectedId}`;
         }
 
-        function playVLC() {
-            const stream = getStreamLink();
-            window.location.href = `vlc://${stream}`;
+        // 1. Native Browser (iPhone Optimized)
+        function launchInternal() {
+            closeSelector();
+            const view = document.getElementById('player-view');
+            const video = document.getElementById('main-video');
+            document.getElementById('now-playing').innerText = `Playing: ${selectedTitle}`;
+            
+            video.src = getStreamURL();
+            view.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            video.play();
         }
 
-        function playMX() {
-            const stream = getStreamLink();
-            window.location.href = `intent:${stream}#Intent;package=com.mxtech.videoplayer.ad;S.title=${mTitle};end`;
+        // 2. VLC Media Player
+        function launchVLC() {
+            const url = getStreamURL();
+            // Deep link fix for iOS/Android
+            window.location.href = `vlc://${url}`;
+            closeSelector();
+        }
+
+        // 3. MX Player (Android)
+        function launchMX() {
+            const url = getStreamURL();
+            const intent = `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;S.title=${selectedTitle};end`;
+            window.location.href = intent;
+            closeSelector();
+        }
+
+        function closePlayer() {
+            const video = document.getElementById('main-video');
+            video.pause(); video.src = "";
+            document.getElementById('player-view').style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
     </script>
 </body>
