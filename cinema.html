@@ -1,54 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CINEMA — A2Z Streaming</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CINEMA — Premium Streaming</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { background: #050505; color: white; font-family: 'Outfit', sans-serif; }
-        .movie-card { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .movie-card:hover { transform: scale(1.05); z-index: 10; }
-        .player-modal { position: fixed; inset: 0; z-index: 100; background: black; display: none; flex-direction: column; }
+        body { background: #050505; color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+        
+        /* Mast UI Cards */
+        .movie-card { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .movie-card:hover { transform: scale(1.08); z-index: 10; }
+        .movie-card img { border-radius: 2rem; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .movie-card:hover img { border-color: rgba(225, 29, 72, 0.4); box-shadow: 0 0 30px rgba(225, 29, 72, 0.2); }
+
+        /* Fullscreen Player */
+        .player-modal { position: fixed; inset: 0; z-index: 1000; background: black; display: none; flex-direction: column; }
+        .video-wrapper { position: relative; width: 100%; height: 100%; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .glass-nav { background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        
+        /* Mobile Buttons */
+        .btn-action { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .btn-action:active { background: #e11d48; border-color: #e11d48; }
     </style>
 </head>
-<body class="p-6">
+<body class="pb-20">
 
-    <!-- Top Nav -->
-    <nav class="flex justify-between items-center mb-12">
-        <a href="index.html" class="w-12 h-12 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10"><i class="fa-solid fa-arrow-left"></i></a>
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 p-6 glass-nav flex justify-between items-center">
+        <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 hover:bg-rose-600 transition">
+            <i class="fa-solid fa-arrow-left text-sm"></i>
+        </a>
         <h1 class="text-2xl font-black tracking-tighter uppercase italic">CINE<span class="text-rose-600">MA</span></h1>
-        <div class="w-12 h-12 flex items-center justify-center bg-rose-600/10 rounded-2xl text-rose-500"><i class="fa-solid fa-film"></i></div>
+        <div class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></div>
     </nav>
 
-    <!-- Search & Filter -->
-    <div class="mb-12">
-        <div class="bg-white/5 p-1 rounded-2xl flex border border-white/5 mb-6">
-            <input type="text" id="search" oninput="filterMovies()" placeholder="Search movies, series..." class="bg-transparent flex-1 px-5 py-4 outline-none text-sm font-medium">
+    <!-- Content -->
+    <div class="max-w-7xl mx-auto p-6 space-y-12">
+        
+        <header>
+            <h2 class="text-4xl font-black uppercase tracking-tight">Movies Hub</h2>
+            <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.5em] mt-1">A2Z Cinema Engine v4.0</p>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="bg-white/5 p-1 rounded-2xl flex border border-white/5 items-center">
+            <i class="fa-solid fa-magnifying-glass ml-4 opacity-20"></i>
+            <input type="text" placeholder="Search by title..." class="bg-transparent flex-1 px-4 py-4 outline-none text-sm font-medium">
         </div>
-        <div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
-            <button class="bg-rose-600 px-6 py-2 rounded-full text-[10px] font-black uppercase">All</button>
-            <button class="bg-white/5 px-6 py-2 rounded-full text-[10px] font-black uppercase border border-white/5">Action</button>
-            <button class="bg-white/5 px-6 py-2 rounded-full text-[10px] font-black uppercase border border-white/5">Drama</button>
-            <button class="bg-white/5 px-6 py-2 rounded-full text-[10px] font-black uppercase border border-white/5">Sci-Fi</button>
+
+        <!-- Movie Grid (2 cols mobile, 6 cols desktop) -->
+        <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
+            <!-- Movies Load Dynamically -->
         </div>
     </div>
 
-    <!-- Movie Grid -->
-    <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        <!-- Movies will load here -->
-    </div>
-
-    <!-- Fullscreen Player Modal -->
+    <!-- PLAYER MODAL (Premium Style) -->
     <div id="player-modal" class="player-modal">
-        <div class="p-4 flex justify-between items-center bg-zinc-900">
-            <h3 id="playing-title" class="text-xs font-bold uppercase tracking-widest">Playing Movie</h3>
-            <button onclick="closePlayer()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10"><i class="fa-solid fa-xmark"></i></button>
+        <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-white/5">
+            <button onclick="closePlayer()" class="btn-action px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest"><i class="fa-solid fa-chevron-left mr-2"></i> Close</button>
+            <h3 id="playing-title" class="text-[10px] font-black uppercase tracking-widest opacity-40 truncate max-w-[40%]">Streaming</h3>
+            <!-- MOBILE FIX: Open in Browser if iframe fails -->
+            <button onclick="fixPlayer()" class="bg-rose-600 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-rose-600/20">Fix / Open</button>
         </div>
-        <div id="video-container" class="flex-1">
-            <!-- Video iframe will be injected here -->
+        
+        <div class="video-wrapper">
+            <div id="player-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black">
+                <div class="w-10 h-10 border-2 border-rose-600/20 border-t-rose-600 rounded-full animate-spin"></div>
+                <p class="text-[8px] font-black uppercase tracking-widest opacity-30">Authenticating Drive Node</p>
+            </div>
+            <div id="iframe-box" class="w-full h-full relative z-10"></div>
         </div>
     </div>
 
@@ -58,43 +84,47 @@
         const config = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const db = firebase.database();
         
-        let allMovies = [];
+        let currentId = "";
 
         db.ref('movies').on('value', s => {
-            allMovies = [];
             const grid = document.getElementById('movie-grid'); grid.innerHTML = '';
             s.forEach(child => {
                 const m = child.val();
-                allMovies.push(m);
                 grid.innerHTML += `
-                    <div class="movie-card relative group cursor-pointer" onclick="playMovie('${m.driveId}', '${m.title}')">
-                        <div class="aspect-[2/3] rounded-[1.5rem] overflow-hidden border border-white/5 shadow-2xl">
-                            <img src="${m.poster}" class="w-full h-full object-cover">
+                    <div class="movie-card group" onclick="playMovie('${m.driveId}', '${m.title}')">
+                        <div class="aspect-[2/3] overflow-hidden">
+                            <img src="${m.poster}" class="w-full h-full object-cover group-hover:brightness-110 transition-all duration-500">
                         </div>
                         <div class="mt-4 px-1">
-                            <h4 class="text-[11px] font-black uppercase truncate">${m.title}</h4>
-                            <p class="text-[8px] font-bold opacity-30 uppercase mt-1">${m.category}</p>
+                            <h4 class="text-[11px] font-black uppercase truncate tracking-wide">${m.title}</h4>
+                            <p class="text-[8px] font-black opacity-20 uppercase mt-1 tracking-tighter">${m.category} • 4K ULTRA</p>
                         </div>
                     </div>`;
             });
         });
 
-        function playMovie(driveId, title) {
+        function playMovie(id, title) {
+            currentId = id;
             const modal = document.getElementById('player-modal');
-            const container = document.getElementById('video-container');
+            const box = document.getElementById('iframe-box');
             document.getElementById('playing-title').innerText = title;
             
-            // Bypass logic: Google Drive Direct Player
-            const streamUrl = `https://www.gdriveplayer.me/embed/?id=${driveId}`;
+            // Standard Drive Preview
+            const streamUrl = `https://drive.google.com/file/d/${id}/preview`;
             
-            container.innerHTML = `<iframe src="${streamUrl}" allowfullscreen></iframe>`;
+            box.innerHTML = `<iframe src="${streamUrl}" allow="autoplay" allowfullscreen></iframe>`;
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
 
+        // MOBILE FIX: Google Drive large files sometimes need full browser tab to show the "Virus Scan" button
+        function fixPlayer() {
+            if(currentId) window.open(`https://drive.google.com/file/d/${currentId}/view`, '_blank');
+        }
+
         function closePlayer() {
             document.getElementById('player-modal').style.display = 'none';
-            document.getElementById('video-container').innerHTML = '';
+            document.getElementById('iframe-box').innerHTML = '';
             document.body.style.overflow = 'auto';
         }
     </script>
