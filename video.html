@@ -3,183 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>EXAR - Neural Media Node</title>
+    <title>EXAR | Neural Extraction Terminal</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Inter:wght@900&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --bg: #030303;
-            --card: rgba(20, 20, 20, 0.8);
-            --accent: #ffffff;
-            --exar-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+        :root { --accent: #ffffff; --bg: #000000; }
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'JetBrains Mono', monospace; 
+            overflow-x: hidden; 
+            transition: background 1s ease;
+        }
+        
+        /* Cyber-Grid Background */
+        .grid-overlay {
+            position: fixed; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none; z-index: 1;
         }
 
-        body {
-            background-color: var(--bg);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
-            color: white;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
+        .tech-card {
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 0.5rem; /* Industrial look */
         }
 
-        .exar-glass {
-            background: var(--card);
-            backdrop-filter: blur(30px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 2rem;
+        /* Glowing Status */
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+        .glow-red { background: #ff4444; box-shadow: 0 0 10px #ff4444; }
+
+        /* Terminal Style Logs */
+        #console {
+            font-size: 9px;
+            color: #555;
+            height: 60px;
+            overflow: hidden;
+            line-height: 1.5;
         }
 
-        .exar-input {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 1.5rem;
-            transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        .input-box {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            transition: 0.4s;
         }
+        .input-box:focus-within { border-color: #fff; box-shadow: 0 0 30px rgba(255,255,255,0.05); }
 
-        .exar-input:focus-within {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: scale(1.02);
+        /* Loading Scan Line */
+        .scanline {
+            position: absolute; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent);
+            top: -100%; animation: scan 3s linear infinite;
         }
+        @keyframes scan { 0% { top: -100%; } 100% { top: 100%; } }
 
-        .btn-exar {
-            background: #ffffff;
-            color: #000000;
-            font-weight: 800;
-            border-radius: 1.2rem;
-            transition: 0.3s;
+        .btn-capture {
+            background: #fff; color: #000;
+            font-weight: 800; font-size: 10px;
+            letter-spacing: 2px; transition: 0.3s;
         }
+        .btn-capture:hover { transform: scale(1.05); }
 
-        .btn-exar:active {
-            transform: scale(0.9);
-            opacity: 0.8;
-        }
-
-        /* Floating Animation */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        .float-anim { animation: float 4s ease-in-out infinite; }
-
-        /* Loader - Scanning Effect */
-        .scanner {
-            width: 100%;
-            height: 2px;
-            background: var(--exar-gradient);
-            position: absolute;
-            top: 0;
-            left: 0;
-            animation: scan 2s linear infinite;
-            box-shadow: 0 0 15px #6366f1;
-        }
-
-        @keyframes scan {
-            0% { top: 0%; opacity: 0; }
-            50% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
-        }
-
-        /* Modern Scrollbar */
-        ::-webkit-scrollbar { width: 0px; }
-
-        .dl-progress-bar {
-            height: 4px;
-            background: var(--exar-gradient);
-            width: 0%;
-            transition: 0.3s;
-            border-radius: 10px;
+        .platform-active { opacity: 1 !important; filter: drop-shadow(0 0 8px currentColor); }
+        
+        .animate-glitch { animation: glitch 0.3s ease; }
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
         }
     </style>
 </head>
-<body class="p-5">
+<body class="p-4 md:p-10">
+    <div class="grid-overlay"></div>
 
-    <!-- Navbar -->
-    <nav class="max-w-4xl mx-auto flex justify-between items-center py-6 mb-12">
-        <a href="index.html" class="w-12 h-12 flex items-center justify-center rounded-2xl exar-glass hover:bg-white/5 transition">
-            <i class="fa-solid fa-arrow-left-long text-xs"></i>
-        </a>
-        <div class="px-5 py-2 rounded-full exar-glass border-white/10">
-            <span class="text-[9px] font-black uppercase tracking-[0.3em] opacity-50">Node v3.0 Active</span>
-        </div>
-    </nav>
-
-    <main class="max-w-xl mx-auto space-y-16">
+    <div class="relative z-10 max-w-2xl mx-auto">
         
-        <!-- Big Hero Section -->
-        <section class="text-center space-y-4">
-            <h1 class="text-7xl font-black tracking-tighter uppercase italic leading-none">
-                E<span class="text-transparent" style="-webkit-text-stroke: 1.5px white;">X</span>AR
-            </h1>
-            <p class="text-[10px] font-medium opacity-30 uppercase tracking-[0.8em]">Atmospheric Extraction</p>
-        </section>
+        <!-- Top Metadata Bar -->
+        <div class="flex justify-between items-center mb-12 text-[8px] font-bold opacity-40 uppercase tracking-[0.3em]">
+            <div><span class="status-dot glow-red"></span> Neural Bridge: Online</div>
+            <div id="clock">00:00:00</div>
+            <div>EXAR v4.0.2</div>
+        </div>
 
-        <!-- Search Hub -->
-        <div class="space-y-8">
-            <div class="exar-input p-2 flex items-center group shadow-2xl">
-                <button onclick="smartPaste()" class="w-14 h-14 flex items-center justify-center opacity-30 group-hover:opacity-100 transition">
-                    <i class="fa-solid fa-paste text-lg"></i>
-                </button>
-                <input type="text" id="v-url" oninput="detect()"
-                    class="bg-transparent flex-1 px-2 py-4 outline-none text-base font-medium placeholder:opacity-10"
-                    placeholder="Enter link to capture...">
-                <button onclick="fetchData()" class="btn-exar px-10 py-5 text-[10px] uppercase tracking-widest">
-                    Capture
-                </button>
-            </div>
+        <!-- Hero Section -->
+        <header class="text-center mb-16">
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter italic mb-2">EXAR</h1>
+            <p class="text-[9px] opacity-30 uppercase tracking-[1em]">Universal Extraction Unit</p>
+        </header>
 
-            <!-- Minimal Platform Status -->
-            <div class="flex justify-center gap-6 opacity-20" id="plat-box">
-                <i id="i-yt" class="fa-brands fa-youtube text-xl"></i>
-                <i id="i-ins" class="fa-brands fa-instagram text-xl"></i>
-                <i id="i-snap" class="fa-brands fa-snapchat text-xl"></i>
-                <i id="i-tik" class="fa-brands fa-tiktok text-xl"></i>
+        <!-- Input Area -->
+        <div class="tech-card p-2 mb-4">
+            <div class="input-box flex items-center p-1 rounded-sm">
+                <input type="text" id="v-url" oninput="techDetect()"
+                    class="bg-transparent flex-1 px-4 py-4 outline-none text-xs text-white placeholder:text-zinc-800"
+                    placeholder="ENTER SOURCE LINK_">
+                <button onclick="techFetch()" class="btn-capture px-8 py-4 uppercase">Capture</button>
             </div>
         </div>
 
-        <!-- Sleek Loader -->
-        <div id="v-loader" class="hidden relative py-20 text-center space-y-6">
-            <div class="w-20 h-20 mx-auto border-t-2 border-white/20 rounded-full animate-spin"></div>
-            <p class="text-[10px] font-bold uppercase tracking-widest opacity-40">Decrypting Stream...</p>
+        <!-- Live Terminal Console -->
+        <div class="px-2 mb-10">
+            <div id="console">
+                <div>> SYSTEM READY...</div>
+                <div>> WAITING FOR INPUT_</div>
+            </div>
         </div>
 
-        <!-- Result Content -->
-        <div id="v-res" class="hidden animate-fade-in pb-32">
-            <div class="exar-glass overflow-hidden relative border-white/5">
-                <!-- Scanner effect inside result -->
-                <div class="scanner"></div>
+        <!-- Platform Matrix -->
+        <div class="flex justify-center gap-10 mb-20 opacity-10 transition-all duration-700" id="matrix">
+            <i id="m-yt" class="fa-brands fa-youtube text-2xl"></i>
+            <i id="m-ins" class="fa-brands fa-instagram text-2xl"></i>
+            <i id="m-snap" class="fa-brands fa-snapchat text-2xl"></i>
+            <i id="m-tik" class="fa-brands fa-tiktok text-2xl"></i>
+        </div>
 
-                <div class="p-2">
-                    <img id="v-thumb" class="w-full h-64 object-cover rounded-[1.5rem] brightness-90 shadow-2xl" src="">
-                </div>
+        <!-- Loader -->
+        <div id="v-loader" class="hidden py-10 text-center space-y-4">
+            <div class="inline-block w-8 h-8 border-2 border-white/10 border-t-white animate-spin"></div>
+            <p class="text-[8px] font-black uppercase tracking-[0.5em] animate-pulse">Handshaking Server</p>
+        </div>
+
+        <!-- Results Display -->
+        <div id="v-res" class="hidden space-y-4 animate-glitch pb-20">
+            <div class="tech-card overflow-hidden relative">
+                <div class="scanline"></div>
+                <img id="v-thumb" class="w-full h-48 object-cover grayscale hover:grayscale-0 transition-all duration-500" src="">
                 
-                <div class="p-8">
-                    <div class="flex justify-between items-start mb-10">
-                        <div class="max-w-[70%]">
-                            <h3 id="v-title" class="text-xl font-bold uppercase leading-tight truncate">Capturing Title</h3>
-                            <p class="text-[9px] font-black uppercase opacity-20 mt-2 tracking-widest">Verified Neural Media</p>
-                        </div>
-                        <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center">
-                            <i class="fa-solid fa-check text-[10px] text-green-500"></i>
+                <div class="p-6 border-t border-white/5">
+                    <div class="flex justify-between items-end mb-8">
+                        <div class="max-w-[80%]">
+                            <h3 id="v-title" class="text-xs font-bold uppercase tracking-wider truncate">Metadata Title</h3>
+                            <div class="flex gap-4 mt-2 opacity-30 text-[8px] font-bold">
+                                <span id="v-src">SRC: UNKNOWN</span>
+                                <span id="v-dur">DUR: 00:00</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div id="v-links" class="space-y-4">
-                        <!-- Items inject here -->
+                    <div id="v-links" class="grid grid-cols-1 gap-2">
+                        <!-- Technical Item Rows -->
                     </div>
                 </div>
             </div>
         </div>
 
-    </main>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -191,113 +168,114 @@
         let apiBase = ""; 
         db.ref('settings/myDownloaderUrl').on('value', s => { apiBase = s.val(); });
 
-        async function smartPaste() {
-            try {
-                const text = await navigator.clipboard.readText();
-                document.getElementById('v-url').value = text;
-                detect();
-            } catch (err) { alert("Enable clipboard permissions."); }
+        // LIVE LOG ENGINE
+        function log(msg) {
+            const con = document.getElementById('console');
+            const div = document.createElement('div');
+            div.innerText = `> ${msg.toUpperCase()}...`;
+            con.prepend(div);
         }
 
-        async function fetchData() {
+        async function techFetch() {
             const url = document.getElementById('v-url').value;
             if(!url) return;
-            const loader = document.getElementById('v-loader');
-            const resBox = document.getElementById('v-res');
-            loader.classList.remove('hidden');
-            resBox.classList.add('hidden');
+
+            log("initializing extraction");
+            log("resolving peer nodes");
+            
+            document.getElementById('v-loader').classList.remove('hidden');
+            document.getElementById('v-res').classList.add('hidden');
 
             try {
                 const response = await fetch(`${apiBase}/extract?url=${encodeURIComponent(url)}`);
                 const data = await response.json();
                 if(data.medias) {
-                    renderResult(data);
-                    resBox.classList.remove('hidden');
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                    log("data packets received");
+                    log("decrypting formats");
+                    renderTechResult(data);
+                    document.getElementById('v-res').classList.remove('hidden');
                 }
-            } catch (e) { alert("Node Busy!"); }
-            finally { loader.classList.add('hidden'); }
+            } catch (e) { log("critical error: node timeout"); }
+            finally { document.getElementById('v-loader').classList.add('hidden'); }
         }
 
-        function renderResult(data) {
+        function renderTechResult(data) {
             document.getElementById('v-thumb').src = data.thumbnail;
             document.getElementById('v-title').innerText = data.title;
+            document.getElementById('v-src').innerText = `SRC: ${data.source || 'CLOUD'}`;
             const list = document.getElementById('v-links');
             list.innerHTML = '';
 
             data.medias.forEach((m, idx) => {
-                const bId = `ex-${idx}`;
                 list.innerHTML += `
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center bg-white/[0.02] p-6 rounded-[1.5rem] border border-white/5 hover:bg-white/[0.05] transition">
-                            <div>
-                                <p class="text-xs font-bold tracking-widest text-white/80">${m.quality}</p>
-                                <p class="text-[8px] font-black opacity-20 uppercase mt-1">High Definition MP4</p>
-                            </div>
-                            <button id="${bId}" onclick="forceDownload('${m.url}', 'EXAR_${Date.now()}.mp4', '${bId}')"
-                                class="w-12 h-12 flex items-center justify-center rounded-2xl bg-white text-black hover:scale-110 transition active:scale-90">
-                                <i class="fa-solid fa-arrow-down-long"></i>
-                            </button>
+                    <div class="flex justify-between items-center p-4 bg-white/5 border border-white/[0.03] group hover:bg-white/10 transition cursor-pointer" 
+                         onclick="forceDL('${m.url}', 'EXAR_${idx}.mp4', this)">
+                        <div>
+                            <p class="text-[10px] font-bold tracking-tighter">${m.quality}</p>
+                            <p class="text-[7px] font-black opacity-20 mt-0.5">TYPE: VIDEO/MP4 | SIZE: ${m.size || 'AUTO'}</p>
                         </div>
-                        <div id="prog-p-${bId}" class="hidden px-2">
-                            <div class="bg-white/5 h-1 rounded-full overflow-hidden">
-                                <div id="bar-${bId}" class="dl-progress-bar"></div>
-                            </div>
-                            <div class="flex justify-between mt-2">
-                                <span class="text-[7px] font-black opacity-20 uppercase">Capturing</span>
-                                <span id="pct-${bId}" class="text-[7px] font-black text-indigo-400">0%</span>
-                            </div>
-                        </div>
-                    </div>`;
+                        <div class="text-[10px]"><i class="fa-solid fa-download opacity-20 group-hover:opacity-100 transition"></i></div>
+                    </div>
+                    <div class="hidden h-0.5 bg-white/10 w-full mb-2"><div class="h-full bg-white w-0 transition-all duration-300"></div></div>`;
             });
         }
 
-        async function forceDownload(url, filename, bId) {
-            const btn = document.getElementById(bId);
-            const bar = document.getElementById(`bar-${bId}`);
-            const pctText = document.getElementById(`pct-${bId}`);
-            const parent = document.getElementById(`prog-p-${bId}`);
-
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xs"></i>`;
-            btn.disabled = true;
-            parent.classList.remove('hidden');
-
+        async function forceDL(url, filename, el) {
+            log(`capturing stream: ${filename}`);
+            const progBar = el.nextElementSibling.firstElementChild;
+            el.nextElementSibling.classList.remove('hidden');
+            
             try {
-                const response = await fetch(url);
-                const reader = response.body.getReader();
-                const contentLength = +response.headers.get('Content-Length');
+                const res = await fetch(url);
+                const reader = res.body.getReader();
+                const total = +res.headers.get('Content-Length');
                 let received = 0; let chunks = [];
 
                 while(true) {
                     const {done, value} = await reader.read();
                     if (done) break;
                     chunks.push(value); received += value.length;
-                    if (contentLength) {
-                        const p = Math.floor((received / contentLength) * 100);
-                        bar.style.width = p + "%"; pctText.innerText = p + "%";
-                    }
+                    if(total) progBar.style.width = (received/total*100) + "%";
                 }
                 const blob = new Blob(chunks);
-                const blobUrl = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = blobUrl; a.download = filename;
-                document.body.appendChild(a); a.click();
-                setTimeout(() => { URL.revokeObjectURL(blobUrl); document.body.removeChild(a); }, 100);
-                btn.innerHTML = `<i class="fa-solid fa-check"></i>`;
-            } catch (e) {
-                window.open(url, '_blank'); btn.innerHTML = `<i class="fa-solid fa-up-right-from-square"></i>`;
-            }
-            setTimeout(() => { btn.innerHTML = `<i class="fa-solid fa-arrow-down-long"></i>`; btn.disabled = false; parent.classList.add('hidden'); }, 5000);
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                a.click();
+                log("extraction complete");
+            } catch(e) { window.open(url, '_blank'); log("cors bypass: opening direct link"); }
         }
 
-        function detect() {
-            const val = document.getElementById('v-url').value.toLowerCase();
-            const icons = {'i-yt':'youtube', 'i-ins':'instagram', 'i-snap':'snapchat', 'i-tik':'tiktok'};
-            Object.keys(icons).forEach(id => {
+        function techDetect() {
+            const url = document.getElementById('v-url').value.toLowerCase();
+            const matrix = document.getElementById('matrix');
+            const chips = {'m-yt':['youtube','red'], 'm-ins':['instagram','#f09'], 'm-snap':['snapchat','#ff0'], 'm-tik':['tiktok','#0ff']};
+            
+            let found = false;
+            Object.keys(chips).forEach(id => {
                 const el = document.getElementById(id);
-                if(val.includes(icons[id])) { el.style.opacity = '1'; el.style.color = '#818cf8'; }
-                else { el.style.opacity = '0.2'; el.style.color = 'white'; }
+                if(url.includes(chips[id][0])) {
+                    el.classList.add('platform-active');
+                    el.style.color = chips[id][1];
+                    document.body.style.background = `radial-gradient(circle at 50% 50%, ${chips[id][1]}11 0%, #000 100%)`;
+                    matrix.style.opacity = "1";
+                    found = true;
+                } else {
+                    el.classList.remove('platform-active');
+                    el.style.color = "white";
+                }
             });
+            if(!found) {
+                document.body.style.background = "#000";
+                matrix.style.opacity = "0.1";
+            }
         }
+
+        // Technical Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toTimeString().split(' ')[0];
+        }, 1000);
     </script>
 </body>
 </html>
