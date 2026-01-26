@@ -3,166 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>EXAR — Pure Extraction</title>
+    <title>EXAR — Pure Power</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --primary: #6366f1;
-            --accent: #f43f5e;
-            --bg: #030308;
-        }
+        :root { --primary: #6366f1; --bg: #000000; }
+        body { background-color: var(--bg); color: white; font-family: 'Outfit', sans-serif; min-height: 100vh; overflow-x: hidden; }
 
-        body {
-            background-color: var(--bg);
-            color: white;
-            font-family: 'Outfit', sans-serif;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
+        /* 1. BIG AURORA BACKGROUND */
+        .aurora { position: fixed; inset: 0; z-index: -1; overflow: hidden; filter: blur(80px); opacity: 0.4; }
+        .blob { position: absolute; width: 60vw; height: 60vw; border-radius: 50%; animation: move 12s infinite alternate ease-in-out; }
+        @keyframes move { 0% { transform: translate(-10%, -10%) scale(1); } 100% { transform: translate(40%, 30%) scale(1.3); } }
 
-        /* 1. MOVING AURORA BACKGROUND */
-        .aurora {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; filter: blur(100px); opacity: 0.6;
-        }
-        .blob {
-            position: absolute; width: 500px; height: 500px; border-radius: 50%;
-            animation: move 20s infinite alternate;
-        }
-        @keyframes move {
-            0% { transform: translate(-20%, -20%) scale(1); }
-            100% { transform: translate(50%, 40%) scale(1.5); }
-        }
+        /* 2. SUPER ANIMATIONS */
+        .spring-up { animation: springUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes springUp { from { opacity: 0; transform: translateY(50px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* 2. BREATHING LOGO */
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(99,102,241,0.2)); }
-            50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(99,102,241,0.5)); }
-        }
-        .exar-logo { animation: breathe 4s ease-in-out infinite; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 2.5rem; }
+        
+        /* 3. BIG LOGO & INPUT */
+        .exar-logo { font-size: clamp(4rem, 15vw, 9rem); font-weight: 900; letter-spacing: -0.05em; line-height: 0.8; }
+        .input-mega { height: 75px; border-radius: 2rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .input-mega:focus-within { border-color: var(--primary); background: rgba(255,255,255,0.1); transform: scale(1.02); box-shadow: 0 0 50px rgba(99,102,241,0.2); }
 
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 2.5rem;
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .btn-go { background: linear-gradient(135deg, #6366f1, #a855f7); width: 65px; height: 55px; border-radius: 1.5rem; font-weight: 900; }
+        
+        /* 4. RESULT CARD MOBILE OPTIMIZED */
+        .result-card { width: 100%; max-width: 500px; margin: auto; border-radius: 2.5rem; overflow: hidden; }
+        .tab-btn { flex: 1; padding: 16px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; border-radius: 1rem; }
+        .tab-active { background: white; color: black; box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
 
-        .input-pill {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 100px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: 0.4s;
-        }
-        .input-pill:focus-within {
-            transform: scale(1.05) translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
+        /* 5. HISTORY TILES */
+        .history-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 1.8rem; padding: 15px; transition: 0.3s; }
+        .history-item:active { transform: scale(0.95); }
 
-        .btn-magic {
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            border-radius: 100px;
-            font-weight: 800;
-            transition: 0.3s;
-            position: relative; overflow: hidden;
-        }
-        .btn-magic::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-            transform: rotate(45deg); animation: shine 3s infinite;
-        }
-        @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
+        #toast { bottom: -100px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #toast.active { bottom: 20px; }
 
-        /* 3. STAGGERED REVEAL ANIMATION */
-        .reveal-item { opacity: 0; transform: translateY(30px); animation: fadeInUp 0.8s forwards; }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-
-        /* 4. SKELETON LOADER */
-        .skeleton {
-            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
-            background-size: 200% 100%;
-            animation: skeleton-move 1.5s infinite linear;
-        }
-        @keyframes skeleton-move { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-        .dl-icon-anim { animation: dl-bob 1s infinite; }
-        @keyframes dl-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
-
-        .progress-bar { height: 4px; background: linear-gradient(90deg, #6366f1, #f43f5e); border-radius: 10px; width: 0%; transition: 0.3s; }
+        .loading-bar { height: 4px; background: var(--primary); border-radius: 10px; width: 0%; transition: 0.3s; box-shadow: 0 0 15px var(--primary); }
     </style>
 </head>
-<body class="p-6">
-    <!-- Aurora background elements -->
+<body class="p-4 md:p-8">
     <div class="aurora">
         <div class="blob" style="background: #6366f1; left: -10%; top: -10%;"></div>
-        <div class="blob" style="background: #f43f5e; right: -10%; bottom: -10%; animation-delay: -5s;"></div>
+        <div class="blob" style="background: #f43f5e; right: -10%; bottom: -10%; animation-delay: -4s;"></div>
     </div>
 
-    <nav class="max-w-4xl mx-auto flex justify-between items-center mb-16 relative z-10">
-        <a href="index.html" class="w-12 h-12 flex items-center justify-center rounded-full glass hover:bg-white/10 transition active:scale-90">
-            <i class="fa-solid fa-arrow-left text-sm"></i>
-        </a>
-        <div class="glass px-5 py-2 rounded-full border-white/5 flex items-center gap-2">
-            <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-ping"></div>
-            <span class="text-[9px] font-black uppercase tracking-[0.2em] opacity-40">Motion Engine Active</span>
+    <!-- Smart Paste Toast -->
+    <div id="toast" class="fixed left-4 right-4 z-[100] glass p-4 flex items-center justify-between shadow-2xl md:max-w-xs md:left-auto md:right-8">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-link text-indigo-400"></i>
+            <span class="text-[10px] font-bold uppercase opacity-60">Ready to Extract?</span>
         </div>
+        <button onclick="useClip()" class="bg-white text-black px-6 py-2 rounded-full text-[10px] font-black uppercase">Fetch</button>
+    </div>
+
+    <nav class="max-w-4xl mx-auto flex justify-between items-center mb-12">
+        <a href="index.html" class="w-12 h-12 flex items-center justify-center rounded-2xl glass active:scale-90 transition"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="w-12 h-12 flex items-center justify-center rounded-2xl glass text-indigo-400"><i class="fa-solid fa-bolt-lightning"></i></div>
     </nav>
 
-    <main class="max-w-xl mx-auto space-y-12 relative z-10">
+    <main class="w-full max-w-2xl mx-auto space-y-12">
         
-        <header class="text-center space-y-4 exar-logo">
-            <h1 class="text-7xl font-black tracking-tighter italic leading-none">EX<span class="text-indigo-500">A</span>R</h1>
-            <p class="text-xs font-medium opacity-30 uppercase tracking-[0.5em]">FREE DOWNLOADS</p>
+        <!-- MEGA HEADER -->
+        <header class="text-center py-6 spring-up">
+            <h1 class="exar-logo italic">EX<span class="text-indigo-500">A</span>R</h1>
+            <p class="text-[10px] font-black uppercase tracking-[0.6em] opacity-20 mt-4">DOWNLOAD VIDEOS</p>
         </header>
 
-        <div class="reveal-item" style="animation-delay: 0.2s;">
-            <div class="input-pill p-2 flex items-center shadow-2xl">
-                <button onclick="autoPaste()" class="w-12 h-12 flex items-center justify-center text-indigo-400 hover:rotate-12 transition">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                </button>
-                <input type="text" id="v-url" class="bg-transparent flex-1 px-3 py-4 outline-none text-base font-medium placeholder:opacity-20" placeholder="Drop magic link...">
-                <button onclick="startMotionExtraction()" class="btn-magic px-8 py-4 text-xs text-white uppercase tracking-widest shadow-lg">Go</button>
+        <!-- INPUT BOX MEGA -->
+        <div class="spring-up" style="animation-delay: 0.1s">
+            <div class="input-mega flex items-center p-2.5">
+                <button onclick="manualPaste()" class="w-12 text-indigo-400 opacity-40 hover:opacity-100 transition"><i class="fa-solid fa-paste"></i></button>
+                <input type="text" id="url-in" class="bg-transparent flex-1 px-2 outline-none font-medium text-white text-sm" placeholder="Paste link to extract...">
+                <button onclick="runExtraction()" class="btn-go text-white flex items-center justify-center"><i class="fa-solid fa-arrow-right"></i></button>
             </div>
         </div>
 
-        <!-- Animated Spinner -->
-        <div id="v-loader" class="hidden flex flex-col items-center py-10 space-y-6">
-            <div class="relative w-16 h-16">
-                <div class="absolute inset-0 border-4 border-indigo-500/10 border-t-indigo-500 rounded-full animate-spin"></div>
-                <div class="absolute inset-2 border-4 border-rose-500/10 border-b-rose-500 rounded-full animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
-            </div>
-            <p class="text-[10px] font-black uppercase tracking-widest opacity-30 animate-pulse">Scanning Neural Paths...</p>
+        <!-- LOADER -->
+        <div id="loader" class="hidden py-10 flex flex-col items-center gap-4">
+            <div class="w-12 h-12 border-4 border-indigo-500/10 border-t-indigo-500 rounded-full animate-spin"></div>
+            <p class="text-[9px] font-black uppercase tracking-widest opacity-30">Connecting to Cloud Engine...</p>
         </div>
 
-        <!-- Result Box -->
-        <div id="v-res" class="hidden pb-24">
-            <div class="glass overflow-hidden reveal-item">
+        <!-- RESULTS -->
+        <div id="result-box" class="hidden spring-up space-y-6">
+            <div class="result-card glass border-white/5">
                 <div class="p-3">
-                    <div id="thumb-wrap" class="w-full h-72 rounded-[2rem] skeleton overflow-hidden relative">
-                        <img id="v-thumb" class="w-full h-full object-cover opacity-0 transition-opacity duration-1000" 
+                    <div id="thumb-container" class="w-full h-80 rounded-[2rem] bg-white/5 overflow-hidden">
+                        <img id="v-thumb" class="w-full h-full object-cover opacity-0 transition-opacity duration-700" 
                              referrerpolicy="no-referrer"
-                             onload="this.classList.remove('opacity-0'); document.getElementById('thumb-wrap').classList.remove('skeleton')">
+                             onload="this.classList.remove('opacity-0')">
                     </div>
                 </div>
-                
+
                 <div class="p-8 space-y-8">
-                    <div class="flex justify-between items-end">
-                        <div>
-                            <h3 id="v-title" class="text-xl font-bold leading-tight truncate">Data Decrypted</h3>
-                            <p class="text-[9px] uppercase font-black opacity-20 mt-1 tracking-widest">Atmospheric Node v6.0</p>
-                        </div>
+                    <h3 id="v-title" class="text-2xl font-bold tracking-tight leading-tight">Media Captured</h3>
+                    
+                    <div class="flex gap-2 p-1.5 glass rounded-[1.2rem]">
+                        <button id="v-tab" onclick="setTab('v')" class="tab-btn tab-active">Video Packets</button>
+                        <button id="a-tab" onclick="setTab('a')" class="tab-btn opacity-40">Audio Only</button>
                     </div>
 
-                    <div id="v-links" class="space-y-4"></div>
+                    <div id="links-grid" class="space-y-4"></div>
                 </div>
             </div>
         </div>
+
+        <!-- HISTORY SECTION -->
+        <div id="history-box" class="hidden space-y-6 pb-32 spring-up" style="animation-delay: 0.3s">
+            <div class="flex justify-between items-center px-4">
+                <h4 class="text-[10px] font-black uppercase tracking-[0.4em] opacity-30">Neural History</h4>
+                <button onclick="clearAll()" class="text-[9px] font-bold text-rose-500 uppercase">Clear</button>
+            </div>
+            <div id="h-list" class="space-y-3"></div>
+        </div>
+
     </main>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -171,109 +130,131 @@
     <script>
         const config = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const db = firebase.database();
-        
-        let apiBase = ""; 
+        let apiBase = ""; let medias = []; 
+        let history = JSON.parse(localStorage.getItem('exar_hist')) || [];
+
         db.ref('settings/myDownloaderUrl').on('value', s => { apiBase = s.val(); });
 
-        async function autoPaste() {
-            try {
-                const text = await navigator.clipboard.readText();
-                document.getElementById('v-url').value = text;
-            } catch (err) { alert("Paste manually!"); }
-        }
+        window.onload = () => { 
+            updateHistoryUI();
+            checkClip();
+        };
 
-        async function startMotionExtraction() {
-            const url = document.getElementById('v-url').value;
-            if(!url) return;
-            const loader = document.getElementById('v-loader');
-            const resBox = document.getElementById('v-res');
-            
-            loader.classList.remove('hidden');
-            resBox.classList.add('hidden');
-
+        async function checkClip() {
             try {
-                const response = await fetch(`${apiBase}/extract?url=${encodeURIComponent(url)}`);
-                const data = await response.json();
-                if(data.medias) {
-                    renderAnimatedUI(data);
-                    resBox.classList.remove('hidden');
+                const txt = await navigator.clipboard.readText();
+                if(txt.includes('http')) {
+                    document.getElementById('toast').classList.add('active');
+                    setTimeout(() => document.getElementById('toast').classList.remove('active'), 8000);
                 }
-            } catch (e) { alert("API Error!"); }
-            finally { loader.classList.add('hidden'); }
+            } catch(e){}
         }
 
-        function renderAnimatedUI(data) {
-            document.getElementById('v-thumb').src = data.thumbnail;
-            document.getElementById('v-title').innerText = data.title;
-            const list = document.getElementById('v-links');
-            list.innerHTML = '';
+        function useClip() { 
+            navigator.clipboard.readText().then(t => { 
+                document.getElementById('url-in').value = t; 
+                document.getElementById('toast').classList.remove('active');
+                runExtraction();
+            }); 
+        }
 
-            data.medias.forEach((m, idx) => {
-                const id = `link-${idx}`;
-                const delay = (idx * 0.1) + "s"; // Stagger effect
-                list.innerHTML += `
-                    <div class="reveal-item" style="animation-delay: ${delay}">
-                        <div class="flex justify-between items-center bg-white/[0.03] p-5 rounded-[1.8rem] border border-white/5 group hover:bg-white/[0.08] hover:border-indigo-500/50 transition-all duration-500">
+        async function runExtraction() {
+            const url = document.getElementById('url-in').value;
+            if(!url) return;
+            const ld = document.getElementById('loader'), rb = document.getElementById('result-box');
+            ld.classList.remove('hidden'); rb.classList.add('hidden');
+
+            try {
+                const res = await fetch(`${apiBase}/extract?url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+                if(data.medias) {
+                    medias = data.medias;
+                    document.getElementById('v-thumb').src = data.thumbnail;
+                    document.getElementById('v-title').innerText = data.title;
+                    saveToHist(data.title, data.thumbnail, url);
+                    setTab('v');
+                    rb.classList.remove('hidden');
+                    window.scrollTo({top: rb.offsetTop - 50, behavior: 'smooth'});
+                }
+            } catch(e) { alert("Engine Blocked! Retry."); }
+            finally { ld.classList.add('hidden'); }
+        }
+
+        function setTab(mode) {
+            const grid = document.getElementById('links-grid');
+            const vt = document.getElementById('v-tab'), at = document.getElementById('a-tab');
+            grid.innerHTML = '';
+            
+            if(mode === 'v') { vt.classList.add('tab-active'); vt.classList.remove('opacity-40'); at.classList.remove('tab-active'); at.classList.add('opacity-40'); }
+            else { at.classList.add('tab-active'); at.classList.remove('opacity-40'); vt.classList.remove('tab-active'); vt.classList.add('opacity-40'); }
+
+            const filtered = mode === 'v' ? medias : [...medias].reverse().slice(0,1);
+
+            filtered.forEach((m, i) => {
+                const id = `dl-${mode}-${i}`;
+                grid.innerHTML += `
+                    <div class="reveal-item">
+                        <div class="flex justify-between items-center bg-white/[0.03] p-6 rounded-[1.8rem] border border-white/5">
                             <div>
-                                <p class="text-sm font-bold text-white/90">${m.quality}</p>
-                                <p class="text-[8px] font-black opacity-20 uppercase mt-1">Ready for Storage</p>
+                                <p class="text-sm font-bold opacity-90">${m.quality}</p>
+                                <p class="text-[8px] font-black opacity-20 uppercase mt-1">${mode==='v'?'Video Stream':'Audio Stream MP3'}</p>
                             </div>
-                            <button id="${id}" onclick="motionDownload('${m.url}', 'EXAR_${idx}.mp4', '${id}')"
-                                class="w-12 h-12 flex items-center justify-center rounded-full bg-white text-black hover:bg-indigo-500 hover:text-white hover:scale-110 transition-all duration-300">
+                            <button id="${id}" onclick="doDL('${m.url}', 'EXAR_${mode}_${i}.${mode==='v'?'mp4':'mp3'}', '${id}')"
+                                class="w-14 h-14 flex items-center justify-center rounded-2xl bg-white text-black active:scale-90 transition">
                                 <i class="fa-solid fa-arrow-down"></i>
                             </button>
                         </div>
-                        <div id="prog-wrap-${id}" class="hidden mt-3 px-2 space-y-2">
-                            <div class="bg-white/5 h-1 rounded-full overflow-hidden">
-                                <div id="bar-${id}" class="progress-bar"></div>
-                            </div>
-                            <div class="flex justify-between text-[7px] font-black opacity-30 uppercase tracking-tighter">
-                                <span>Capturing Bitstream</span>
-                                <span id="pct-${id}">0%</span>
-                            </div>
-                        </div>
+                        <div id="p-wrap-${id}" class="hidden mt-4 px-2"><div class="bg-white/5 h-1 rounded-full"><div id="bar-${id}" class="loading-bar"></div></div></div>
                     </div>`;
             });
         }
 
-        async function motionDownload(url, filename, id) {
-            const btn = document.getElementById(id);
-            const bar = document.getElementById(`bar-${id}`);
-            const pct = document.getElementById(`pct-${id}`);
-            const wrap = document.getElementById(`prog-wrap-${id}`);
-
-            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i>`;
-            btn.disabled = true;
+        async function doDL(url, name, id) {
+            const btn = document.getElementById(id), bar = document.getElementById(`bar-${id}`), wrap = document.getElementById(`p-wrap-${id}`);
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-xs"></i>`; btn.disabled = true;
             wrap.classList.remove('hidden');
-            btn.querySelector('i').classList.add('dl-icon-anim');
 
             try {
-                const response = await fetch(url);
-                const reader = response.body.getReader();
-                const total = +response.headers.get('Content-Length');
-                let loaded = 0; let chunks = [];
-
+                const res = await fetch(url);
+                const reader = res.body.getReader();
+                const total = +res.headers.get('Content-Length');
+                let received = 0; let chunks = [];
                 while(true) {
                     const {done, value} = await reader.read();
-                    if (done) break;
-                    chunks.push(value); loaded += value.length;
-                    if (total) {
-                        const p = Math.floor((loaded / total) * 100);
-                        bar.style.width = p + "%"; pct.innerText = p + "%";
-                        if(p > 99) btn.innerHTML = `<i class="fa-solid fa-check"></i>`;
-                    }
+                    if(done) break;
+                    chunks.push(value); received += value.length;
+                    if(total) bar.style.width = (received/total*100) + "%";
                 }
-                const blob = new Blob(chunks);
-                const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-                a.download = filename; a.click();
-            } catch (e) {
-                window.open(url, '_blank'); btn.innerHTML = `<i class="fa-solid fa-arrow-up-right-from-square"></i>`;
-            }
-            setTimeout(() => { 
-                btn.innerHTML = `<i class="fa-solid fa-arrow-down"></i>`; 
-                btn.disabled = false; wrap.classList.add('hidden');
-            }, 5000);
+                const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(chunks)); a.download = name; a.click();
+                btn.innerHTML = `<i class="fa-solid fa-check"></i>`;
+            } catch(e) { window.open(url, '_blank'); }
+            setTimeout(() => { btn.innerHTML = `<i class="fa-solid fa-arrow-down"></i>`; btn.disabled = false; wrap.classList.add('hidden'); }, 4000);
         }
+
+        function saveToHist(t, im, u) {
+            history = [{t, im, u}, ...history.filter(x => x.u !== u)].slice(0, 5);
+            localStorage.setItem('exar_hist', JSON.stringify(history));
+            updateHistoryUI();
+        }
+
+        function updateHistoryUI() {
+            const list = document.getElementById('h-list'), box = document.getElementById('history-box');
+            if(!history.length) return box.classList.add('hidden');
+            box.classList.remove('hidden'); list.innerHTML = '';
+            history.forEach(h => {
+                list.innerHTML += `
+                    <div class="history-item flex items-center gap-4 cursor-pointer" onclick="document.getElementById('url-in').value='${h.u}'; runExtraction();">
+                        <img src="${h.im}" class="w-14 h-14 object-cover rounded-2xl opacity-40" referrerpolicy="no-referrer">
+                        <div class="flex-1 truncate">
+                            <p class="text-[11px] font-bold uppercase truncate pr-4">${h.t}</p>
+                            <p class="text-[8px] font-black opacity-20 uppercase tracking-tighter truncate">${h.u}</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-20 mr-2"></i>
+                    </div>`;
+            });
+        }
+        function clearAll() { history = []; localStorage.removeItem('exar_hist'); updateHistoryUI(); }
+        function manualPaste() { navigator.clipboard.readText().then(t => document.getElementById('url-in').value = t); }
     </script>
 </body>
 </html>
