@@ -2,130 +2,203 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CINEMA — Premium Streaming</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>CINEMA — Pro Streaming Node</title>
+    
+    <!-- Design & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+    
+    <!-- Plyr.io for iOS Fullscreen Support -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
     <style>
-        body { background: #050505; color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
-        
-        /* Mast UI Cards */
+        :root { --primary: #e11d48; --bg: #050505; }
+        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+
+        /* Movie Grid UI */
         .movie-card { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
-        .movie-card:hover { transform: scale(1.08); z-index: 10; }
-        .movie-card img { border-radius: 2rem; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .movie-card:hover img { border-color: rgba(225, 29, 72, 0.4); box-shadow: 0 0 30px rgba(225, 29, 72, 0.2); }
+        .movie-card:hover { transform: scale(1.05); }
+        .movie-card img { border-radius: 2rem; border: 1px solid rgba(255,255,255,0.05); }
 
-        /* Fullscreen Player */
-        .player-modal { position: fixed; inset: 0; z-index: 1000; background: black; display: none; flex-direction: column; }
-        .video-wrapper { position: relative; width: 100%; height: 100%; background: #000; }
-        iframe { width: 100%; height: 100%; border: none; }
+        /* iOS Style Bottom Sheet Selector */
+        .bottom-sheet {
+            position: fixed; inset: 0; z-index: 3000; display: none; align-items: flex-end;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+        }
+        .sheet-content {
+            width: 100%; background: #121212; border-radius: 2.5rem 2.5rem 0 0;
+            padding: 30px; border-top: 1px solid rgba(255,255,255,0.1);
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .glass-nav { background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        
-        /* Mobile Buttons */
-        .btn-action { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
-        .btn-action:active { background: #e11d48; border-color: #e11d48; }
+        .player-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px; border-radius: 1.5rem; display: flex; align-items: center; gap: 15px;
+            transition: 0.3s; width: 100%; text-align: left; margin-bottom: 12px;
+        }
+        .player-btn:active { background: var(--primary); transform: scale(0.95); }
+
+        /* Internal Player View */
+        #internal-view { position: fixed; inset: 0; z-index: 4000; background: black; display: none; flex-direction: column; }
+        .plyr--full-ui { --plyr-color-main: #e11d48; }
+
+        .glass-nav { background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body class="pb-20">
 
-    <!-- Navbar -->
+    <!-- Header -->
     <nav class="sticky top-0 z-50 p-6 glass-nav flex justify-between items-center">
-        <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 hover:bg-rose-600 transition">
-            <i class="fa-solid fa-arrow-left text-sm"></i>
+        <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10">
+            <i class="fa-solid fa-chevron-left"></i>
         </a>
-        <h1 class="text-2xl font-black tracking-tighter uppercase italic">CINE<span class="text-rose-600">MA</span></h1>
+        <h1 class="text-2xl font-black italic tracking-tighter uppercase">CINE<span class="text-rose-600">MA</span></h1>
         <div class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></div>
     </nav>
 
-    <!-- Content -->
-    <div class="max-w-7xl mx-auto p-6 space-y-12">
-        
+    <div class="max-w-7xl mx-auto p-6 space-y-10">
         <header>
-            <h2 class="text-4xl font-black uppercase tracking-tight">Movies Hub</h2>
-            <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.5em] mt-1">A2Z Cinema Engine v4.0</p>
+            <h2 class="text-4xl font-black uppercase tracking-tight">Streaming Hub</h2>
+            <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.5em] mt-1">Multi-Channel Player Support</p>
         </header>
 
-        <!-- Search Bar -->
-        <div class="bg-white/5 p-1 rounded-2xl flex border border-white/5 items-center">
-            <i class="fa-solid fa-magnifying-glass ml-4 opacity-20"></i>
-            <input type="text" placeholder="Search by title..." class="bg-transparent flex-1 px-4 py-4 outline-none text-sm font-medium">
-        </div>
-
-        <!-- Movie Grid (2 cols mobile, 6 cols desktop) -->
-        <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
-            <!-- Movies Load Dynamically -->
+        <!-- Dynamic Grid -->
+        <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            <!-- Movies Inject here -->
         </div>
     </div>
 
-    <!-- PLAYER MODAL (Premium Style) -->
-    <div id="player-modal" class="player-modal">
-        <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-white/5">
-            <button onclick="closePlayer()" class="btn-action px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest"><i class="fa-solid fa-chevron-left mr-2"></i> Close</button>
-            <h3 id="playing-title" class="text-[10px] font-black uppercase tracking-widest opacity-40 truncate max-w-[40%]">Streaming</h3>
-            <!-- MOBILE FIX: Open in Browser if iframe fails -->
-            <button onclick="fixPlayer()" class="bg-rose-600 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-rose-600/20">Fix / Open</button>
-        </div>
-        
-        <div class="video-wrapper">
-            <div id="player-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black">
-                <div class="w-10 h-10 border-2 border-rose-600/20 border-t-rose-600 rounded-full animate-spin"></div>
-                <p class="text-[8px] font-black uppercase tracking-widest opacity-30">Authenticating Drive Node</p>
+    <!-- PLAYER SELECTOR (Bottom Sheet) -->
+    <div id="selector-sheet" class="bottom-sheet" onclick="if(event.target == this) closeSelector()">
+        <div class="sheet-content">
+            <div class="w-12 h-1.5 bg-white/10 rounded-full mx-auto mb-8"></div>
+            
+            <header class="mb-8">
+                <h3 id="sel-title" class="text-xl font-black uppercase italic tracking-tight">Select Media Player</h3>
+                <p class="text-[10px] font-bold text-white/30 uppercase mt-1 tracking-widest">Enhanced Streaming Options</p>
+            </header>
+
+            <div class="space-y-4">
+                <!-- Internal Player -->
+                <button onclick="launchInternal()" class="player-btn">
+                    <div class="w-12 h-12 bg-rose-600/10 rounded-xl flex items-center justify-center text-rose-500"><i class="fa-solid fa-play"></i></div>
+                    <div><p class="text-sm font-bold uppercase">Native Quick Play</p><p class="text-[9px] opacity-40 uppercase">Optimized for Web & iPhone</p></div>
+                </button>
+
+                <!-- VLC Player -->
+                <button onclick="launchVLC()" class="player-btn">
+                    <div class="w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center text-orange-500"><i class="fa-solid fa-cone-striped"></i></div>
+                    <div><p class="text-sm font-bold uppercase">VLC Media Player</p><p class="text-[9px] opacity-40 uppercase">Recommended for Dual Audio (iOS/Android)</p></div>
+                </button>
+
+                <!-- MX Player -->
+                <button onclick="launchMX()" class="player-btn">
+                    <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500"><i class="fa-solid fa-bolt"></i></div>
+                    <div><p class="text-sm font-bold uppercase">MX Player Pro</p><p class="text-[9px] opacity-40 uppercase">Best for Advanced Controls (Android)</p></div>
+                </button>
             </div>
-            <div id="iframe-box" class="w-full h-full relative z-10"></div>
+
+            <!-- Professional Instruction -->
+            <div class="mt-8 p-5 bg-white/5 rounded-2xl border border-white/5">
+                <p class="text-[10px] leading-relaxed font-medium text-white/50 text-center uppercase tracking-wider">
+                    <i class="fa-solid fa-circle-info mr-2 text-rose-500"></i>
+                    For a premium experience with <b>Dual Audio (Hindi/English)</b> and subtitles, please choose <b>VLC</b> or <b>MX Player</b>. Native browser playback is optimized for quick viewing only.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- INTERNAL PLAYER VIEW -->
+    <div id="internal-view">
+        <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-white/5">
+            <button onclick="closeInternal()" class="text-[10px] font-black uppercase tracking-[0.2em]"><i class="fa-solid fa-xmark mr-2"></i> Close Cinema</button>
+            <h4 id="now-playing" class="text-[9px] font-bold uppercase opacity-30 truncate max-w-[50%]">Streaming</h4>
+        </div>
+        <div class="flex-1 flex items-center justify-center">
+            <video id="player" playsinline controls></video>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
     <script>
         const config = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const db = firebase.database();
         
-        let currentId = "";
+        let selectedId = "", selectedTitle = "";
+        const plyrPlayer = new Plyr('#player');
 
+        // Load Movies from Firebase
         db.ref('movies').on('value', s => {
             const grid = document.getElementById('movie-grid'); grid.innerHTML = '';
             s.forEach(child => {
                 const m = child.val();
                 grid.innerHTML += `
-                    <div class="movie-card group" onclick="playMovie('${m.driveId}', '${m.title}')">
+                    <div class="movie-card" onclick="openSelector('${m.driveId}', '${m.title}')">
                         <div class="aspect-[2/3] overflow-hidden">
-                            <img src="${m.poster}" class="w-full h-full object-cover group-hover:brightness-110 transition-all duration-500">
+                            <img src="${m.poster}" class="w-full h-full object-cover">
                         </div>
                         <div class="mt-4 px-1">
-                            <h4 class="text-[11px] font-black uppercase truncate tracking-wide">${m.title}</h4>
-                            <p class="text-[8px] font-black opacity-20 uppercase mt-1 tracking-tighter">${m.category} • 4K ULTRA</p>
+                            <h4 class="text-[11px] font-black uppercase truncate">${m.title}</h4>
+                            <p class="text-[8px] font-bold opacity-30 uppercase mt-1">4K • DUAL AUDIO</p>
                         </div>
                     </div>`;
             });
         });
 
-        function playMovie(id, title) {
-            currentId = id;
-            const modal = document.getElementById('player-modal');
-            const box = document.getElementById('iframe-box');
-            document.getElementById('playing-title').innerText = title;
-            
-            // Standard Drive Preview
-            const streamUrl = `https://drive.google.com/file/d/${id}/preview`;
-            
-            box.innerHTML = `<iframe src="${streamUrl}" allow="autoplay" allowfullscreen></iframe>`;
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+        function openSelector(id, title) {
+            selectedId = id; selectedTitle = title;
+            document.getElementById('sel-title').innerText = title;
+            document.getElementById('selector-sheet').style.display = 'flex';
         }
 
-        // MOBILE FIX: Google Drive large files sometimes need full browser tab to show the "Virus Scan" button
-        function fixPlayer() {
-            if(currentId) window.open(`https://drive.google.com/file/d/${currentId}/view`, '_blank');
+        function closeSelector() { document.getElementById('selector-sheet').style.display = 'none'; }
+
+        // --- THE JADU: DRIVE BYPASS ENGINE ---
+        function getDirectURL(id) {
+            // Standard GDrive Direct Construction
+            // Note: For files >100MB, users might see a browser warning first.
+            return `https://drive.google.com/uc?id=${id}&export=download`;
         }
 
-        function closePlayer() {
-            document.getElementById('player-modal').style.display = 'none';
-            document.getElementById('iframe-box').innerHTML = '';
-            document.body.style.overflow = 'auto';
+        // 1. Internal Plyr Engine (Fixes iPhone Fullscreen)
+        function launchInternal() {
+            closeSelector();
+            const url = getDirectURL(selectedId);
+            document.getElementById('internal-view').style.display = 'flex';
+            document.getElementById('now-playing').innerText = `Playing: ${selectedTitle}`;
+            
+            plyrPlayer.source = {
+                type: 'video',
+                title: selectedTitle,
+                sources: [{ src: url, type: 'video/mp4' }]
+            };
+            plyrPlayer.play();
+        }
+
+        // 2. VLC Player (Universal iOS/Android)
+        function launchVLC() {
+            const url = getDirectURL(selectedId);
+            window.location.href = `vlc://${url}`;
+            closeSelector();
+        }
+
+        // 3. MX Player (Android Intent Logic)
+        function launchMX() {
+            const url = getDirectURL(selectedId);
+            const intent = `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;S.title=${selectedTitle};end`;
+            window.location.href = intent;
+            closeSelector();
+        }
+
+        function closeInternal() {
+            plyrPlayer.stop();
+            document.getElementById('internal-view').style.display = 'none';
         }
     </script>
 </body>
