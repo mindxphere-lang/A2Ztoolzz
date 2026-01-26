@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>CINEMA — Ultra Streaming Node</title>
+    <title>CINEMA — Neural Media Streamer</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -13,7 +13,7 @@
         :root { --primary: #e11d48; --bg: #050505; }
         body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
 
-        /* Movie UI */
+        /* Movie UI Grid */
         .movie-card { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
         .movie-card:hover { transform: scale(1.05); }
         .movie-card img { border-radius: 2rem; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
@@ -24,7 +24,7 @@
             background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
         }
         .sheet-content {
-            width: 100%; background: #0a0a0a; border-radius: 2.5rem 2.5rem 0 0;
+            width: 100%; background: #0a0a0a; border-radius: 3rem 3rem 0 0;
             padding: 35px; border-top: 1px solid rgba(255,255,255,0.1);
             animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -37,15 +37,19 @@
         }
         .player-opt:active { background: var(--primary); border-color: var(--primary); transform: scale(0.96); }
 
+        /* Fullscreen Player View */
+        #player-view { position: fixed; inset: 0; z-index: 6000; background: black; display: none; flex-direction: column; }
+        video { width: 100%; height: 100%; background: black; }
+
         .glass-nav { background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body class="pb-24">
 
-    <!-- Header Navigation -->
+    <!-- Sticky Header -->
     <nav class="sticky top-0 z-50 p-6 glass-nav flex justify-between items-center">
         <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 active:scale-90 transition">
-            <i class="fa-solid fa-arrow-left text-sm"></i>
+            <i class="fa-solid fa-chevron-left text-sm"></i>
         </a>
         <h1 class="text-2xl font-black italic uppercase tracking-tighter">CINE<span class="text-rose-600">MA</span></h1>
         <div class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></div>
@@ -53,8 +57,8 @@
 
     <div class="max-w-7xl mx-auto p-6 space-y-12">
         <header>
-            <h2 class="text-4xl font-black uppercase tracking-tight">Global Cinema</h2>
-            <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.5em] mt-1">Cloudflare Direct Stream Engine</p>
+            <h2 class="text-4xl font-black uppercase tracking-tight">Stream Hub</h2>
+            <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.5em] mt-1">Direct Cloud API Streaming</p>
         </header>
 
         <!-- Movie Grid -->
@@ -66,40 +70,51 @@
     <!-- PLAYER SELECTOR (Bottom Sheet) -->
     <div id="selector-sheet" class="bottom-sheet" onclick="if(event.target == this) closeSelector()">
         <div class="sheet-content">
-            <div class="w-12 h-1 bg-white/10 rounded-full mx-auto mb-10"></div>
+            <div class="w-14 h-1.5 bg-white/10 rounded-full mx-auto mb-10"></div>
             
             <header class="mb-10 text-center">
                 <h3 id="sel-title" class="text-2xl font-black uppercase italic tracking-tight mb-2">Movie Title</h3>
-                <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">Bypassing GDrive Security...</p>
+                <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">Connecting to G-Drive API Node...</p>
             </header>
 
             <div class="space-y-4">
                 <!-- Native Browser / iPhone Quick Play -->
-                <button onclick="playNative()" class="player-opt">
+                <button onclick="launchInternal()" class="player-opt">
                     <div class="w-14 h-14 bg-rose-600/20 rounded-2xl flex items-center justify-center text-rose-500 text-xl"><i class="fa-solid fa-play"></i></div>
-                    <div><p class="text-base font-bold uppercase tracking-tight">Native Player</p><p class="text-[10px] opacity-30 uppercase font-medium">Full Speed • iPhone Browser Support</p></div>
+                    <div><p class="text-base font-bold uppercase tracking-tight">Native Player</p><p class="text-[10px] opacity-30 uppercase font-medium">Auto Fullscreen • Bypass Virus Warning</p></div>
                 </button>
 
                 <!-- VLC Player -->
-                <button onclick="playVLC()" class="player-opt">
+                <button onclick="launchVLC()" class="player-opt">
                     <div class="w-14 h-14 bg-orange-500/20 rounded-2xl flex items-center justify-center text-orange-500 text-xl"><i class="fa-solid fa-cone-striped"></i></div>
-                    <div><p class="text-base font-bold uppercase tracking-tight">VLC Media Player</p><p class="text-[10px] opacity-30 uppercase font-medium">Recommended for Dual-Audio (iOS/Android)</p></div>
+                    <div><p class="text-base font-bold uppercase tracking-tight">VLC Media Player</p><p class="text-[10px] opacity-30 uppercase font-medium">Universal Support • Multi-Audio Tracks</p></div>
                 </button>
 
                 <!-- MX Player -->
-                <button onclick="playMX()" class="player-opt">
+                <button onclick="launchMX()" class="player-opt">
                     <div class="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-500 text-xl"><i class="fa-solid fa-bolt"></i></div>
-                    <div><p class="text-base font-bold uppercase tracking-tight">MX Player Pro</p><p class="text-[10px] opacity-30 uppercase font-medium">Advanced Performance (Android Only)</p></div>
+                    <div><p class="text-base font-bold uppercase tracking-tight">MX Player Pro</p><p class="text-[10px] opacity-30 uppercase font-medium">Hardware+ Acceleration • Android</p></div>
                 </button>
             </div>
 
             <!-- Professional Instruction -->
             <div class="mt-10 p-6 bg-white/[0.03] rounded-3xl border border-white/5">
-                <p class="text-[10px] leading-relaxed font-bold text-white/40 text-center uppercase tracking-widest">
+                <p class="text-[10px] leading-relaxed font-bold text-white/40 text-center uppercase tracking-widest leading-loose">
                     <i class="fa-solid fa-circle-info mr-2 text-rose-500"></i>
-                    To access <b>Dual-Audio (Hindi/English)</b> tracks and customized subtitles, please utilize <b>VLC</b> or <b>MX Player</b>. Native browser playback is optimized for instant single-track viewing.
+                    For an enhanced cinematic experience with <b>Dual Audio (Hindi/English)</b> and subtitles, we highly recommend using <b>VLC</b> or <b>MX Player</b>. The native player is optimized for fast web streaming.
                 </p>
             </div>
+        </div>
+    </div>
+
+    <!-- INTERNAL FULLSCREEN VIEW -->
+    <div id="player-view">
+        <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-white/5">
+            <button onclick="closePlayer()" class="text-[10px] font-black uppercase tracking-widest text-rose-500 active:scale-90 transition"><i class="fa-solid fa-xmark mr-2"></i> Exit Player</button>
+            <h4 id="now-playing" class="text-[9px] font-bold uppercase opacity-30 truncate max-w-[50%] tracking-widest">A2Z Cinema Engine</h4>
+        </div>
+        <div class="flex-1 flex items-center justify-center bg-black">
+            <video id="main-video" controls playsinline controlsList="nodownload"></video>
         </div>
     </div>
 
@@ -110,11 +125,11 @@
         const config = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const db = firebase.database();
         
-        let mId = "", mTitle = "", workerUrl = "";
+        let selectedId = "", selectedTitle = "", workerUrl = "";
 
-        // 1. Fetch Cloudflare Worker URL from Settings
+        // 1. Fetch Proxy Worker URL from Settings (Aapka gdrive-proxy link yahan save karein)
         db.ref('settings/workerUrl').on('value', s => {
-            workerUrl = s.val() || "";
+            workerUrl = s.val() || "https://gdrive-proxy.mindxphere.workers.dev/";
         });
 
         // 2. Load Movies
@@ -131,45 +146,56 @@
         });
 
         function openSelector(id, title) {
-            mId = id; mTitle = title;
+            selectedId = id; selectedTitle = title;
             document.getElementById('sel-title').innerText = title;
             document.getElementById('selector-sheet').style.display = 'flex';
         }
 
         function closeSelector() { document.getElementById('selector-sheet').style.display = 'none'; }
 
-        // --- THE ENGINE: DIRECT STREAM CONSTRUCTOR ---
-        function getStreamLink() {
-            // This URL hits your Cloudflare Worker which auto-confirms the virus scan
-            return `${workerUrl}?id=${mId}`;
+        // --- THE ENGINE: API PROXY CONSTRUCTOR ---
+        function getStreamURL() {
+            // Hitting your worker which returns a pure video stream
+            return `${workerUrl}?id=${selectedId}`;
         }
 
-        // 1. NATIVE PLAYER (Browser / iPhone)
-        function playNative() {
+        // 1. Native Player (iPhone/Web Optimized)
+        function launchInternal() {
             closeSelector();
-            const link = getStreamLink();
-            // Redirect to the direct stream link
-            window.location.href = link;
-        }
-
-        // 2. VLC PLAYER (Universal iOS/Android)
-        function playVLC() {
-            const stream = getStreamLink();
-            // Using x-callback for iOS to ensure it treats it as a stream
-            const vlcUrl = `vlc-x-callback://x-callback-url/stream?url=${encodeURIComponent(stream)}`;
+            const view = document.getElementById('player-view');
+            const video = document.getElementById('main-video');
+            document.getElementById('now-playing').innerText = `Streaming: ${selectedTitle}`;
             
-            window.location.href = vlcUrl;
-            // Fallback for Android
-            setTimeout(() => { window.location.href = `vlc://${stream}`; }, 1000);
+            video.src = getStreamURL();
+            view.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            video.play();
+        }
+
+        // 2. VLC Media Player (Universal)
+        function launchVLC() {
+            const url = getStreamURL();
+            // VLC x-callback to ensure it treats it as a stream, not a file
+            window.location.href = `vlc-x-callback://x-callback-url/stream?url=${encodeURIComponent(url)}`;
+            
+            // Android Fallback
+            setTimeout(() => { window.location.href = `vlc://${url}`; }, 1000);
             closeSelector();
         }
 
-        // 3. MX PLAYER (Android Intent)
-        function playMX() {
-            const stream = getStreamLink();
-            const intent = `intent:${stream}#Intent;package=com.mxtech.videoplayer.ad;S.title=${mTitle};end`;
+        // 3. MX Player (Android Intent)
+        function launchMX() {
+            const url = getStreamURL();
+            const intent = `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;S.title=${selectedTitle};end`;
             window.location.href = intent;
             closeSelector();
+        }
+
+        function closePlayer() {
+            const video = document.getElementById('main-video');
+            video.pause(); video.src = "";
+            document.getElementById('player-view').style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
     </script>
 </body>
