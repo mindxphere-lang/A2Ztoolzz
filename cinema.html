@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CINEMA — Dual-Audio Pro</title>
+    <title>CINEMA — Pure Hindi/Dual Audio Node</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
@@ -21,8 +21,10 @@
         .server-btn.active { background: #e11d48; border-color: #fb7185; color: white; box-shadow: 0 0 15px rgba(225, 29, 72, 0.4); }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .tip-anim { animation: glowText 2s infinite; }
-        @keyframes glowText { 0%, 100% { color: #f43f5e; } 50% { color: #fff; } }
+        
+        /* Floating Audio Tip Animation */
+        .audio-tip { animation: tipGlow 1.5s infinite; font-weight: 900; color: #fb7185; }
+        @keyframes tipGlow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.98); } }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -34,31 +36,32 @@
         <div class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></div>
     </nav>
 
-    <!-- Movies Library -->
+    <!-- Movies Grid -->
     <div class="max-w-7xl mx-auto">
-        <h2 class="text-2xl font-black uppercase italic mb-8 border-l-4 border-rose-600 pl-4">Premium <span class="text-zinc-600">Selection</span></h2>
+        <h2 class="text-2xl font-black uppercase italic mb-8 border-l-4 border-rose-600 pl-4">Premium <span class="text-zinc-600">Streaming</span></h2>
         <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
-            <!-- Dynamic Content -->
+            <!-- Dynamic Movies -->
         </div>
     </div>
 
-    <!-- PLAYER TERMINAL -->
+    <!-- PLAYER OVERLAY -->
     <div id="player-modal" class="player-modal">
-        <!-- Control Bar -->
+        <!-- Technical Control Bar -->
         <div class="p-3 md:p-4 flex flex-col md:flex-row gap-4 justify-between items-center bg-zinc-950 border-b border-white/5">
             <div class="flex items-center gap-4 w-full md:w-auto justify-between">
                 <button onclick="closePlayer()" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition"><i class="fa-solid fa-xmark mr-1"></i> Exit</button>
                 <div class="flex gap-2 overflow-x-auto no-scrollbar" id="server-list"></div>
             </div>
             
-            <!-- Audio Help Tip -->
+            <!-- Real-time Status / Audio Tip -->
             <p id="movie-status" class="text-[9px] font-black uppercase tracking-[0.1em] text-center"></p>
         </div>
 
+        <!-- Video Stream Container -->
         <div class="iframe-container flex-1">
             <div id="p-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-5 bg-black z-0">
                 <div class="w-14 h-14 border-4 border-rose-600/10 border-t-rose-600 rounded-full animate-spin"></div>
-                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500 animate-pulse">Scanning Audio Tracks...</p>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500 animate-pulse text-center">Decrypting Multi-Audio Streams...</p>
             </div>
             <iframe id="main-iframe" allowfullscreen src="" referrerpolicy="no-referrer"></iframe>
         </div>
@@ -72,13 +75,13 @@
         
         let currentImdbId = "";
 
-        // --- DUAL-AUDIO OPTIMIZED SOURCES ---
+        // --- DUAL AUDIO & HINDI DUB SOURCES ---
         const sources = [
-            { name: "Server 1 (Dual Audio)", url: (id) => `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=1` },
-            { name: "Server 2 (Pro)", url: (id) => `https://vidlink.pro/movie/${id}?primaryColor=e11d48` },
-            { name: "Server 3 (Hindi Dub)", url: (id) => `https://vidsrc.icu/embed/movie/${id}` },
-            { name: "Server 4 (Backup)", url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=0` },
-            { name: "Server 5 (HD)", url: (id) => `https://vidsrc.to/embed/movie/${id}` }
+            { name: "Server 1 (Hindi Dub)", url: (id) => `https://vidsrc.icu/embed/movie/${id}` },
+            { name: "Server 2 (Dual Audio)", url: (id) => `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=1` },
+            { name: "Server 3 (HD Pro)", url: (id) => `https://vidlink.pro/movie/${id}?primaryColor=e11d48` },
+            { name: "Server 4 (Smashy)", url: (id) => `https://embed.smashystream.com/playere.php?tmdb=0&id=${id}` },
+            { name: "Server 5 (Backup)", url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=0` }
         ];
 
         // Load Movies
@@ -105,15 +108,13 @@
                 `<button onclick="switchServer(${i})" class="server-btn s-btn-${i} ${i===0?'active':''}">${src.name}</button>`
             ).join('');
 
-            document.getElementById('movie-status').innerHTML = `<i class="fa-solid fa-film text-rose-500 mr-2"></i> ${title}`;
-            switchServer(0); 
+            document.getElementById('movie-status').innerHTML = `<i class="fa-solid fa-volume-high text-rose-500 mr-2"></i> ${title}`;
+            switchServer(0); // Start with Hindi Priority Server
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
 
-            // Trigger Audio Tip
-            setTimeout(() => {
-                document.getElementById('movie-status').innerHTML = `<span class="tip-anim font-bold uppercase"><i class="fa-solid fa-gear mr-1"></i> Use Gear Icon ⚙️ to Switch Audio to Hindi</span>`;
-            }, 4000);
+            // Trigger the "How to change Audio" instruction
+            showAudioInstruction();
         }
 
         function switchServer(index) {
@@ -127,8 +128,23 @@
             iframe.src = sources[index].url(currentImdbId);
 
             iframe.onload = () => {
-                setTimeout(() => { loader.style.display = 'none'; }, 1500);
+                setTimeout(() => { loader.style.display = 'none'; }, 2000);
             };
+        }
+
+        // --- SMART AUDIO INSTRUCTION ---
+        function showAudioInstruction() {
+            const statusBox = document.getElementById('movie-status');
+            const originalTitle = statusBox.innerHTML;
+            
+            setTimeout(() => {
+                statusBox.innerHTML = `<span class="audio-tip uppercase"><i class="fa-solid fa-gear mr-1"></i> Gear Icon -> Audio -> Select Hindi</span>`;
+                
+                // Switch back to title after 7 seconds
+                setTimeout(() => {
+                    statusBox.innerHTML = originalTitle;
+                }, 7000);
+            }, 4000);
         }
 
         function closePlayer() {
