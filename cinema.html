@@ -2,47 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CINEMA — Pro Streaming</title>
+    <title>CINEMA — Multi-Audio Node</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: white; font-family: 'Outfit', sans-serif; }
-        .movie-card { transition: 0.4s cubic-bezier(0.2, 1, 0.3, 1); cursor: pointer; }
+        body { background: #000; color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+        .movie-card { transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1); cursor: pointer; }
         .movie-card:hover { transform: scale(1.05) translateY(-5px); }
-        .player-modal { position: fixed; inset: 0; z-index: 2000; background: black; display: none; flex-direction: column; }
+        .movie-card img { border-radius: 1.8rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .movie-card:hover img { border-color: #e11d48; box-shadow: 0 0 30px rgba(225, 29, 72, 0.2); }
+        
+        .player-modal { position: fixed; inset: 0; z-index: 5000; background: black; display: none; flex-direction: column; }
         .iframe-container { position: relative; width: 100%; height: 100%; background: #000; }
-        iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
-        .server-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 12px; font-size: 10px; font-weight: 900; text-transform: uppercase; }
-        .server-btn.active { background: #e11d48; border-color: #e11d48; }
+        iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; z-index: 10; }
+        
+        .server-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; white-space: nowrap; transition: 0.3s; }
+        .server-btn.active { background: #e11d48; border-color: #fb7185; color: white; box-shadow: 0 0 15px rgba(225, 29, 72, 0.4); }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .tip-anim { animation: pulseGlow 2s infinite; }
+        @keyframes pulseGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
-<body class="p-6">
+<body class="p-4 md:p-8">
 
-    <!-- Top Nav -->
-    <nav class="flex justify-between items-center mb-12">
-        <a href="index.html" class="w-12 h-12 flex items-center justify-center bg-white/5 rounded-2xl"><i class="fa-solid fa-arrow-left"></i></a>
+    <!-- Navbar -->
+    <nav class="flex justify-between items-center mb-12 max-w-7xl mx-auto">
+        <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 hover:bg-rose-600 transition"><i class="fa-solid fa-arrow-left text-sm"></i></a>
         <h1 class="text-2xl font-black uppercase italic tracking-tighter text-rose-600">EXAR CINEMA</h1>
-        <div class="w-12 h-12 flex items-center justify-center bg-rose-600/10 rounded-2xl text-rose-500 animate-pulse"><i class="fa-solid fa-cloud-bolt"></i></div>
+        <div class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></div>
     </nav>
 
-    <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-        <!-- Movies will load from Firebase here -->
+    <!-- Movies Library -->
+    <div class="max-w-7xl mx-auto">
+        <h2 class="text-2xl font-black uppercase italic mb-8 border-l-4 border-rose-600 pl-4">Trending <span class="text-zinc-600">Movies</span></h2>
+        <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
+            <!-- Dynamic Movies -->
+        </div>
     </div>
 
-    <!-- PLAYER MODAL -->
+    <!-- PLAYER TERMINAL -->
     <div id="player-modal" class="player-modal">
-        <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-white/5">
-            <button onclick="closePlayer()" class="text-xs font-black uppercase tracking-widest text-zinc-500"><i class="fa-solid fa-xmark mr-2"></i> Close</button>
-            <div id="server-list" class="flex gap-2">
-                <!-- Server buttons will inject here -->
+        <!-- Control Bar -->
+        <div class="p-3 md:p-4 flex flex-col md:flex-row gap-4 justify-between items-center bg-zinc-950 border-b border-white/5">
+            <div class="flex items-center gap-4 w-full md:w-auto justify-between">
+                <button onclick="closePlayer()" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition"><i class="fa-solid fa-xmark mr-1"></i> Exit</button>
+                <div class="md:hidden flex gap-2 overflow-x-auto no-scrollbar" id="server-list-mobile"></div>
             </div>
+            
+            <div class="hidden md:flex gap-2" id="server-list-desktop"></div>
+
+            <!-- This is where the Smart Tip will appear -->
+            <p id="movie-status" class="text-[8px] font-black uppercase opacity-30 tracking-[0.2em] text-center"></p>
         </div>
 
-        <div class="iframe-container">
-            <div id="p-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black">
-                <div class="w-10 h-10 border-2 border-rose-600 border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-[9px] font-black uppercase tracking-widest opacity-30">Connecting to Global Nodes...</p>
+        <div class="iframe-container flex-1">
+            <div id="p-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-5 bg-black z-0">
+                <div class="w-14 h-14 border-4 border-rose-600/10 border-t-rose-600 rounded-full animate-spin"></div>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500 animate-pulse text-center">Syncing Multi-Audio Node...</p>
             </div>
             <iframe id="main-iframe" allowfullscreen src="" referrerpolicy="no-referrer"></iframe>
         </div>
@@ -56,58 +74,89 @@
         
         let currentImdbId = "";
 
+        // --- ENHANCED SOURCES FOR DUAL AUDIO ---
+        const sources = [
+            { name: "Server 1 (Best)", url: (id) => `https://vidlink.pro/movie/${id}?primaryColor=e11d48` },
+            { name: "Server 2 (Hindi Dub)", url: (id) => `https://vidsrc.icu/embed/movie/${id}` },
+            { name: "Server 3 (Auto)", url: (id) => `https://vidsrc.to/embed/movie/${id}` },
+            { name: "Server 4 (Multi)", url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=0` },
+            { name: "Server 5 (Stream)", url: (id) => `https://2embed.cc/embed/${id}` }
+        ];
+
+        // Load Movies
         db.ref('movies').on('value', s => {
             const grid = document.getElementById('movie-grid'); grid.innerHTML = '';
             s.forEach(child => {
                 const m = child.val();
                 grid.innerHTML += `
-                    <div class="movie-card group" onclick="initPlayer('${m.imdbId}')">
-                        <div class="aspect-[2/3] rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl">
+                    <div class="movie-card group" onclick="openPlayer('${m.imdbId}', '${m.title}')">
+                        <div class="aspect-[2/3] overflow-hidden">
                             <img src="${m.poster}" class="w-full h-full object-cover">
                         </div>
-                        <h4 class="mt-4 text-[11px] font-black uppercase truncate px-2 opacity-70">${m.title}</h4>
+                        <h4 class="mt-4 text-[11px] font-bold uppercase truncate opacity-50 px-1">${m.title}</h4>
                     </div>`;
             });
         });
 
-        // Professional Streaming Sources (Same as top free sites)
-        const sources = [
-            { name: "Server 1", url: (id) => `https://vidsrc.me/embed/movie?imdb=${id}` },
-            { name: "Server 2", url: (id) => `https://vidsrc.to/embed/movie/${id}` },
-            { name: "Server 3", url: (id) => `https://embed.su/embed/movie/${id}` }
-        ];
-
-        function initPlayer(imdbId) {
+        function openPlayer(imdbId, title) {
             currentImdbId = imdbId;
             const modal = document.getElementById('player-modal');
-            const serverList = document.getElementById('server-list');
+            const listDesktop = document.getElementById('server-list-desktop');
+            const listMobile = document.getElementById('server-list-mobile');
             
-            // Build Server Switcher
-            serverList.innerHTML = '';
-            sources.forEach((src, index) => {
-                serverList.innerHTML += `<button onclick="switchServer(${index})" class="server-btn ${index===0?'active':''}">${src.name}</button>`;
-            });
+            const btnHtml = sources.map((src, i) => 
+                `<button onclick="switchServer(${i})" class="server-btn s-btn-${i} ${i===0?'active':''}">${src.name}</button>`
+            ).join('');
 
-            switchServer(0); // Load Server 1 by default
+            listDesktop.innerHTML = btnHtml;
+            listMobile.innerHTML = btnHtml;
+            
+            // Start with original title
+            const status = document.getElementById('movie-status');
+            status.innerHTML = `<i class="fa-solid fa-volume-high text-rose-500 mr-2"></i> ${title}`;
+
+            switchServer(0); 
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+
+            // Start Smart Tip Engine
+            triggerAudioTip(title);
         }
 
         function switchServer(index) {
-            // Update UI
-            document.querySelectorAll('.server-btn').forEach((btn, i) => {
-                btn.classList.toggle('active', i === index);
-            });
+            document.querySelectorAll('.server-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll(`.s-btn-${index}`).forEach(btn => btn.classList.add('active'));
             
-            // Update Iframe
             const iframe = document.getElementById('main-iframe');
+            const loader = document.getElementById('p-loader');
+            
+            loader.style.display = 'flex';
             iframe.src = sources[index].url(currentImdbId);
+
+            iframe.onload = () => {
+                setTimeout(() => { loader.style.display = 'none'; }, 1500);
+            };
+        }
+
+        // --- SMART AUDIO TIP ENGINE ---
+        function triggerAudioTip(movieTitle) {
+            const status = document.getElementById('movie-status');
+            const originalHtml = `<i class="fa-solid fa-volume-high text-rose-500 mr-2"></i> ${movieTitle}`;
+            
+            // Wait 5 seconds after player opens, then show tip
+            setTimeout(() => {
+                status.innerHTML = `<span class="text-rose-400 font-bold tip-anim uppercase tracking-widest"><i class="fa-solid fa-gear mr-1"></i> TIP: Use Gear Icon to change Audio to Hindi</span>`;
+                
+                // Switch back after 6 seconds
+                setTimeout(() => {
+                    status.innerHTML = originalHtml;
+                }, 6000);
+            }, 4000);
         }
 
         function closePlayer() {
-            const modal = document.getElementById('player-modal');
+            document.getElementById('player-modal').style.display = 'none';
             document.getElementById('main-iframe').src = '';
-            modal.style.display = 'none';
             document.body.style.overflow = 'auto';
         }
     </script>
