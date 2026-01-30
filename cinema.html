@@ -2,144 +2,128 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>EXAR CINEMA — Legacy Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CINEMA — Legacy Node v12</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Plyr.io (For iOS Native Player feel) -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    
     <style>
-        :root { --primary: #e11d48; --bg: #050505; }
-        body { background: var(--bg); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        :root { --primary: #a855f7; --bg: #030303; }
+        body { background-color: var(--bg); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+        
+        .movie-card { transition: all 0.5s ease; cursor: pointer; }
+        .movie-card:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(168, 85, 247, 0.3); }
+        .movie-card img { border-radius: 2rem; border: 1px solid rgba(255,255,255,0.05); }
 
-        /* Movie Grid */
-        .movie-card { transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
-        .movie-card:hover { transform: scale(1.05); }
-        .movie-card img { border-radius: 2rem; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
-
-        /* iOS Bottom Sheet */
+        /* Bottom Sheet Selector */
         .bottom-sheet {
             position: fixed; inset: 0; z-index: 5000; display: none; align-items: flex-end;
             background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
         }
         .sheet-content {
             width: 100%; background: #0a0a0a; border-radius: 3rem 3rem 0 0;
-            padding: 35px; border-top: 1px solid rgba(255,255,255,0.1);
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 35px; border-top: 1px solid rgba(168, 85, 247, 0.2);
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .player-opt {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
-            padding: 22px; border-radius: 1.8rem; display: flex; align-items: center; gap: 18px;
-            transition: 0.3s; width: 100%; text-align: left; margin-bottom: 12px;
-        }
-        .player-opt:active { background: var(--primary); transform: scale(0.96); }
-
-        /* Legacy Loader Styling */
-        #analyzing-loader {
+        /* Legacy Loader Overlay */
+        #loader-overlay {
             position: absolute; inset: 0; z-index: 100;
-            background: rgba(0,0,0,0.95); display: flex;
+            background: rgba(0,0,0,0.9); display: flex;
             flex-direction: column; justify-content: center; align-items: center;
         }
 
-        #player-view { position: fixed; inset: 0; z-index: 6000; background: black; display: none; flex-direction: column; }
-        video { width: 100%; height: 100%; background: black; }
-        .glass-nav { background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .neon-text { text-shadow: 0 0 15px rgba(168, 85, 247, 0.8); }
+        .vlc-btn { background: #f97316; }
+        .plyr--full-ui { --plyr-color-main: #a855f7; border-radius: 2rem; overflow: hidden; }
     </style>
 </head>
-<body class="pb-24">
+<body class="p-4 md:p-10">
 
-    <nav class="sticky top-0 z-50 p-6 glass-nav flex justify-between items-center">
-        <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 active:scale-90 transition">
-            <i class="fa-solid fa-chevron-left"></i>
+    <!-- Top Nav -->
+    <nav class="max-w-6xl mx-auto flex justify-between items-center mb-12">
+        <a href="index.html" class="text-zinc-500 hover:text-purple-500 transition font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
+            <i class="fas fa-chevron-left"></i> Home
         </a>
-        <h1 class="text-2xl font-black italic uppercase tracking-tighter">CINE<span class="text-rose-600">MA</span></h1>
-        <div class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></div>
+        <h1 class="text-xl font-black italic uppercase neon-text">CINE<span class="text-purple-500">MA</span></h1>
+        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
     </nav>
 
-    <div class="max-w-7xl mx-auto p-6 space-y-12">
-        <header>
-            <h2 class="text-4xl font-black uppercase tracking-tight">Legacy Streaming</h2>
-            <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.5em] mt-1">Multi-Intent Player Node</p>
-        </header>
-
-        <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8"></div>
+    <!-- Movie Grid -->
+    <div class="max-w-7xl mx-auto">
+        <h2 class="text-2xl font-black uppercase italic mb-8 border-l-4 border-purple-600 pl-4">Trending <span class="text-zinc-500">Library</span></h2>
+        <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
+            <!-- Dynamic Load -->
+        </div>
     </div>
 
-    <!-- SELECTOR SHEET -->
+    <!-- PLAYER SELECTOR -->
     <div id="selector-sheet" class="bottom-sheet" onclick="if(event.target == this) closeSelector()">
         <div class="sheet-content">
-            <div class="w-14 h-1.5 bg-white/10 rounded-full mx-auto mb-10"></div>
+            <div class="w-12 h-1 bg-white/10 rounded-full mx-auto mb-8"></div>
+            <h3 id="sel-title" class="text-2xl font-black uppercase italic mb-8 neon-text">Movie Title</h3>
             
-            <header class="mb-10 text-center">
-                <h3 id="sel-title" class="text-2xl font-black uppercase italic tracking-tight mb-2">Movie Title</h3>
-                <p class="text-[9px] font-bold text-white/20 uppercase tracking-[0.3em]">Select Stream Intent</p>
-            </header>
-
             <div class="space-y-4">
-                <button onclick="launchInternal()" class="player-opt">
-                    <div class="w-14 h-14 bg-rose-600/20 rounded-2xl flex items-center justify-center text-rose-500 text-xl"><i class="fa-solid fa-play"></i></div>
-                    <div><p class="text-base font-bold uppercase tracking-tight">Web Browser</p><p class="text-[10px] opacity-30 uppercase font-medium">Native iOS Player • Fullscreen Fix</p></div>
+                <button onclick="launchInternal()" class="w-full bg-white/5 border border-white/5 p-6 rounded-3xl flex items-center gap-4 hover:bg-purple-600/10 transition">
+                    <div class="w-12 h-12 bg-purple-600/20 text-purple-500 rounded-2xl flex items-center justify-center"><i class="fas fa-play"></i></div>
+                    <div class="text-left"><p class="text-sm font-bold uppercase">Quick Browser Play</p><p class="text-[9px] opacity-40 uppercase">Optimized for iPhone Native</p></div>
                 </button>
 
-                <button onclick="launchVLC()" class="player-opt">
-                    <div class="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center text-orange-500 text-xl"><i class="fa-solid fa-cone-striped"></i></div>
-                    <div><p class="text-base font-bold uppercase tracking-tight">VLC Media Player</p><p class="text-[10px] opacity-30 uppercase font-medium">Supports Dual-Audio & MKV</p></div>
-                </button>
-
-                <button onclick="launchMX()" class="player-opt">
-                    <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 text-xl"><i class="fa-solid fa-bolt"></i></div>
-                    <div><p class="text-base font-bold uppercase tracking-tight">MX Player Pro</p><p class="text-[10px] opacity-30 uppercase font-medium">Hardware Decoding (Android)</p></div>
+                <button onclick="launchVLC()" class="w-full vlc-btn p-6 rounded-3xl flex items-center gap-4 shadow-lg active:scale-95 transition">
+                    <div class="w-12 h-12 bg-black/10 rounded-2xl flex items-center justify-center text-white"><i class="fas fa-orange-cone"></i></div>
+                    <div class="text-left"><p class="text-sm font-bold uppercase text-white">VLC Media Player</p><p class="text-[9px] text-white/60 uppercase font-black">Supports Dual-Audio & MKV Files</p></div>
                 </button>
             </div>
 
-            <div class="mt-10 p-6 bg-white/[0.03] rounded-3xl border border-white/5">
-                <p class="text-[10px] leading-relaxed font-bold text-white/40 text-center uppercase tracking-widest">
-                    <i class="fa-solid fa-circle-info mr-2 text-rose-500"></i>
-                    Professional Tip: Utilize <b>VLC</b> or <b>MX Player</b> to enable multi-audio tracks (Hindi/English) and subtitles.
+            <div class="mt-8 p-6 bg-white/5 rounded-[2rem] border border-white/5">
+                <p class="text-[10px] leading-relaxed font-bold text-zinc-500 text-center uppercase tracking-widest">
+                    Instruction: For <b class="text-purple-400">Multi-Language Audio</b> and subtitles, please utilize the VLC Player option. Native playback is designed for immediate streaming only.
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- PLAYER VIEW -->
-    <div id="player-view">
-        <div id="analyzing-loader">
-            <div class="w-12 h-12 border-4 border-rose-600 border-t-transparent rounded-full animate-spin"></div>
-            <p class="mt-6 text-rose-500 font-bold text-[10px] tracking-[0.4em] animate-pulse uppercase">Analyzing Cloud Streams...</p>
-        </div>
-        
+    <!-- PLAYER OVERLAY -->
+    <div id="player-overlay" class="fixed inset-0 z-[6000] bg-black hidden flex-col">
         <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-white/5">
-            <button onclick="closePlayer()" class="text-[10px] font-black uppercase tracking-widest text-rose-500"><i class="fa-solid fa-xmark mr-2"></i> Exit</button>
-            <h4 id="now-playing" class="text-[9px] font-bold uppercase opacity-30 truncate max-w-[50%]">Streaming Node</h4>
+            <button onclick="closePlayer()" class="text-[10px] font-black uppercase text-purple-500"><i class="fas fa-times mr-2"></i> Close Cinema</button>
+            <h4 id="now-playing" class="text-[9px] font-bold uppercase opacity-30 truncate max-w-[50%]">Streaming</h4>
         </div>
-        <div class="flex-1 bg-black flex items-center justify-center">
-            <video id="main-video" controls playsinline controlsList="nodownload"></video>
+        <div class="flex-1 relative flex items-center justify-center bg-black">
+            <div id="loader-overlay">
+                <div class="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                <p class="mt-4 text-purple-400 font-mono text-[10px] tracking-[0.4em] animate-pulse uppercase">Analyzing Audio Streams...</p>
+            </div>
+            <video id="player" playsinline controls class="w-full"></video>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 
     <script>
         const config = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const db = firebase.database();
         
+        const plyrPlayer = new Plyr('#player');
         let selectedId = "", selectedTitle = "", workerUrl = "";
 
-        db.ref('settings/workerUrl').on('value', s => {
-            workerUrl = s.val() || "https://gdrive-proxy.mindxphere.workers.dev/";
-        });
+        db.ref('settings/workerUrl').on('value', s => workerUrl = s.val());
 
         db.ref('movies').on('value', s => {
             const grid = document.getElementById('movie-grid'); grid.innerHTML = '';
-            s.forEach(child => {
-                const m = child.val();
-                grid.innerHTML += `<div class="movie-card" onclick="openSelector('${m.driveId}', '${m.title}')">
-                    <div class="aspect-[2/3] overflow-hidden"><img src="${m.poster}" class="w-full h-full object-cover shadow-2xl"></div>
-                    <div class="mt-4"><h4 class="text-[11px] font-black uppercase truncate tracking-wide">${m.title}</h4></div>
+            s.forEach(c => {
+                const m = c.val();
+                grid.innerHTML += `<div class="movie-card group" onclick="openSelector('${m.driveId}', '${m.title}')">
+                    <div class="relative overflow-hidden aspect-[2/3]"><img src="${m.poster}" class="w-full h-full object-cover shadow-2xl"></div>
+                    <div class="mt-4"><h4 class="text-[11px] font-black uppercase truncate italic">${m.title}</h4></div>
                 </div>`;
             });
         });
@@ -154,56 +138,50 @@
 
         function getStreamURL() { return `${workerUrl}?id=${selectedId}`; }
 
-        // --- LEGACY MERGED LOGIC ---
+        // --- MERGED WORKING LOGIC ---
 
         function launchInternal() {
             closeSelector();
-            const view = document.getElementById('player-view');
-            const loader = document.getElementById('analyzing-loader');
-            const video = document.getElementById('main-video');
+            const overlay = document.getElementById('player-overlay');
+            const loader = document.getElementById('loader-overlay');
+            document.getElementById('now-playing').innerText = `NODE: ${selectedTitle}`;
             
+            overlay.style.display = 'flex';
             loader.style.display = 'flex';
-            document.getElementById('now-playing').innerText = `Playing: ${selectedTitle}`;
             
-            video.src = getStreamURL();
-            view.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            plyrPlayer.source = {
+                type: 'video',
+                title: selectedTitle,
+                sources: [{ src: getStreamURL(), type: 'video/mp4' }]
+            };
 
-            video.onplaying = () => { loader.style.display = 'none'; };
-            video.play();
+            plyrPlayer.on('playing', () => { loader.style.display = 'none'; });
+            plyrPlayer.play();
         }
 
         function launchVLC() {
             const stream = getStreamURL();
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            const encodedUrl = encodeURIComponent(stream);
+            const strippedUrl = stream.replace('https://', '');
 
-            // iPhone (iOS) Fix from Legacy
-            if (/iPad|iPhone|iPod/.test(userAgent)) {
-                window.location.href = `vlc-x-callback://x-callback-url/stream?url=${encodedUrl}`;
+            // 1. LEGACY ANDROID INTENT (Most Stable)
+            if (/android/i.test(userAgent)) {
+                window.location.href = `intent://${strippedUrl}#Intent;package=org.videolan.vlc;type=video/*;scheme=https;S.title=${selectedTitle};end`;
             } 
-            // Android Powerful Intent from Legacy
-            else if (/android/i.test(userAgent)) {
-                window.location.href = `intent://${stream}#Intent;package=org.videolan.vlc;type=video/*;S.title=${selectedTitle};end`;
+            // 2. LEGACY iOS CALLBACK (Fixed)
+            else if (/iPad|iPhone|iPod/.test(userAgent)) {
+                window.location.href = `vlc-x-callback://x-callback-url/stream?url=${encodeURIComponent(stream)}`;
             } 
-            // Fallback
+            // 3. Fallback
             else {
                 window.location.href = `vlc://${stream}`;
             }
             closeSelector();
         }
 
-        function launchMX() {
-            const stream = getStreamURL();
-            const intent = `intent:${stream}#Intent;package=com.mxtech.videoplayer.ad;S.title=${selectedTitle};end`;
-            window.location.href = intent;
-            closeSelector();
-        }
-
         function closePlayer() {
-            const video = document.getElementById('main-video');
-            video.pause(); video.src = "";
-            document.getElementById('player-view').style.display = 'none';
+            plyrPlayer.stop();
+            document.getElementById('player-overlay').style.display = 'none';
             document.body.style.overflow = 'auto';
         }
     </script>
