@@ -2,66 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CINEMA — Pure Hindi/Dual Audio Node</title>
+    <title>EXAR CINEMA — Pure Dual-Audio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { background: #000; color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
-        .movie-card { transition: 0.5s cubic-bezier(0.2, 1, 0.3, 1); cursor: pointer; }
-        .movie-card:hover { transform: scale(1.05) translateY(-5px); }
+        .movie-card { transition: 0.5s ease; cursor: pointer; }
+        .movie-card:hover { transform: translateY(-5px) scale(1.03); }
         .movie-card img { border-radius: 1.8rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .movie-card:hover img { border-color: #e11d48; box-shadow: 0 0 30px rgba(225, 29, 72, 0.2); }
         
         .player-modal { position: fixed; inset: 0; z-index: 5000; background: black; display: none; flex-direction: column; }
         .iframe-container { relative; width: 100%; height: 100%; background: #000; }
         iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; z-index: 10; }
         
         .server-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; white-space: nowrap; transition: 0.3s; }
-        .server-btn.active { background: #e11d48; border-color: #fb7185; color: white; box-shadow: 0 0 15px rgba(225, 29, 72, 0.4); }
+        .server-btn.active { background: #e11d48; border-color: #fb7185; box-shadow: 0 0 15px rgba(225, 29, 72, 0.4); }
         
+        .vlc-btn { background: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        /* Floating Audio Tip Animation */
-        .audio-tip { animation: tipGlow 1.5s infinite; font-weight: 900; color: #fb7185; }
-        @keyframes tipGlow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.98); } }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- Top Navigation -->
+    <!-- Nav -->
     <nav class="flex justify-between items-center mb-12 max-w-7xl mx-auto">
-        <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 hover:bg-rose-600 transition"><i class="fa-solid fa-arrow-left text-sm"></i></a>
+        <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 active:scale-90 transition"><i class="fa-solid fa-arrow-left text-sm"></i></a>
         <h1 class="text-2xl font-black uppercase italic tracking-tighter text-rose-600">EXAR CINEMA</h1>
         <div class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></div>
     </nav>
 
     <!-- Movies Grid -->
     <div class="max-w-7xl mx-auto">
-        <h2 class="text-2xl font-black uppercase italic mb-8 border-l-4 border-rose-600 pl-4">Premium <span class="text-zinc-600">Streaming</span></h2>
-        <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
-            <!-- Dynamic Movies -->
-        </div>
+        <h2 class="text-2xl font-black uppercase italic mb-8 border-l-4 border-rose-600 pl-4">Neural <span class="text-zinc-600">Selection</span></h2>
+        <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8"></div>
     </div>
 
     <!-- PLAYER OVERLAY -->
     <div id="player-modal" class="player-modal">
-        <!-- Technical Control Bar -->
+        <!-- Control Bar -->
         <div class="p-3 md:p-4 flex flex-col md:flex-row gap-4 justify-between items-center bg-zinc-950 border-b border-white/5">
             <div class="flex items-center gap-4 w-full md:w-auto justify-between">
                 <button onclick="closePlayer()" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition"><i class="fa-solid fa-xmark mr-1"></i> Exit</button>
-                <div class="flex gap-2 overflow-x-auto no-scrollbar" id="server-list"></div>
+                
+                <!-- VLC MODE BUTTON (Pro Feature) -->
+                <button onclick="launchVLCFromEmbed()" class="vlc-btn px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white animate-pulse">
+                    <i class="fa-solid fa-orange-cone mr-1"></i> Play in VLC (Dual Audio)
+                </button>
+                
+                <div class="hidden md:flex gap-2 overflow-x-auto no-scrollbar" id="server-list"></div>
             </div>
             
-            <!-- Real-time Status / Audio Tip -->
-            <p id="movie-status" class="text-[9px] font-black uppercase tracking-[0.1em] text-center"></p>
+            <div class="md:hidden flex gap-2 overflow-x-auto no-scrollbar w-full" id="server-list-mobile"></div>
+            
+            <p id="movie-status" class="text-[9px] font-black uppercase tracking-[0.1em] text-rose-500"></p>
         </div>
 
-        <!-- Video Stream Container -->
+        <!-- Video Player Container -->
         <div class="iframe-container flex-1">
             <div id="p-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-5 bg-black z-0">
                 <div class="w-14 h-14 border-4 border-rose-600/10 border-t-rose-600 rounded-full animate-spin"></div>
-                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500 animate-pulse text-center">Decrypting Multi-Audio Streams...</p>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500 animate-pulse">Decrypting Multi-Audio Node...</p>
             </div>
             <iframe id="main-iframe" allowfullscreen src="" referrerpolicy="no-referrer"></iframe>
         </div>
@@ -73,78 +74,75 @@
         const config = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const db = firebase.database();
         
-        let currentImdbId = "";
+        let currentImdbId = "", currentTitle = "";
 
-        // --- DUAL AUDIO & HINDI DUB SOURCES ---
+        // --- DUAL-AUDIO SPECIALIZED SOURCES ---
         const sources = [
             { name: "Server 1 (Hindi Dub)", url: (id) => `https://vidsrc.icu/embed/movie/${id}` },
             { name: "Server 2 (Dual Audio)", url: (id) => `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=1` },
             { name: "Server 3 (HD Pro)", url: (id) => `https://vidlink.pro/movie/${id}?primaryColor=e11d48` },
-            { name: "Server 4 (Smashy)", url: (id) => `https://embed.smashystream.com/playere.php?tmdb=0&id=${id}` },
-            { name: "Server 5 (Backup)", url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=0` }
+            { name: "Server 4 (Multi)", url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=0` }
         ];
 
-        // Load Movies
+        // Load Grid
         db.ref('movies').on('value', s => {
             const grid = document.getElementById('movie-grid'); grid.innerHTML = '';
             s.forEach(child => {
                 const m = child.val();
-                grid.innerHTML += `
-                    <div class="movie-card group" onclick="openPlayer('${m.imdbId}', '${m.title}')">
-                        <div class="aspect-[2/3] overflow-hidden">
-                            <img src="${m.poster}" class="w-full h-full object-cover">
-                        </div>
-                        <h4 class="mt-4 text-[11px] font-bold uppercase truncate opacity-50 px-1 italic">${m.title}</h4>
-                    </div>`;
+                grid.innerHTML += `<div class="movie-card group" onclick="openPlayer('${m.imdbId}', '${m.title}')">
+                    <div class="aspect-[2/3] overflow-hidden"><img src="${m.poster}" class="w-full h-full object-cover"></div>
+                    <h4 class="mt-4 text-[11px] font-bold uppercase truncate opacity-50 px-1">${m.title}</h4>
+                </div>`;
             });
         });
 
         function openPlayer(imdbId, title) {
-            currentImdbId = imdbId;
+            currentImdbId = imdbId; currentTitle = title;
             const modal = document.getElementById('player-modal');
             const list = document.getElementById('server-list');
+            const listMob = document.getElementById('server-list-mobile');
             
-            list.innerHTML = sources.map((src, i) => 
+            const btnHtml = sources.map((src, i) => 
                 `<button onclick="switchServer(${i})" class="server-btn s-btn-${i} ${i===0?'active':''}">${src.name}</button>`
             ).join('');
 
-            document.getElementById('movie-status').innerHTML = `<i class="fa-solid fa-volume-high text-rose-500 mr-2"></i> ${title}`;
-            switchServer(0); // Start with Hindi Priority Server
+            list.innerHTML = btnHtml;
+            listMob.innerHTML = btnHtml;
+            document.getElementById('movie-status').innerText = title;
+
+            switchServer(0); 
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
-
-            // Trigger the "How to change Audio" instruction
-            showAudioInstruction();
         }
 
         function switchServer(index) {
             document.querySelectorAll('.server-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll(`.s-btn-${index}`).forEach(btn => btn.classList.add('active'));
-            
             const iframe = document.getElementById('main-iframe');
             const loader = document.getElementById('p-loader');
-            
             loader.style.display = 'flex';
             iframe.src = sources[index].url(currentImdbId);
-
-            iframe.onload = () => {
-                setTimeout(() => { loader.style.display = 'none'; }, 2000);
-            };
+            iframe.onload = () => { setTimeout(() => { loader.style.display = 'none'; }, 2000); };
         }
 
-        // --- SMART AUDIO INSTRUCTION ---
-        function showAudioInstruction() {
-            const statusBox = document.getElementById('movie-status');
-            const originalTitle = statusBox.innerHTML;
-            
-            setTimeout(() => {
-                statusBox.innerHTML = `<span class="audio-tip uppercase"><i class="fa-solid fa-gear mr-1"></i> Gear Icon -> Audio -> Select Hindi</span>`;
-                
-                // Switch back to title after 7 seconds
-                setTimeout(() => {
-                    statusBox.innerHTML = originalTitle;
-                }, 7000);
-            }, 4000);
+        // --- THE VLC MAGIC FOR IMDb MOVIES ---
+        function launchVLCFromEmbed() {
+            // Hum iFrame ka source URL lete hain aur usey VLC Intent me bhejte hain
+            const currentUrl = document.getElementById('main-iframe').src;
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+            // Android Intent for VLC (Package name force)
+            if (/android/i.test(userAgent)) {
+                window.location.href = `intent://${currentUrl.replace('https://','')}#Intent;package=org.videolan.vlc;type=video/*;scheme=https;S.title=${currentTitle};end`;
+            } 
+            // iOS VLC Callback
+            else if (/iPad|iPhone|iPod/.test(userAgent)) {
+                window.location.href = `vlc-x-callback://x-callback-url/stream?url=${encodeURIComponent(currentUrl)}`;
+            } 
+            // PC Fallback
+            else {
+                window.location.href = `vlc://${currentUrl}`;
+            }
         }
 
         function closePlayer() {
