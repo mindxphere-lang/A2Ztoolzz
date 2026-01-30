@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CINEMA — Multi-Audio Node</title>
+    <title>CINEMA — Dual-Audio Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
@@ -14,20 +14,20 @@
         .movie-card:hover img { border-color: #e11d48; box-shadow: 0 0 30px rgba(225, 29, 72, 0.2); }
         
         .player-modal { position: fixed; inset: 0; z-index: 5000; background: black; display: none; flex-direction: column; }
-        .iframe-container { position: relative; width: 100%; height: 100%; background: #000; }
+        .iframe-container { relative; width: 100%; height: 100%; background: #000; }
         iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; z-index: 10; }
         
         .server-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; white-space: nowrap; transition: 0.3s; }
         .server-btn.active { background: #e11d48; border-color: #fb7185; color: white; box-shadow: 0 0 15px rgba(225, 29, 72, 0.4); }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .tip-anim { animation: pulseGlow 2s infinite; }
-        @keyframes pulseGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .tip-anim { animation: glowText 2s infinite; }
+        @keyframes glowText { 0%, 100% { color: #f43f5e; } 50% { color: #fff; } }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- Navbar -->
+    <!-- Top Navigation -->
     <nav class="flex justify-between items-center mb-12 max-w-7xl mx-auto">
         <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 hover:bg-rose-600 transition"><i class="fa-solid fa-arrow-left text-sm"></i></a>
         <h1 class="text-2xl font-black uppercase italic tracking-tighter text-rose-600">EXAR CINEMA</h1>
@@ -36,9 +36,9 @@
 
     <!-- Movies Library -->
     <div class="max-w-7xl mx-auto">
-        <h2 class="text-2xl font-black uppercase italic mb-8 border-l-4 border-rose-600 pl-4">Trending <span class="text-zinc-600">Movies</span></h2>
+        <h2 class="text-2xl font-black uppercase italic mb-8 border-l-4 border-rose-600 pl-4">Premium <span class="text-zinc-600">Selection</span></h2>
         <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8">
-            <!-- Dynamic Movies -->
+            <!-- Dynamic Content -->
         </div>
     </div>
 
@@ -48,19 +48,17 @@
         <div class="p-3 md:p-4 flex flex-col md:flex-row gap-4 justify-between items-center bg-zinc-950 border-b border-white/5">
             <div class="flex items-center gap-4 w-full md:w-auto justify-between">
                 <button onclick="closePlayer()" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition"><i class="fa-solid fa-xmark mr-1"></i> Exit</button>
-                <div class="md:hidden flex gap-2 overflow-x-auto no-scrollbar" id="server-list-mobile"></div>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar" id="server-list"></div>
             </div>
             
-            <div class="hidden md:flex gap-2" id="server-list-desktop"></div>
-
-            <!-- This is where the Smart Tip will appear -->
-            <p id="movie-status" class="text-[8px] font-black uppercase opacity-30 tracking-[0.2em] text-center"></p>
+            <!-- Audio Help Tip -->
+            <p id="movie-status" class="text-[9px] font-black uppercase tracking-[0.1em] text-center"></p>
         </div>
 
         <div class="iframe-container flex-1">
             <div id="p-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-5 bg-black z-0">
                 <div class="w-14 h-14 border-4 border-rose-600/10 border-t-rose-600 rounded-full animate-spin"></div>
-                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500 animate-pulse text-center">Syncing Multi-Audio Node...</p>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500 animate-pulse">Scanning Audio Tracks...</p>
             </div>
             <iframe id="main-iframe" allowfullscreen src="" referrerpolicy="no-referrer"></iframe>
         </div>
@@ -74,13 +72,13 @@
         
         let currentImdbId = "";
 
-        // --- ENHANCED SOURCES FOR DUAL AUDIO ---
+        // --- DUAL-AUDIO OPTIMIZED SOURCES ---
         const sources = [
-            { name: "Server 1 (Best)", url: (id) => `https://vidlink.pro/movie/${id}?primaryColor=e11d48` },
-            { name: "Server 2 (Hindi Dub)", url: (id) => `https://vidsrc.icu/embed/movie/${id}` },
-            { name: "Server 3 (Auto)", url: (id) => `https://vidsrc.to/embed/movie/${id}` },
-            { name: "Server 4 (Multi)", url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=0` },
-            { name: "Server 5 (Stream)", url: (id) => `https://2embed.cc/embed/${id}` }
+            { name: "Server 1 (Dual Audio)", url: (id) => `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=1` },
+            { name: "Server 2 (Pro)", url: (id) => `https://vidlink.pro/movie/${id}?primaryColor=e11d48` },
+            { name: "Server 3 (Hindi Dub)", url: (id) => `https://vidsrc.icu/embed/movie/${id}` },
+            { name: "Server 4 (Backup)", url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=0` },
+            { name: "Server 5 (HD)", url: (id) => `https://vidsrc.to/embed/movie/${id}` }
         ];
 
         // Load Movies
@@ -93,7 +91,7 @@
                         <div class="aspect-[2/3] overflow-hidden">
                             <img src="${m.poster}" class="w-full h-full object-cover">
                         </div>
-                        <h4 class="mt-4 text-[11px] font-bold uppercase truncate opacity-50 px-1">${m.title}</h4>
+                        <h4 class="mt-4 text-[11px] font-bold uppercase truncate opacity-50 px-1 italic">${m.title}</h4>
                     </div>`;
             });
         });
@@ -101,26 +99,21 @@
         function openPlayer(imdbId, title) {
             currentImdbId = imdbId;
             const modal = document.getElementById('player-modal');
-            const listDesktop = document.getElementById('server-list-desktop');
-            const listMobile = document.getElementById('server-list-mobile');
+            const list = document.getElementById('server-list');
             
-            const btnHtml = sources.map((src, i) => 
+            list.innerHTML = sources.map((src, i) => 
                 `<button onclick="switchServer(${i})" class="server-btn s-btn-${i} ${i===0?'active':''}">${src.name}</button>`
             ).join('');
 
-            listDesktop.innerHTML = btnHtml;
-            listMobile.innerHTML = btnHtml;
-            
-            // Start with original title
-            const status = document.getElementById('movie-status');
-            status.innerHTML = `<i class="fa-solid fa-volume-high text-rose-500 mr-2"></i> ${title}`;
-
+            document.getElementById('movie-status').innerHTML = `<i class="fa-solid fa-film text-rose-500 mr-2"></i> ${title}`;
             switchServer(0); 
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
 
-            // Start Smart Tip Engine
-            triggerAudioTip(title);
+            // Trigger Audio Tip
+            setTimeout(() => {
+                document.getElementById('movie-status').innerHTML = `<span class="tip-anim font-bold uppercase"><i class="fa-solid fa-gear mr-1"></i> Use Gear Icon ⚙️ to Switch Audio to Hindi</span>`;
+            }, 4000);
         }
 
         function switchServer(index) {
@@ -136,22 +129,6 @@
             iframe.onload = () => {
                 setTimeout(() => { loader.style.display = 'none'; }, 1500);
             };
-        }
-
-        // --- SMART AUDIO TIP ENGINE ---
-        function triggerAudioTip(movieTitle) {
-            const status = document.getElementById('movie-status');
-            const originalHtml = `<i class="fa-solid fa-volume-high text-rose-500 mr-2"></i> ${movieTitle}`;
-            
-            // Wait 5 seconds after player opens, then show tip
-            setTimeout(() => {
-                status.innerHTML = `<span class="text-rose-400 font-bold tip-anim uppercase tracking-widest"><i class="fa-solid fa-gear mr-1"></i> TIP: Use Gear Icon to change Audio to Hindi</span>`;
-                
-                // Switch back after 6 seconds
-                setTimeout(() => {
-                    status.innerHTML = originalHtml;
-                }, 6000);
-            }, 4000);
         }
 
         function closePlayer() {
