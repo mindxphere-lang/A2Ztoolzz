@@ -2,69 +2,71 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EXAR CINEMA — Pure Dual-Audio</title>
+    <title>EXAR CINEMA — Ultimate Node</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { background: #000; color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
-        .movie-card { transition: 0.5s ease; cursor: pointer; }
+        .movie-card { transition: 0.4s ease; cursor: pointer; }
         .movie-card:hover { transform: translateY(-5px) scale(1.03); }
-        .movie-card img { border-radius: 1.8rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .movie-card img { border-radius: 1.5rem; border: 1px solid rgba(255,255,255,0.05); }
         
-        .player-modal { position: fixed; inset: 0; z-index: 5000; background: black; display: none; flex-direction: column; }
-        .iframe-container { relative; width: 100%; height: 100%; background: #000; }
-        iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; z-index: 10; }
+        /* Modal Fix */
+        .player-modal { position: fixed; inset: 0; z-index: 9999; background: black; display: none; flex-direction: column; }
         
-        .server-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 12px; font-size: 9px; font-weight: 900; text-transform: uppercase; white-space: nowrap; transition: 0.3s; }
-        .server-btn.active { background: #e11d48; border-color: #fb7185; box-shadow: 0 0 15px rgba(225, 29, 72, 0.4); }
+        /* Buttons Styling */
+        .server-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 18px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; white-space: nowrap; transition: 0.3s; color: rgba(255,255,255,0.6); }
+        .server-btn.active { background: #e11d48; border-color: #ff4d6d; color: white; box-shadow: 0 0 15px rgba(225, 29, 72, 0.4); }
         
-        .vlc-btn { background: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
+        .vlc-btn { background: linear-gradient(135deg, #f97316, #ea580c); box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
+        
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .iframe-container { position: relative; width: 100%; height: 100%; background: #000; flex: 1; }
+        iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; z-index: 10; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- Nav -->
-    <nav class="flex justify-between items-center mb-12 max-w-7xl mx-auto">
-        <a href="index.html" class="w-11 h-11 flex items-center justify-center bg-white/5 rounded-2xl border border-white/10 active:scale-90 transition"><i class="fa-solid fa-arrow-left text-sm"></i></a>
-        <h1 class="text-2xl font-black uppercase italic tracking-tighter text-rose-600">EXAR CINEMA</h1>
+    <!-- Header -->
+    <nav class="flex justify-between items-center mb-10 max-w-7xl mx-auto">
+        <a href="index.html" class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl border border-white/10 active:scale-90 transition"><i class="fa-solid fa-arrow-left"></i></a>
+        <h1 class="text-xl font-black uppercase italic tracking-tighter text-rose-600">EXAR CINEMA</h1>
         <div class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></div>
     </nav>
 
-    <!-- Movies Grid -->
-    <div class="max-w-7xl mx-auto">
-        <h2 class="text-2xl font-black uppercase italic mb-8 border-l-4 border-rose-600 pl-4">Neural <span class="text-zinc-600">Selection</span></h2>
-        <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-8"></div>
-    </div>
+    <!-- Grid -->
+    <div id="movie-grid" class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
 
-    <!-- PLAYER OVERLAY -->
+    <!-- PLAYER INTERFACE -->
     <div id="player-modal" class="player-modal">
-        <!-- Control Bar -->
-        <div class="p-3 md:p-4 flex flex-col md:flex-row gap-4 justify-between items-center bg-zinc-950 border-b border-white/5">
-            <div class="flex items-center gap-4 w-full md:w-auto justify-between">
-                <button onclick="closePlayer()" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition"><i class="fa-solid fa-xmark mr-1"></i> Exit</button>
-                
-                <!-- VLC MODE BUTTON (Pro Feature) -->
-                <button onclick="launchVLCFromEmbed()" class="vlc-btn px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white animate-pulse">
-                    <i class="fa-solid fa-orange-cone mr-1"></i> Play in VLC (Dual Audio)
-                </button>
-                
-                <div class="hidden md:flex gap-2 overflow-x-auto no-scrollbar" id="server-list"></div>
-            </div>
+        
+        <!-- TOP BAR (Exit & VLC) -->
+        <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-white/5">
+            <button onclick="closePlayer()" class="bg-white/5 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400"><i class="fa-solid fa-xmark mr-1"></i> Exit</button>
             
-            <div class="md:hidden flex gap-2 overflow-x-auto no-scrollbar w-full" id="server-list-mobile"></div>
-            
-            <p id="movie-status" class="text-[9px] font-black uppercase tracking-[0.1em] text-rose-500"></p>
+            <button onclick="launchVLCFromEmbed()" class="vlc-btn px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white">
+                <i class="fa-solid fa-orange-cone mr-1"></i> VLC Player
+            </button>
         </div>
 
-        <!-- Video Player Container -->
-        <div class="iframe-container flex-1">
-            <div id="p-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-5 bg-black z-0">
-                <div class="w-14 h-14 border-4 border-rose-600/10 border-t-rose-600 rounded-full animate-spin"></div>
-                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500 animate-pulse">Decrypting Multi-Audio Node...</p>
+        <!-- SERVER BAR (Scrollable) -->
+        <div class="bg-zinc-900/50 p-3 border-b border-white/5 flex gap-2 overflow-x-auto no-scrollbar" id="server-list">
+            <!-- Server Buttons will load here -->
+        </div>
+
+        <!-- VIDEO AREA -->
+        <div class="iframe-container">
+            <div id="p-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black z-20">
+                <div class="w-10 h-10 border-2 border-rose-600/20 border-t-rose-600 rounded-full animate-spin"></div>
+                <p class="text-[9px] font-black uppercase tracking-[0.2em] text-rose-500 animate-pulse">Neural Node Connecting...</p>
             </div>
             <iframe id="main-iframe" allowfullscreen src="" referrerpolicy="no-referrer"></iframe>
+        </div>
+
+        <!-- MOVIE TITLE BAR -->
+        <div class="p-3 bg-black text-center border-t border-white/5">
+            <p id="movie-status" class="text-[9px] font-black uppercase tracking-widest text-zinc-500 truncate"></p>
         </div>
     </div>
 
@@ -76,22 +78,20 @@
         
         let currentImdbId = "", currentTitle = "";
 
-        // --- DUAL-AUDIO SPECIALIZED SOURCES ---
         const sources = [
-            { name: "Server 1 (Hindi Dub)", url: (id) => `https://vidsrc.icu/embed/movie/${id}` },
-            { name: "Server 2 (Dual Audio)", url: (id) => `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=1` },
-            { name: "Server 3 (HD Pro)", url: (id) => `https://vidlink.pro/movie/${id}?primaryColor=e11d48` },
-            { name: "Server 4 (Multi)", url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=0` }
+            { name: "Server 1 (Multi-Audio)", url: (id) => `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=1` },
+            { name: "Server 2 (Hindi Dub)", url: (id) => `https://vidsrc.icu/embed/movie/${id}` },
+            { name: "Server 3 (Direct Pro)", url: (id) => `https://vidlink.pro/movie/${id}?primaryColor=e11d48` },
+            { name: "Server 4 (Backup)", url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=0` }
         ];
 
-        // Load Grid
         db.ref('movies').on('value', s => {
             const grid = document.getElementById('movie-grid'); grid.innerHTML = '';
             s.forEach(child => {
                 const m = child.val();
                 grid.innerHTML += `<div class="movie-card group" onclick="openPlayer('${m.imdbId}', '${m.title}')">
-                    <div class="aspect-[2/3] overflow-hidden"><img src="${m.poster}" class="w-full h-full object-cover"></div>
-                    <h4 class="mt-4 text-[11px] font-bold uppercase truncate opacity-50 px-1">${m.title}</h4>
+                    <img src="${m.poster}" class="aspect-[2/3] object-cover mb-3 shadow-lg">
+                    <h4 class="text-[10px] font-bold uppercase truncate px-1 opacity-60">${m.title}</h4>
                 </div>`;
             });
         });
@@ -100,16 +100,13 @@
             currentImdbId = imdbId; currentTitle = title;
             const modal = document.getElementById('player-modal');
             const list = document.getElementById('server-list');
-            const listMob = document.getElementById('server-list-mobile');
             
-            const btnHtml = sources.map((src, i) => 
+            // Inject Servers
+            list.innerHTML = sources.map((src, i) => 
                 `<button onclick="switchServer(${i})" class="server-btn s-btn-${i} ${i===0?'active':''}">${src.name}</button>`
             ).join('');
 
-            list.innerHTML = btnHtml;
-            listMob.innerHTML = btnHtml;
-            document.getElementById('movie-status').innerText = title;
-
+            document.getElementById('movie-status').innerText = `NODE: ${title}`;
             switchServer(0); 
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -118,29 +115,27 @@
         function switchServer(index) {
             document.querySelectorAll('.server-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll(`.s-btn-${index}`).forEach(btn => btn.classList.add('active'));
+            
             const iframe = document.getElementById('main-iframe');
             const loader = document.getElementById('p-loader');
+            
             loader.style.display = 'flex';
             iframe.src = sources[index].url(currentImdbId);
-            iframe.onload = () => { setTimeout(() => { loader.style.display = 'none'; }, 2000); };
+            
+            iframe.onload = () => {
+                setTimeout(() => { loader.style.display = 'none'; }, 2000);
+            };
         }
 
-        // --- THE VLC MAGIC FOR IMDb MOVIES ---
         function launchVLCFromEmbed() {
-            // Hum iFrame ka source URL lete hain aur usey VLC Intent me bhejte hain
             const currentUrl = document.getElementById('main-iframe').src;
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const userAgent = navigator.userAgent;
 
-            // Android Intent for VLC (Package name force)
             if (/android/i.test(userAgent)) {
                 window.location.href = `intent://${currentUrl.replace('https://','')}#Intent;package=org.videolan.vlc;type=video/*;scheme=https;S.title=${currentTitle};end`;
-            } 
-            // iOS VLC Callback
-            else if (/iPad|iPhone|iPod/.test(userAgent)) {
+            } else if (/iPad|iPhone|iPod/.test(userAgent)) {
                 window.location.href = `vlc-x-callback://x-callback-url/stream?url=${encodeURIComponent(currentUrl)}`;
-            } 
-            // PC Fallback
-            else {
+            } else {
                 window.location.href = `vlc://${currentUrl}`;
             }
         }
