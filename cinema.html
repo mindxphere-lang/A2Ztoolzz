@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>CINEMA — Pure Intelligence Node</title>
+    <title>EXAR CINEMA — Stable Node</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -18,31 +18,26 @@
         
         .player-modal { position: fixed; inset: 0; z-index: 9999; background: black; display: none; flex-direction: column; }
         
-        /* Server & VLC Buttons */
         .s-btn { 
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
             padding: 10px 18px; border-radius: 12px; font-size: 10px; font-weight: 800; 
             text-transform: uppercase; white-space: nowrap; color: #888; transition: 0.3s;
         }
-        .s-btn.active { background: #e11d48; border-color: #fb7185; color: white; box-shadow: 0 0 15px rgba(225, 29, 72, 0.4); }
+        .s-btn.active { background: #e11d48; border-color: #fb7185; color: white; }
         
-        .vlc-btn { background: linear-gradient(135deg, #f97316, #ea580c); box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
+        .vlc-btn { background: linear-gradient(135deg, #f97316, #ea580c); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
         .iframe-container { position: relative; width: 100%; height: 100%; background: #000; flex: 1; }
         iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; z-index: 10; }
-        
-        .status-bar { background: #0a0a0a; padding: 10px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; }
-        .tip-txt { font-size: 9px; font-weight: 900; color: #fb7185; text-transform: uppercase; animation: blink 2s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- Nav -->
     <nav class="flex justify-between items-center mb-8 max-w-7xl mx-auto">
-        <a href="index.html" class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl border border-white/10 transition active:scale-90"><i class="fa-solid fa-arrow-left"></i></a>
+        <a href="index.html" class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl border border-white/10 active:scale-90 transition"><i class="fa-solid fa-arrow-left"></i></a>
         <h1 class="text-xl font-black uppercase italic tracking-tighter text-rose-600">EXAR CINEMA</h1>
-        <div class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></div>
+        <div class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></div>
     </nav>
 
     <div id="movie-grid" class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5"></div>
@@ -51,32 +46,28 @@
     <div id="player-modal" class="player-modal">
         <!-- Control Bar -->
         <div class="p-3 flex justify-between items-center bg-zinc-950 border-b border-white/5">
-            <button onclick="closePlayer()" class="bg-white/5 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-zinc-400"><i class="fa-solid fa-xmark mr-1"></i> Exit</button>
+            <button onclick="closePlayer()" class="bg-white/5 px-4 py-2 rounded-lg text-[10px] font-black uppercase text-zinc-400"><i class="fa-solid fa-xmark mr-1"></i> Exit</button>
             
-            <!-- VLC BUTTON (The Ad-Free Solution) -->
-            <button onclick="launchVLC()" class="vlc-btn px-6 py-2.5 rounded-xl text-[10px] font-black uppercase text-white animate-pulse">
-                <i class="fa-solid fa-orange-cone mr-1"></i> VLC Player (No Ads)
+            <!-- VLC BUTTON (Bhai isko use karne ko bolo user ko bina ads k liye) -->
+            <button onclick="launchVLC()" class="vlc-btn px-5 py-2.5 rounded-xl text-[10px] font-black uppercase text-white shadow-lg">
+                <i class="fa-solid fa-orange-cone mr-1"></i> VLC Player (Ad-Free)
             </button>
         </div>
 
-        <!-- Scrollable Server List -->
         <div class="p-3 flex gap-2 overflow-x-auto no-scrollbar bg-black/50" id="server-list"></div>
 
         <div class="iframe-container">
             <div id="p-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black z-20">
                 <div class="w-10 h-10 border-2 border-rose-600/20 border-t-rose-600 rounded-full animate-spin"></div>
-                <p class="text-[9px] font-black uppercase text-rose-500">Syncing Hindi Node...</p>
+                <p class="text-[9px] font-black uppercase text-rose-500">Connecting Neural Node...</p>
             </div>
             
-            <!-- ADVANCED SANDBOX IFRAME (Blocks Redirect Ads) -->
-            <iframe id="cinema-frame" 
-                    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation" 
-                    src="" 
-                    allowfullscreen></iframe>
+            <!-- Standard Iframe (No Sandbox to avoid block) -->
+            <iframe id="cinema-frame" src="" allowfullscreen referrerpolicy="no-referrer"></iframe>
         </div>
 
-        <div class="status-bar">
-            <p class="tip-txt" id="audio-tip"><i class="fa-solid fa-headphones mr-1"></i> HINDI AUDIO DETECTED • CLICK GEAR ⚙️ TO SWITCH</p>
+        <div class="p-4 bg-black text-center border-t border-white/5">
+            <p class="text-[9px] font-black uppercase tracking-widest text-zinc-600">Select Node for optimal playback. VLC recommended for Dual Audio.</p>
         </div>
     </div>
 
@@ -88,11 +79,10 @@
         
         let currentImdbId = "", currentTitle = "";
 
-        // --- NEW WORKING HINDI SERVERS ---
         const sources = [
-            { name: "Node 1 (Hindi/Dual)", url: (id) => `https://moviesapi.club/movie/${id}` },
-            { name: "Node 2 (Hindi Dub)", url: (id) => `https://vidsrc.icu/embed/movie/${id}` },
-            { name: "Node 3 (Multi-Audio)", url: (id) => `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=1` }
+            { name: "Server 1 (Multi-Audio)", url: (id) => `https://moviesapi.club/movie/${id}` },
+            { name: "Server 2 (Hindi Dub)", url: (id) => `https://vidsrc.icu/embed/movie/${id}` },
+            { name: "Server 3 (Dual Audio)", url: (id) => `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=1` }
         ];
 
         db.ref('movies').on('value', s => {
@@ -124,9 +114,7 @@
             iframe.onload = () => { setTimeout(() => { document.getElementById('p-loader').style.display = 'none'; }, 2000); };
         }
 
-        // --- THE VLC PRO BYPASS ---
         function launchVLC() {
-            // VLC logic using current active stream
             const currentUrl = document.getElementById('cinema-frame').src;
             const stripped = currentUrl.replace('https://','');
             const userAgent = navigator.userAgent;
