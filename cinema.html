@@ -1,72 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EXAR CINEMA — Ultimate Node</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>CINEMA — Pure Elite Node</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap" rel="stylesheet">
+    
+    <!-- Premium Player Assets -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
     <style>
-        body { background: #000; color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
-        .movie-card { transition: 0.4s ease; cursor: pointer; }
-        .movie-card:hover { transform: translateY(-5px) scale(1.03); }
-        .movie-card img { border-radius: 1.5rem; border: 1px solid rgba(255,255,255,0.05); }
+        :root { --primary: #8b5cf6; --bg: #030303; --rose: #e11d48; }
+        body { background-color: var(--bg); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         
-        /* Modal Fix */
-        .player-modal { position: fixed; inset: 0; z-index: 9999; background: black; display: none; flex-direction: column; }
-        
-        /* Buttons Styling */
-        .server-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 18px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; white-space: nowrap; transition: 0.3s; color: rgba(255,255,255,0.6); }
-        .server-btn.active { background: #e11d48; border-color: #ff4d6d; color: white; box-shadow: 0 0 15px rgba(225, 29, 72, 0.4); }
-        
-        .vlc-btn { background: linear-gradient(135deg, #f97316, #ea580c); box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .iframe-container { position: relative; width: 100%; height: 100%; background: #000; flex: 1; }
-        iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; z-index: 10; }
+        ::-webkit-scrollbar { display: none; }
+
+        /* Cinematic UI */
+        .glass { background: rgba(15, 15, 15, 0.7); backdrop-filter: blur(25px) saturate(160%); border: 1px solid rgba(255,255,255,0.08); }
+        .hero-vignette { background: linear-gradient(0deg, #030303 0%, transparent 100%); }
+
+        /* Modern Movie Card */
+        .movie-card { transition: 0.6s cubic-bezier(0.2, 1, 0.2, 1); cursor: pointer; }
+        .movie-card:hover { transform: scale(1.06) translateY(-10px); }
+        .movie-card img { border-radius: 1.2rem; border: 1px solid rgba(255,255,255,0.05); }
+        .movie-card:hover img { border-color: var(--primary); box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3); }
+
+        /* Selection Sheet */
+        .bottom-sheet { position: fixed; inset: 0; z-index: 5000; display: none; align-items: flex-end; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); }
+        .sheet-content { width: 100%; background: #0a0a0a; border-radius: 3rem 3rem 0 0; padding: 35px; border-top: 1px solid rgba(139, 92, 246, 0.2); animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .node-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 20px; border-radius: 1.8rem; display: flex; align-items: center; gap: 15px; width: 100%; transition: 0.3s; }
+        .node-btn:active { background: var(--primary); transform: scale(0.95); }
+
+        /* Fullscreen Player Terminal */
+        .player-modal { position: fixed; inset: 0; z-index: 9999; background: #000; display: none; flex-direction: column; }
+        .plyr--full-ui { --plyr-color-main: #8b5cf6; border-radius: 0; }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="pb-20">
 
-    <!-- Header -->
-    <nav class="flex justify-between items-center mb-10 max-w-7xl mx-auto">
-        <a href="index.html" class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl border border-white/10 active:scale-90 transition"><i class="fa-solid fa-arrow-left"></i></a>
-        <h1 class="text-xl font-black uppercase italic tracking-tighter text-rose-600">EXAR CINEMA</h1>
-        <div class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></div>
-    </nav>
+    <!-- Hero Header -->
+    <header class="relative h-[60vh] md:h-[80vh] w-full overflow-hidden mb-12">
+        <div id="hero-bg" class="absolute inset-0 w-full h-full bg-cover bg-center scale-105" style="background-image: url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059');"></div>
+        <div class="absolute inset-0 hero-vignette"></div>
+        <nav class="absolute top-0 left-0 w-full p-8 flex justify-between items-center z-50">
+            <a href="index.html" class="w-12 h-12 flex items-center justify-center rounded-full glass hover:bg-white/10 transition"><i class="fa-solid fa-arrow-left"></i></a>
+            <h1 class="text-2xl font-black italic tracking-tighter">EXAR <span class="text-violet-500">ELITE</span></h1>
+            <div class="w-2 h-2 rounded-full bg-violet-500 animate-pulse shadow-[0_0_10px_#8b5cf6]"></div>
+        </nav>
+        <div class="absolute bottom-16 left-8 md:left-20 max-w-2xl z-10 space-y-4">
+            <h2 id="hero-title" class="text-5xl md:text-8xl font-black uppercase italic leading-none tracking-tighter">NEURAL<br>STREAM</h2>
+            <p class="text-[10px] font-black uppercase tracking-[0.5em] text-white/30">Hugging Face Consumet API v3.0</p>
+        </div>
+    </header>
 
-    <!-- Grid -->
-    <div id="movie-grid" class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
+    <!-- Movies Grid -->
+    <main class="max-w-7xl mx-auto px-6">
+        <div id="movie-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-10"></div>
+    </main>
 
-    <!-- PLAYER INTERFACE -->
-    <div id="player-modal" class="player-modal">
-        
-        <!-- TOP BAR (Exit & VLC) -->
-        <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-white/5">
-            <button onclick="closePlayer()" class="bg-white/5 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400"><i class="fa-solid fa-xmark mr-1"></i> Exit</button>
+    <!-- PLAYER SELECTOR (Bottom Sheet) -->
+    <div id="selector-sheet" class="bottom-sheet" onclick="if(event.target==this) this.style.display='none'">
+        <div class="sheet-content">
+            <div class="w-14 h-1.5 bg-white/10 rounded-full mx-auto mb-10"></div>
+            <h3 id="sel-title" class="text-2xl font-black uppercase italic mb-8">Movie Title</h3>
             
-            <button onclick="launchVLCFromEmbed()" class="vlc-btn px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white">
-                <i class="fa-solid fa-orange-cone mr-1"></i> VLC Player
-            </button>
-        </div>
-
-        <!-- SERVER BAR (Scrollable) -->
-        <div class="bg-zinc-900/50 p-3 border-b border-white/5 flex gap-2 overflow-x-auto no-scrollbar" id="server-list">
-            <!-- Server Buttons will load here -->
-        </div>
-
-        <!-- VIDEO AREA -->
-        <div class="iframe-container">
-            <div id="p-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black z-20">
-                <div class="w-10 h-10 border-2 border-rose-600/20 border-t-rose-600 rounded-full animate-spin"></div>
-                <p class="text-[9px] font-black uppercase tracking-[0.2em] text-rose-500 animate-pulse">Neural Node Connecting...</p>
+            <div class="grid gap-4">
+                <!-- Consumet Option -->
+                <button onclick="launchConsumet('internal')" class="node-btn">
+                    <div class="w-14 h-14 bg-violet-600/20 rounded-2xl flex items-center justify-center text-violet-400 text-xl"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="text-left"><p class="text-base font-bold uppercase">Ultra Direct (No Ads)</p><p class="text-[10px] opacity-40 uppercase">Pure 4K Stream • Best Experience</p></div>
+                </button>
+                <!-- Hindi Node Option -->
+                <button onclick="launchHindi()" class="node-btn">
+                    <div class="w-14 h-14 bg-rose-600/20 rounded-2xl flex items-center justify-center text-rose-400 text-xl"><i class="fa-solid fa-language"></i></div>
+                    <div class="text-left"><p class="text-base font-bold uppercase">Hindi Dubbed Node</p><p class="text-[10px] opacity-40 uppercase">External Source • Multi-Audio</p></div>
+                </button>
+                <!-- VLC Option -->
+                <button onclick="launchConsumet('vlc')" class="node-btn">
+                    <div class="w-14 h-14 bg-orange-600/20 rounded-2xl flex items-center justify-center text-orange-400 text-xl"><i class="fa-solid fa-cone-striped"></i></div>
+                    <div class="text-left"><p class="text-base font-bold uppercase">External VLC Player</p><p class="text-[10px] opacity-40 uppercase">Instant Playback • No Buffering</p></div>
+                </button>
             </div>
-            <iframe id="main-iframe" allowfullscreen src="" referrerpolicy="no-referrer"></iframe>
         </div>
+    </div>
 
-        <!-- MOVIE TITLE BAR -->
-        <div class="p-3 bg-black text-center border-t border-white/5">
-            <p id="movie-status" class="text-[9px] font-black uppercase tracking-widest text-zinc-500 truncate"></p>
+    <!-- PLAYER OVERLAY -->
+    <div id="player-modal" class="player-modal">
+        <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-white/5">
+            <button onclick="closePlayer()" class="bg-white/5 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 active:scale-95 transition"><i class="fa-solid fa-xmark mr-1"></i> Exit</button>
+            <h4 id="playing-title" class="text-[9px] font-bold uppercase opacity-30 tracking-widest truncate max-w-[50%]">Streaming</h4>
+        </div>
+        <div class="flex-1 relative flex items-center justify-center bg-black">
+            <div id="p-loader" class="absolute inset-0 flex flex-col items-center justify-center gap-5 bg-black z-20">
+                <div class="w-14 h-14 border-4 border-violet-500/10 border-t-violet-500 rounded-full animate-spin"></div>
+                <p class="text-[10px] font-black uppercase text-violet-500 animate-pulse tracking-[0.3em]">Connecting Neural Hub...</p>
+            </div>
+            <div id="video-wrap" class="w-full h-full"></div>
         </div>
     </div>
 
@@ -76,73 +112,103 @@
         const config = { apiKey: "AIzaSyDI7v-5DoTUWZBhajcpZk6ed9rH2GcAqLw", databaseURL: "https://a2ztools-6ea22-default-rtdb.asia-southeast1.firebasedatabase.app" };
         firebase.initializeApp(config); const db = firebase.database();
         
-        let currentImdbId = "", currentTitle = "";
+        let selectedImdb = "", selectedTitle = "", consumetApi = "";
+        
+        // Fetch Consumet URL from Firebase
+        db.ref('settings/consumetUrl').on('value', s => consumetApi = s.val());
 
-        const sources = [
-            { name: "Server 1 (Multi-Audio)", url: (id) => `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=1` },
-            { name: "Server 2 (Hindi Dub)", url: (id) => `https://vidsrc.icu/embed/movie/${id}` },
-            { name: "Server 3 (Direct Pro)", url: (id) => `https://vidlink.pro/movie/${id}?primaryColor=e11d48` },
-            { name: "Server 4 (Backup)", url: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=0` }
-        ];
-
+        // Load Movies
         db.ref('movies').on('value', s => {
             const grid = document.getElementById('movie-grid'); grid.innerHTML = '';
-            s.forEach(child => {
-                const m = child.val();
-                grid.innerHTML += `<div class="movie-card group" onclick="openPlayer('${m.imdbId}', '${m.title}')">
-                    <img src="${m.poster}" class="aspect-[2/3] object-cover mb-3 shadow-lg">
-                    <h4 class="text-[10px] font-bold uppercase truncate px-1 opacity-60">${m.title}</h4>
+            let count = 0;
+            s.forEach(c => {
+                const m = c.val();
+                if(count === 0) {
+                    document.getElementById('hero-bg').style.backgroundImage = `url('${m.poster}')`;
+                    document.getElementById('hero-title').innerText = m.title;
+                }
+                grid.innerHTML += `<div class="movie-card group" onclick="openSelector('${m.imdbId}', '${m.title}')">
+                    <img src="${m.poster}" class="aspect-[2/3] object-cover shadow-2xl">
+                    <h4 class="mt-4 text-[11px] font-bold uppercase truncate opacity-30">${m.title}</h4>
                 </div>`;
+                count++;
             });
         });
 
-        function openPlayer(imdbId, title) {
-            currentImdbId = imdbId; currentTitle = title;
-            const modal = document.getElementById('player-modal');
-            const list = document.getElementById('server-list');
-            
-            // Inject Servers
-            list.innerHTML = sources.map((src, i) => 
-                `<button onclick="switchServer(${i})" class="server-btn s-btn-${i} ${i===0?'active':''}">${src.name}</button>`
-            ).join('');
-
-            document.getElementById('movie-status').innerText = `NODE: ${title}`;
-            switchServer(0); 
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+        function openSelector(id, title) {
+            selectedImdb = id; selectedTitle = title;
+            document.getElementById('sel-title').innerText = title;
+            document.getElementById('selector-sheet').style.display = 'flex';
         }
 
-        function switchServer(index) {
-            document.querySelectorAll('.server-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll(`.s-btn-${index}`).forEach(btn => btn.classList.add('active'));
-            
-            const iframe = document.getElementById('main-iframe');
-            const loader = document.getElementById('p-loader');
-            
-            loader.style.display = 'flex';
-            iframe.src = sources[index].url(currentImdbId);
-            
-            iframe.onload = () => {
-                setTimeout(() => { loader.style.display = 'none'; }, 2000);
-            };
-        }
+        // --- CONSUMET LOGIC: THE BRAIN ---
+        async function launchConsumet(type) {
+            if(!consumetApi) return alert("Consumet API URL is missing!");
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-3"></i> OPTIMIZING STREAM...`;
 
-        function launchVLCFromEmbed() {
-            const currentUrl = document.getElementById('main-iframe').src;
-            const userAgent = navigator.userAgent;
+            try {
+                // Fetch Movie Data
+                const res = await fetch(`${consumetApi}/movies/flixhq/info?id=${selectedImdb}`);
+                const data = await res.json();
+                if(!data.episodes) throw new Error();
 
-            if (/android/i.test(userAgent)) {
-                window.location.href = `intent://${currentUrl.replace('https://','')}#Intent;package=org.videolan.vlc;type=video/*;scheme=https;S.title=${currentTitle};end`;
-            } else if (/iPad|iPhone|iPod/.test(userAgent)) {
-                window.location.href = `vlc-x-callback://x-callback-url/stream?url=${encodeURIComponent(currentUrl)}`;
-            } else {
-                window.location.href = `vlc://${currentUrl}`;
+                // Fetch Stream Link
+                const watchRes = await fetch(`${consumetApi}/movies/flixhq/watch?episodeId=${data.episodes[0].id}&mediaId=${selectedImdb}`);
+                const watchData = await watchRes.json();
+                const m3u8 = watchData.sources.find(s => s.quality === 'auto' || s.quality === '1080p').url;
+
+                if(type === 'vlc') {
+                    // Direct Android Intent for VLC (Pure Link)
+                    const stripped = m3u8.replace('https://', '');
+                    window.location.href = `intent://${stripped}#Intent;package=org.videolan.vlc;type=video/*;scheme=https;S.title=${selectedTitle};end`;
+                } else {
+                    playInInternal(m3u8);
+                }
+            } catch (e) {
+                alert("Consumet Node Offline. Try Hindi Dubbed Node.");
+            } finally {
+                btn.innerHTML = originalHtml;
+                document.getElementById('selector-sheet').style.display = 'none';
             }
+        }
+
+        function playInInternal(url) {
+            const modal = document.getElementById('player-modal');
+            const wrap = document.getElementById('video-wrap');
+            modal.style.display = 'flex';
+            document.getElementById('playing-title').innerText = selectedTitle;
+            
+            wrap.innerHTML = `<video id="main-player" playsinline controls class="w-full h-full"></video>`;
+            const video = document.getElementById('main-player');
+
+            // HLS Support logic
+            if (Hls.isSupported()) {
+                const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video);
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+            }
+            new Plyr(video);
+            video.play();
+            document.getElementById('p-loader').style.display = 'none';
+        }
+
+        function launchHindi() {
+            document.getElementById('selector-sheet').style.display = 'none';
+            const modal = document.getElementById('player-modal');
+            const wrap = document.getElementById('video-wrap');
+            modal.style.display = 'flex';
+            document.getElementById('playing-title').innerText = `${selectedTitle} (Hindi Node)`;
+            
+            // Hindi specialized iFrame
+            wrap.innerHTML = `<iframe src="https://vidsrc.cc/v2/embed/movie/${selectedImdb}?autoPlay=1" allowfullscreen referrerpolicy="no-referrer"></iframe>`;
+            document.getElementById('p-loader').style.display = 'none';
         }
 
         function closePlayer() {
             document.getElementById('player-modal').style.display = 'none';
-            document.getElementById('main-iframe').src = '';
+            document.getElementById('video-wrap').innerHTML = '';
             document.body.style.overflow = 'auto';
         }
     </script>
